@@ -2,7 +2,7 @@ Files:
 hello.c
 
 Description:
-This program outputs "hello, world".
+This program outputs "Hello, world!".
 
 Compile command:
 $ cc -Wall -Werror -Wextra -Wpedantic -std=c99 hello.c -o myhello
