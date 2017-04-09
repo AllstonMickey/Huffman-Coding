@@ -44,28 +44,38 @@ int main()
                 switch (roll)
                 {
                     case LEFT:
+                    {
                         prevPlayer = getPrevPlayer(curPlayer, numOfPlayers);
                         --bank[curPlayer]; // the current player loses $1
                         ++bank[prevPlayer]; // the previous player gains $1
                         printf(" gives $1 to %s", names[prevPlayer]);
                         break;
+                    }
                     case RIGHT:
+                    {
                         nextPlayer = getNextPlayer(curPlayer, numOfPlayers);
                         --bank[curPlayer]; // the current player loses $1
                         ++bank[nextPlayer]; // the next player gains $1
                         printf(" gives $1 to %s", names[nextPlayer]); 
                         break;
+                    }
                     case CENTER:
+                    {
                         --bank[curPlayer]; // the current player loses $1
                         ++pot; // the pot gains $1
                         printf(" puts $1 in the pot");
                         break;
+                    }
                     case PASS:
+                    {
                         printf(" gets a pass");
                         break;
+                    }
                     default:
+                    {
                         printf("%s cheated and brought their own die", names[curPlayer]);
                         break;
+                    }
                 }
             } // end of a player's rolls
             printf("\n");
