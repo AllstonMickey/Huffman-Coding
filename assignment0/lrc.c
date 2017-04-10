@@ -16,7 +16,7 @@ int main()
     const char* names[] = {"Whoopi", "Dale", "Rosie", "Jimmie", "Barbara", "Kyle", "Raven", "Tony", "Jenny", "Clint"};
 
     unsigned int seed; // the seed to set for rand(), srand() takes in an unsigned int
-    printf("Enter a seed: ");
+    printf("Random seed: ");
     scanf("%u", &seed);
     srand(seed);
 
@@ -73,7 +73,6 @@ int main()
                     }
                     default:
                     {
-                        printf("%s cheated and brought their own die", names[curPlayer]);
                         break;
                     }
                 }
@@ -88,22 +87,19 @@ int main()
         }
     }
     printf("%s wins the $%d pot with $%d left in the bank!\n", names[winner], pot, bank[winner]);
+    
     return 0;
 }
 
 int setNumOfPlayers() // sets the number of players playing the game at the start from user input
 {
-    int players = 2; // minimum number of players for a game to be played
-    do
+    int players = 1; // minimum number of players for a game to be played
+    while (players < 2 || players > 10)
     {    
-        if (players < 2 || players > 10) // if an invalid number of players is entered
-        {
-            printf("\nYou have must at least 2 players and no more than 10.  Try again.\n");
-        }
-        printf("How many players?: ");
+        printf("How many players? ");
         scanf("%d", &players);
-    } while (players < 2 || players > 10); // while the number of players is invalid, keep asking for a valid number
-    
+    }
+
     return players;
 }
 
@@ -179,3 +175,4 @@ void findWinner(int *winningPlayer, int players, int playersBank[]) // sets the 
         }
     }
 }
+
