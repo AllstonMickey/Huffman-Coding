@@ -1,11 +1,11 @@
+RM = rm -f
 CC = gcc $(CFLAGS)
 CFLAGS = -Wall -Werror -Wextra -pedantic -std=c99
 OBJECTS =  hello.o cat.o
-EXECS = hello cat
+BINS = hello cat
 
 .PHONY: all
-all : $(EXECS)
-	
+all : $(BINS)
 
 cat.o : cat.c
 	$(CC) -c cat.c
@@ -21,4 +21,4 @@ hello : hello.o
 
 .PHONY: clean
 clean:
-	rm -f $(OBJECTS) cat hello
+	$(RM) $(OBJECTS) $(BINS)
