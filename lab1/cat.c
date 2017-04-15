@@ -9,11 +9,11 @@
 
 int main(int argc, char** argv)
 {
-	if (argc == 1) // if there is only 1 argument, get input from standard input
+	if (argc == 1) // if there is only 1 argument
 	{
-		while (1)
+		while (1) // keep getting input and writing to standard output until the user quits
 		{
-			char* buf[2048];
+			char* buf[2048]; // 2048 byte string buffer
 			ssize_t bytesRead = read(STDIN_FILENO, buf, 2048);
 			if (bytesRead == -1)
 			{
@@ -32,15 +32,15 @@ int main(int argc, char** argv)
 	{
 		for (int arg_i = 1; arg_i < argc; arg_i++) // for each file
 		{
-			int fd = open(argv[arg_i], O_RDONLY);
+			int fd = open(argv[arg_i], O_RDONLY); // open it as read only
 			if (fd == -1)
 			{
-				
 				perror(argv[0]);
 			}
-			else
+			else // file opened successfully
 			{
-				char* buf[2048]; // 2048 byte buffer
+				// read the file into a string buffer, 2048 bytes at a time, then write from the buffer.
+				char* buf[2048]; // 2048 byte string buffer
 				ssize_t bytesRead;
 				while ((bytesRead = read(fd, buf, 2048)) > 0)
 				{
