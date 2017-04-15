@@ -13,23 +13,22 @@ int main(int argc, char** argv)
 	{
 		
 	}
-	else // arguments (hopefully files to read) were given, read from I/O
+	else
 	{
 		for (int arg_i = 1; arg_i < argc; arg_i++) // for each file
 		{
-			int fd = open(argv[arg_i], O_RDONLY); // file descriptor of current argument
-			if (fd == -1) // file can't be opened
+			int fd = open(argv[arg_i], O_RDONLY);
+			if (fd == -1)
 			{
 				perror(argv[0]);
 			}
-			else // file is opened
+			else
 			{
-				// read
 				char* buf[2048]; // 2048 byte buffer
 				ssize_t bytesRead;
 				while ((bytesRead = read(fd, buf, 2048)) > 0)
 				{
-					ssize_t bytesWritten = write(STDOUT_FILENO, buf, 2048);
+					ssize_t bytesWritten = write(STDOUT_FILENO, buf, bytesRead);
 					if (bytesWritten == -1)
 					{
 						perror(argv[0]);
@@ -40,8 +39,11 @@ int main(int argc, char** argv)
 					perror(argv[0]);
 				}
 
-				// print
-				// close
+				int closed = close(fd);
+				if (closed == -1)
+				{
+					perror(argv[0]);
+				}
 			}
 		}
 	}
