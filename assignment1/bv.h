@@ -14,7 +14,7 @@ bitV *newVec(uint32_t);
 
 void delVec(bitV *);
 
-void one(bitV *);
+void oneVec(bitV *);
 
 void setBit(bitV *, uint32_t);
 

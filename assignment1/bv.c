@@ -2,41 +2,41 @@
 #include "bv.h"
 #include <stdlib.h>
 
-bitV *newVec(uint32_t len) // creates a new vector of specified length
+bitV *newVec(uint32_t len) // creates a new vector of specified length in bytes
 {
 	bitV *v = calloc(len, 1);
 	return v;
 }
 
-void delVec(bitV *v) // deletes a vector
+void delVec(bitV *vec) // deletes a vector
 {
-	free(v);
+	free(vec);
 }
 
-void one(bitV *v) // sets a vector to all 1
+void oneVec(bitV *vec) // sets a vector to all 1
 {
-	for (int i = 0; i < (v->l); i++) // for the length of the bit vector
+	for (uint8_t i = 0; i < (vec->l); i++) // for the length of the bit vector
 	{
-		v[i] |= 11111111;
+		(vec->v)[i] |= 11111111;
 	}
 }
 
-void setBit(bitV *v, uint32_t bit) // sets a specified bit
+void setBit(bitV *vec, uint32_t bit) // sets a specified bit
 {
-	v[bit >> 3] |= (01 << (bit & 07));
+	(vec->v)[bit >> 3] |= (01 << (bit & 07));
 }
 
-void clrBit(bitV *v, uint32_t bit) // clears a specified bit
+void clrBit(bitV *vec, uint32_t bit) // clears a specified bit
 {
-	v[bit >> 3] &= ~(01 << (bit & 07));
+	(vec->v)[bit >> 3] &= ~(01 << (bit & 07));
 }
 
-uint8_t valBit(bitV *v, uint32_t bit) // returns the value of a specified bit
+uint8_t valBit(bitV *vec, uint32_t bit) // returns the value of a specified bit
 {
-	return (v[bit >> 3] & (01 << (bit & 07))) >> (bit & 07);
+	return ((vec->v)[bit >> 3] & (01 << (bit & 07))) >> (bit & 07);
 }
 
-uint32_t lenVec(bitV *v) // returns the length of the vector
+uint32_t lenVec(bitV *vec) // returns the length of the vector
 {
-	return v->l;
+	return vec->l;
 }
