@@ -14,5 +14,5 @@ Description:
 './cat' mimics the behavior of UNIX 'cat'.  Given extra <argn> files as arguments, ./cat will read them
 from standard input and write them to standard output, concatenating each file with each other.
 Given no arguments, ./cat will continuously be waiting for input from the user.  When given input,
-./cat will write the input back to the user.  The user must quit then program when done.
+./cat will write the input back to the user.  The user must quit then program when done (CTRL-D).
 'hello.c' is a simple 'Hello, world!' program which can be used as an example.
