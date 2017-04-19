@@ -11,21 +11,21 @@ int main(int argc, char** argv)
 {
 	if (argc == 1) // if there is only 1 argument
 	{
-		while (1) // keep getting input and writing to standard output until the user quits
+		char* buf[2048];
+		ssize_t bytesRead;
+		while ((bytesRead = read(STDIN_FILENO, buf, 2048)) > 0) // keep getting input and writing to standard output until the user quits
 		{
-			char* buf[2048]; // 2048 byte string buffer
-			ssize_t bytesRead = read(STDIN_FILENO, buf, 2048);
-			if (bytesRead == -1)
-			{
-				perror(argv[0]);
-				exit(errno);
-			}
 			ssize_t bytesWritten = write(STDOUT_FILENO, buf, bytesRead);
 			if (bytesWritten == -1)
 			{
 				perror(argv[0]);
 				exit(errno);
 			}
+		}
+		if (bytesRead == -1)
+		{
+			perror(argv[0]);
+			exit(errno);
 		}
 	}
 	else
