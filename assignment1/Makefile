@@ -9,7 +9,7 @@ all : parfait
 parfait: $(OBJECTS)
 	$(CC) $(OBJECTS) -o parfait
 
-parfait.o : parfait.c bv.h sieve.h
+parfait.o : parfait.c sieve.h
 	$(CC) -c parfait.c
 
 bv.o : bv.c bv.h
