@@ -1,13 +1,16 @@
 RM = rm -f
 CC = gcc $(CFLAGS)
 CFLAGS = -Wall -Werror -Wextra -pedantic -std=c99
-OBJECTS = bv.o sieve.o
+OBJECTS = parfait.o bv.o sieve.o
 
 .PHONY: all
 all : parfait
 
-parfait : $(OBJECTS)
-	$(CC) $(OBJECTS) -o parfait
+parfait: parfait.o
+	$(CC) parfait.o -o parfait
+
+parfait.o : parfait.c
+	$(CC) -c parfait.c
 
 sieve.o : sieve.c sieve.h
 	$(CC) -c sieve.c -lm
