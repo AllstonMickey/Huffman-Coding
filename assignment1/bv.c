@@ -1,10 +1,11 @@
 #include "bv.h"
 #include <stdlib.h>
+#include <stdio.h> // remove when done testing in main
 
-bitV *newVec(uint32_t len) // creates a new vector of specified length in bytes
+bitV *newVec(uint32_t len) // creates a new vector of specified length in bits
 {
-	bitV *vec = malloc(len);
-	vec->v = calloc(len, 1);
+	bitV *vec = malloc(sizeof(bitV));
+	vec->v = calloc(len / 8 + 1, sizeof(uint8_t));
 	vec->l = len;
 	return vec;
 }
