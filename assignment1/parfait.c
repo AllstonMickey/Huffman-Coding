@@ -5,10 +5,11 @@
 void printPr(bitV *v, uint32_t n);
 void printPrimeFactors(bitV *v, uint32_t n);
 uint32_t isPerfect(bitV *v, uint32_t n);
+void printProperDivisors(uint32_t n);
 
 int main(void)
 {
-	uint32_t l = 500;
+	uint32_t l = 8150;
 	bitV *v = newVec(l);
 	sieve(v);
 	for (uint32_t i = 2; i <= l; i++) // go through each 1 < n < 100,001 (i = 2; i <= l)
@@ -17,16 +18,18 @@ int main(void)
 		{
 			printf("%d P\n", i);
 		}
-		else if (isPerfect(v, i))
-		{
-			printf("%d E\n", i);
-			// ... still should list proper divisors
-		}
 		else // composite
 		{
 			printf("%d C:", i);
 			printPrimeFactors(v, i);
 			printf("\n");
+			if (isPerfect(v, i))
+			{
+				printf("%d E:", i);
+				printProperDivisors(i);
+				// ... still should list proper divisors
+				printf("\n");
+			}
 		}
 
 	}
@@ -82,4 +85,15 @@ uint32_t isPerfect(bitV *v, uint32_t n)
 		}
 	}
 	return perfect;
+}
+
+void printProperDivisors(uint32_t n)
+{
+	for (uint32_t i = 1; i < n; i++)
+	{
+		if (n % i == 0)
+		{
+			printf(" %d", i);
+		}
+	}
 }
