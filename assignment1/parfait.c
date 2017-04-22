@@ -9,7 +9,7 @@ void printProperDivisors(uint32_t n);
 
 int main(void)
 {
-	uint32_t l = 8150;
+	uint32_t l = 100000;
 	bitV *v = newVec(l);
 	sieve(v);
 	for (uint32_t i = 2; i <= l; i++) // go through each 1 < n < 100,001 (i = 2; i <= l)
