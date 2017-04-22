@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <math.h>
 #include "sieve.h"
 
 void sieve(bitV *v) // Sieve of Eratosthenes

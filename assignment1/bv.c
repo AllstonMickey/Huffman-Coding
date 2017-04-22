@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "bv.h"
 #include <stdlib.h>
 
@@ -17,7 +16,7 @@ void delVec(bitV *vec) // deletes a vector
 
 void oneVec(bitV *vec) // sets a vector to all 1
 {
-	for (int i = 0; i < (vec->l); i++)
+	for (uint32_t i = 0; i < (vec->l); i++)
 	{
 		(vec->v)[i] |= 0xFF;
 	}
