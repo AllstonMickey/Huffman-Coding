@@ -18,3 +18,4 @@ void sieve(bitV *v) // Sieve of Eratosthenes
 		}
 	}
 }
+

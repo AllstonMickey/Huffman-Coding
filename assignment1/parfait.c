@@ -77,3 +77,4 @@ void printProperDivisors(uint32_t n)
 		}
 	}
 }
+
