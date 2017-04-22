@@ -7,7 +7,7 @@ OBJECTS = parfait.o bv.o sieve.o
 all : parfait
 
 parfait: $(OBJECTS)
-	$(CC) $(OBJECTS) -o parfait
+	$(CC) $(OBJECTS) -o parfait -lm
 
 parfait.o : parfait.c sieve.h
 	$(CC) -c parfait.c
@@ -16,7 +16,7 @@ bv.o : bv.c bv.h
 	$(CC) -c bv.c
 
 sieve.o : sieve.c sieve.h
-	$(CC) -c sieve.c -lm
+	$(CC) -c sieve.c
 
 .PHONY: clean
 clean:
