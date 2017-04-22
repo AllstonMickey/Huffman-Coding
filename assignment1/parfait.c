@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include "sieve.h"
 #include <math.h>
+#include "sieve.h"
 
-void printPr(bitV *v, uint32_t n);
 void printPrimeFactors(bitV *v, uint32_t n);
 uint32_t isPerfect(bitV *v, uint32_t n);
 void printProperDivisors(uint32_t n);
@@ -12,7 +11,7 @@ int main(void)
 	uint32_t l = 100000;
 	bitV *v = newVec(l);
 	sieve(v);
-	for (uint32_t i = 2; i <= l; i++) // go through each 1 < n < 100,001 (i = 2; i <= l)
+	for (uint32_t i = 2; i <= l; i++) // go through each bit in the vector
 	{
 		if (valBit(v, i)) // prime
 		{
@@ -27,41 +26,22 @@ int main(void)
 			{
 				printf("%d E:", i);
 				printProperDivisors(i);
-				// ... still should list proper divisors
 				printf("\n");
 			}
 		}
 
 	}
+	delVec(v);
 	return 0;
-}
-
-void printPr(bitV *v, uint32_t n)
-{
-	if (valBit(v, n))
-	{
-		printf(" %d", n);
-	}
-	else
-	{
-		for (uint32_t i = 2; i <= n; i++)
-		{
-			if (valBit(v, i) && n % i == 0)
-			{
-				printf(" %d", i);
-				printPr(v, n / i);
-			}
-		}
-	}
 }
 
 void printPrimeFactors(bitV *v, uint32_t n)
 {
 	for (uint32_t i = 2; i <= n; i++)
 	{
-		while (valBit(v, i) && (n % i == 0))
+		while (valBit(v, i) && (n % i == 0)) // while i is prime and divides evenly into n
 		{
-			n /= i;
+			n /= i; // divide n by i
 			printf(" %d", i);
 		}
 	}
