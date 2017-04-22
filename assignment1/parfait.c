@@ -3,22 +3,12 @@
 #include <math.h>
 
 void printPr(bitV *v, uint32_t n);
-
-void printPrimeFactors(bitV *v, uint32_t n)
-{
-	for (uint32_t i = 2; i <= n; i++)
-	{
-		while (valBit(v, i) && (n % i == 0))
-		{
-			n /= i;
-			printf(" %d", i);
-		}
-	}
-}
+void printPrimeFactors(bitV *v, uint32_t n);
+uint32_t isPerfect(bitV *v, uint32_t n);
 
 int main(void)
 {
-	uint32_t l = 100;
+	uint32_t l = 500;
 	bitV *v = newVec(l);
 	sieve(v);
 	for (uint32_t i = 2; i <= l; i++) // go through each 1 < n < 100,001 (i = 2; i <= l)
@@ -27,15 +17,18 @@ int main(void)
 		{
 			printf("%d P\n", i);
 		}
+		else if (isPerfect(v, i))
+		{
+			printf("%d E\n", i);
+			// ... still should list proper divisors
+		}
 		else // composite
 		{
 			printf("%d C:", i);
 			printPrimeFactors(v, i);
-			//printPr(v, i);
 			printf("\n");
 		}
 
-		// ... still should check for perfect numbers
 	}
 	return 0;
 }
@@ -59,3 +52,34 @@ void printPr(bitV *v, uint32_t n)
 	}
 }
 
+void printPrimeFactors(bitV *v, uint32_t n)
+{
+	for (uint32_t i = 2; i <= n; i++)
+	{
+		while (valBit(v, i) && (n % i == 0))
+		{
+			n /= i;
+			printf(" %d", i);
+		}
+	}
+}
+
+uint32_t isPerfect(bitV *v, uint32_t n)
+{
+	uint32_t perfect = 0;
+	if (n % 2 == 0) // only known perfect numbers are even
+	{
+		for (uint32_t i = 2; i <= n; i++)
+		{
+			if (valBit(v, i))
+			{
+				uint32_t perfForm = pow(2, i - 1) * (pow(2, i) - 1);
+				if (n == perfForm)
+				{
+					perfect = 1;
+				}
+			}
+		}
+	}
+	return perfect;
+}
