@@ -11,6 +11,7 @@ bitV *newVec(uint32_t len) // creates a new vector of specified length in bits
 
 void delVec(bitV *vec) // deletes a vector
 {
+	free(vec->v);
 	free(vec);
 }
 

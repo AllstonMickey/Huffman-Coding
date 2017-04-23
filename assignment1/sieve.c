@@ -1,3 +1,9 @@
+/*
+ * sieve.c
+ * Author: Darrel Long
+ * CMPS 12B: Spring 2017
+ */
+
 #include <math.h>
 #include "sieve.h"
 
