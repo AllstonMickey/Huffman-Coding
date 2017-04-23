@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <getopt.h>
+#include <stdlib.h>
 #include <math.h>
 #include "sieve.h"
 
@@ -6,9 +8,22 @@ void printPrimeFactors(bitV *v, uint32_t n);
 uint32_t isPerfect(bitV *v, uint32_t n);
 void printProperDivisors(uint32_t n);
 
-int main(void)
+int main(int argc, char *argv[])
 {
-	uint32_t l = 100000;
+	uint32_t l;
+	int opt;
+	while ((opt = getopt(argc, argv, "n:")) != -1)
+	{
+		switch (opt)
+		{
+			case 'n':
+			{
+				l = atoi(optarg);
+				break;
+			}
+		}
+	}
+
 	bitV *v = newVec(l);
 	sieve(v);
 	for (uint32_t i = 2; i <= l; i++) // go through each bit in the vector
