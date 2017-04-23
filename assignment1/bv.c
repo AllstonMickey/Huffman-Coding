@@ -1,10 +1,19 @@
 #include "bv.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 bitV *newVec(uint32_t len) // creates a new vector of specified length in bits
 {
 	bitV *vec = malloc(sizeof(bitV));
+	if (vec == NULL)
+	{
+		perror("malloc: bitV");
+	}
 	vec->v = calloc(len / 8 + 1, sizeof(uint8_t));
+	if (vec->v == NULL)
+	{
+		perror("calloc: vector");
+	}
 	vec->l = len;
 	return vec;
 }
@@ -12,7 +21,15 @@ bitV *newVec(uint32_t len) // creates a new vector of specified length in bits
 void delVec(bitV *vec) // deletes a vector
 {
 	free(vec->v);
+	if (vec->v == NULL)
+	{
+		perror("free: vector");
+	}
 	free(vec);
+	if (vec == NULL)
+	{
+		perror("free: bitV");
+	}
 }
 
 void oneVec(bitV *vec) // sets a vector to all 1

@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
 				l = atoi(optarg);
 				break;
 			}
+			default:
+			{
+				break;
+			}
 		}
 	}
 
