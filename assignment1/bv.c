@@ -17,7 +17,7 @@ void delVec(bitV *vec) // deletes a vector
 
 void oneVec(bitV *vec) // sets a vector to all 1
 {
-	for (uint32_t i = 0; i < (vec->l); i++)
+	for (uint32_t i = 0; i < (vec->l) / 8 + 1; i++)
 	{
 		(vec->v)[i] |= 0xFF;
 	}

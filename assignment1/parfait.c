@@ -10,8 +10,8 @@ void printProperDivisors(uint32_t n);
 
 int main(int argc, char *argv[])
 {
-	uint32_t l;
 	int opt;
+	uint32_t l = 100000;
 	while ((opt = getopt(argc, argv, "n:")) != -1)
 	{
 		switch (opt)
