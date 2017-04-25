@@ -1,0 +1,5 @@
+calloc should allocate (stringSize + 1) number of members instead of
+solely stringSize because it is failing to account for the size of the
+null termination character in the string being copied (line 343).
+
+valgrind noted that a chunk of memory allocated by realloc (line 444) was never freed.
