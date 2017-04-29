@@ -12,7 +12,7 @@ sorting : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o sorting
 
 sorting.o : sorting.c $(HEADERS)
-	$(CC) $(CFLAGS) sorting.c -c
+	$(CC) $(CFLAGS) $(MASK) sorting.c -c
 
 minsort : minsort.o
 	$(CC) $(CFLAGS) minsort.o -o minsort
