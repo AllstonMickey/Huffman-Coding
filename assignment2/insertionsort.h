@@ -5,7 +5,7 @@
 
 /* 
  * insert: inserts an element into a sorted subarray of length
- * 	> the number being inserted must be the b[length] element
+ * 	> the element being inserted must be in the furthest index from zero.
  */
 void insert(uint32_t b[], uint32_t length, uint32_t *moves, uint32_t *compares);
 
