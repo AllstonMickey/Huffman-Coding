@@ -2,8 +2,8 @@ CC = gcc
 CFLAGS = -Wall -Werror -Wextra -pedantic -std=c99
 RM = rm -f
 MASK = -DMASK=0x00ffffff
-OBJECTS = bv.o minsort.o sorting.o
-HEADERS = bv.h minsort.h
+OBJECTS = bv.o minsort.o bubblesort.o sorting.o
+HEADERS = bv.h minsort.h bubblesort.h
 
 .PHONY: all
 all : sorting
@@ -14,14 +14,11 @@ sorting : $(OBJECTS)
 sorting.o : sorting.c $(HEADERS)
 	$(CC) $(CFLAGS) $(MASK) sorting.c -c
 
-minsort : minsort.o
-	$(CC) $(CFLAGS) minsort.o -o minsort
+bubblesort.o : bubblesort.c bubblesort.h
+	$(CC) $(CFLAGS) bubblesort.c -c
 
 minsort.o : minsort.c minsort.h
 	$(CC) $(CFLAGS) minsort.c -c
-
-bv : bv.o
-	$(CC) $(CFLAGS) bv.o -o bv
 
 bv.o : bv.c bv.h
 	$(CC) $(CFLAGS) bv.c -c
