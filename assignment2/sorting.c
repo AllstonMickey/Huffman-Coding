@@ -5,6 +5,7 @@
 # include "bv.h"         // bitVectors
 # include "minsort.h"    // minsort
 # include "bubblesort.h" // bubblesort
+# include "insertionsort.h" // insertionsort
 
 enum sortingAlgorithms { UNSORTED, MIN, BUBBLE, INSERTION, QUICK, MERGE, END };
 
@@ -158,7 +159,14 @@ void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, 
 		}
 		case INSERTION:
 		{
-
+			uint32_t moveCount = 0;
+			uint32_t compareCount = 0;
+			insertionSort(a, len, &moveCount, &compareCount);
+			if (printFlag)
+			{
+				printf("Insertion Sort\n");
+				printArray(a, len, printLen, moveCount, compareCount);
+			}
 			break;
 		}
 		case QUICK:
