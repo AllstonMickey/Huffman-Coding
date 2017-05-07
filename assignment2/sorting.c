@@ -7,31 +7,53 @@
 
 enum sortingAlgorithms { UNSORTED, MIN, BUBBLE, INSERTION, QUICK, MERGE, END };
 
+void randomizeArray(uint32_t a[], uint32_t len, uint32_t seed);
+void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, uint32_t printLen);
 void printArray(uint32_t a[], uint32_t len, uint32_t printAmount);
 
 int main(int argc, char *argv[])
 {
-	uint32_t printNum = 100, seed = 8062022, capacity = 100, length = 0;
-	bitV *sorts = newVec(8);
+	uint32_t printNum = 100, seed = 8062022, capacity = 100;
+	bitV *sortFlags = newVec(7);
 
 	int opt;
-	while ((opt = getopt(argc, argv, "AmbiqMup:r:n:")) != -1)
+	while ((opt = getopt(argc, argv, "AumbiqMp:r:n:")) != -1)
 	{
 		switch (opt)
 		{
 			case 'A':
 			{
-				oneVec(sorts);
-				break;
-			}
-			case 'm':
-			{
-				setBit(sorts, MIN);
+				oneVec(sortFlags);
 				break;
 			}
 			case 'u':
 			{
-				setBit(sorts, UNSORTED);
+				setBit(sortFlags, UNSORTED);
+				break;
+			}
+			case 'm':
+			{
+				setBit(sortFlags, MIN);
+				break;
+			}
+			case 'b':
+			{
+				setBit(sortFlags, BUBBLE);
+				break;
+			}
+			case 'i':
+			{
+				setBit(sortFlags, INSERTION);
+				break;
+			}
+			case 'q':
+			{
+				setBit(sortFlags, QUICK);
+				break;
+			}
+			case 'M':
+			{
+				setBit(sortFlags, MERGE);
 				break;
 			}
 			case 'p':
@@ -51,100 +73,93 @@ int main(int argc, char *argv[])
 			}
 			case '?':
 			{
-				// invalid parameter input?
-				// no argument supplied to a parameter that required one?
 				break;
 			}
 			default:
 			{
-				// something very bad happened, unknown error
 				break;
 			}
 		}
 	}
 
-	/*
-	 * Create a dynamic array of random 24 bit integers.
-	 */	
-
-	srand(seed);
-	uint32_t *nums = (uint32_t *) calloc(capacity, sizeof(uint32_t));
+	uint32_t *nums = (uint32_t *) malloc(capacity * sizeof(uint32_t));
 	if (nums == NULL)
 	{
-		printf("Calloc error {nums == NULL) [%d]", errno);
+		printf("Malloc error {nums == NULL) [%d]", errno);
 		return errno;
 	}
 
-	for (uint32_t i = 0; i < capacity; i += 1)
-	{
-		nums[i] = rand() & MASK;
-		length += 1;
-	}
-	
-	//printArray(nums, length, printNum); // unsorted array (USE FOR TESTING)
-
-
-	/*
-	 * TODO: if the sort flag is true, copy the unsorted array into the specified sort
-	 * TODO: count moves and compares per sort
-	 */
-
-
-	/*
-	if (valBit(sorts, UNSORTED))
-	{
-		printArray(nums, length, printNum);
-	}
-	if (valBit(sorts, MIN))
-	{
-
-	}
-	if (valBit(sorts, BUBBLE))
-	{
-
-	}
-	if (valBit(sorts, INSERTION))
-	{
-		
-	}
-	if (valBit(sorts, QUICK))
-	{
-
-	}
-	if (valBit(sorts, MERGE))
-	{
-
-	}
-	*/
-	
 	uint8_t currentSort = UNSORTED;
 	while (currentSort != END)
 	{
-		if (valBit(sorts, currentSort))
+		if (valBit(sortFlags, currentSort))
 		{
-			if (currentSort == UNSORTED)
-			{
-				printArray(nums, length, printNum);	
-			}	
-			else
-			{
-				// sort
-				// print sorted
-			}
+			randomizeArray(nums, capacity, seed);
+			sortArray(nums, capacity, currentSort, 1, printNum);
 		}
 		currentSort += 1;
 	}
 
-	/*
-	 * Free all allocated memory:
-	 * 	sorts bitVector
-	 * 	nums 24-bit int array
-	 */
-	delVec(sorts);
+	delVec(sortFlags);
 	free(nums);
 	nums = NULL;
 
 	return 0;
+}
+
+void randomizeArray(uint32_t a[], uint32_t len, uint32_t seed)
+{
+	srand(seed);
+	for (uint32_t i = 0; i < len; i += 1)
+	{
+		a[i] = rand() & MASK;
+	}
+}
+
+void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, uint32_t printLen)
+{
+	switch (sortType)
+	{
+		case UNSORTED:
+		{
+			if (printFlag)
+			{
+				printf("Unsorted\n");
+				printArray(a, len, printLen);
+			}
+			break;
+		}
+		case MIN:
+		{
+			minSort(a, len);
+			if (printFlag)
+			{
+				printf("Min Sort\n");
+				printArray(a, len, printLen);
+			}
+			break;
+		}
+		case BUBBLE:
+		{
+
+			break;
+		}
+		case INSERTION:
+		{
+
+			break;
+		}
+		case QUICK:
+		{
+
+			break;
+		}
+		case MERGE:
+		{
+
+			break;
+		}
+	}
 }
 
 /*
@@ -161,7 +176,7 @@ void printArray(uint32_t a[], uint32_t len, uint32_t printAmount)
 	for (uint32_t i = 0; i < printAmount && i < len; i += 1)
 	{
 		int columnWidth = 8;
-		printf("  %*d", columnWidth, a[i]);
+		printf("  %*u", columnWidth, a[i]);
 
 		if ((i+1) % 7 == 0) // print a new line after every 7 entries
 		{
