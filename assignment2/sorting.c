@@ -1,15 +1,16 @@
-# include <stdio.h>   // printf, perror
-# include <stdlib.h>  // atoi, rand & srand, malloc/calloc/realloc/free
-# include <getopt.h>  // getopt
-# include <errno.h>   // errno
-# include "bv.h"      // bitVectors
-# include "minsort.h" // minsort
+# include <stdio.h>      // printf, perror
+# include <stdlib.h>     // atoi, rand & srand, malloc/calloc/realloc/free
+# include <getopt.h>     // getopt
+# include <errno.h>      // errno
+# include "bv.h"         // bitVectors
+# include "minsort.h"    // minsort
+# include "bubblesort.h" // bubblesort
 
 enum sortingAlgorithms { UNSORTED, MIN, BUBBLE, INSERTION, QUICK, MERGE, END };
 
 void randomizeArray(uint32_t a[], uint32_t len, uint32_t seed);
 void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, uint32_t printLen);
-void printArray(uint32_t a[], uint32_t len, uint32_t printAmount);
+void printArray(uint32_t a[], uint32_t len, uint32_t printLen, uint32_t moves, uint32_t compares);
 
 int main(int argc, char *argv[])
 {
@@ -122,26 +123,37 @@ void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, 
 	{
 		case UNSORTED:
 		{
+			uint32_t moveCount = 0;
+			uint32_t compareCount = 0;
 			if (printFlag)
 			{
 				printf("Unsorted\n");
-				printArray(a, len, printLen);
+				printArray(a, len, printLen, moveCount, compareCount);
 			}
 			break;
 		}
 		case MIN:
 		{
-			minSort(a, len);
+			uint32_t moveCount = 0;
+			uint32_t compareCount = 0;
+			minSort(a, len, &moveCount, &compareCount);
 			if (printFlag)
 			{
 				printf("Min Sort\n");
-				printArray(a, len, printLen);
+				printArray(a, len, printLen, moveCount, compareCount);
 			}
 			break;
 		}
 		case BUBBLE:
 		{
-
+			uint32_t moveCount = 0;
+			uint32_t compareCount = 0;
+			bubbleSort(a, len, &moveCount, &compareCount);
+			if (printFlag)
+			{
+				printf("Bubble Sort\n");
+				printArray(a, len, printLen, moveCount, compareCount);
+			}
 			break;
 		}
 		case INSERTION:
@@ -168,12 +180,15 @@ void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, 
  *
  * @param   a            The array of integers to print
  * @param   len          The number of elements in the array
- * @param   printAmount  The number of elements to print
+ * @param   printLen  The number of elements to print
  * @return  void
  */
-void printArray(uint32_t a[], uint32_t len, uint32_t printAmount)
+void printArray(uint32_t a[], uint32_t len, uint32_t printLen, uint32_t moves, uint32_t compares)
 {
-	for (uint32_t i = 0; i < printAmount && i < len; i += 1)
+	printf("%u elements\n", len);
+	printf("%u moves\n", moves);
+	printf("%u compares\n", compares);
+	for (uint32_t i = 0; i < printLen && i < len; i += 1)
 	{
 		int columnWidth = 8;
 		printf("  %*u", columnWidth, a[i]);
