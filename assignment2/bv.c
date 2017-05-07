@@ -1,6 +1,6 @@
-#include "bv.h"
-#include <stdlib.h>
-#include <stdio.h>
+# include "bv.h"
+# include <stdlib.h>
+# include <stdio.h>
 
 bitV *newVec(uint32_t len) // creates a new vector of specified length in bits
 {
