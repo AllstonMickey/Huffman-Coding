@@ -10,9 +10,9 @@
 
 enum sortingAlgorithms { UNSORTED, MIN, BUBBLE, INSERTION, QUICK, MERGE, END };
 
-void randomizeArray(uint32_t a[], uint32_t len, uint32_t seed);
-void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, uint32_t printLen);
-void printArray(uint32_t a[], uint32_t len, uint32_t printLen, uint32_t moves, uint32_t compares);
+void randomizeArray(uint32_t a[], uint32_t len, uint32_t seed); // fills all array elements with random 24 bit numbers
+void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, uint32_t printLen); // sorts an array by algorithm
+void printArray(uint32_t a[], uint32_t len, uint32_t printLen, uint32_t moves, uint32_t compares); // prints an array up to n
 
 int main(int argc, char *argv[])
 {
@@ -111,6 +111,13 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+/*
+ * randomizeArray: sets all array elements to a random 24-bit natural number.
+ * 
+ * @param a    The array to randomize.
+ * @param len  Length of the array, a.
+ * @param seed The rand() seed to set with srand().
+ */
 void randomizeArray(uint32_t a[], uint32_t len, uint32_t seed)
 {
 	srand(seed);
@@ -120,6 +127,16 @@ void randomizeArray(uint32_t a[], uint32_t len, uint32_t seed)
 	}
 }
 
+/*
+ * sortArray: sorts an array of length by a specified sorting algorithm.  Also prints if requested.
+ *
+ * @param a         The array to sort.
+ * @param len       Length of the array, a.
+ * @param sortType  The sorting algorithm to use.  Definitions are in the enum "sortingAlgorithms" at the top of this file.
+ * @param printFlag If '0', the array will not be printed after sorting.
+ * @param printLen  Only matters if printFlag is set to '1'.  Determines how many elements of the array to print.
+ * @return void
+ */
 void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, uint32_t printLen)
 {
 	switch (sortType)
@@ -175,7 +192,7 @@ void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, 
 		{
 			uint32_t moveCount = 0;
 			uint32_t compareCount = 0;
-			quickSort(a, len);
+			quickSort(a, len, &moveCount, &compareCount);
 			if (printFlag)
 			{
 				printf("Quick Sort\n");
@@ -185,7 +202,14 @@ void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, 
 		}
 		case MERGE:
 		{
-
+			uint32_t moveCount = 0;
+			uint32_t compareCount = 0;
+			// sort it
+			if (printFlag)
+			{
+				printf("Merge Sort\n");
+				printArray(a, len, printLen, moveCount, compareCount);
+			}
 			break;
 		}
 	}

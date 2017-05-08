@@ -1,5 +1,4 @@
 # include "insertionsort.h"
-# include <stdio.h>
 # define SWAP(x, y) { uint32_t t = x; x = y; y = t; ; }
 
 /*
