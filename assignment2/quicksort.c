@@ -5,7 +5,7 @@
  * partition: modifies an array so that values to the left of a chosen pivot
  * 	are smaller than the pivot, and values to the right are larger.
  */
-void partition(uint32_t a[], uint32_t length)
+uint32_t partition(uint32_t a[], uint32_t length)
 {
 	uint32_t pivot = a[0];
 	uint32_t left = 1;
@@ -39,6 +39,7 @@ void partition(uint32_t a[], uint32_t length)
 		}
 	}
 	SWAP(a[0], a[right]);
+	return right;
 }
 
 /*
