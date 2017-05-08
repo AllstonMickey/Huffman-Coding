@@ -48,6 +48,21 @@ uint32_t partition(uint32_t a[], uint32_t length)
  */
 void quickSort(uint32_t a[], uint32_t length)
 {
+	if (length == 0 || length == 1)
+	{
+		return;
+	}
+	
+	uint32_t pivot = partition(a, length);
 
+	uint32_t *left;
+	left = a;
+	uint32_t leftLength = pivot;
+	quickSort(left, leftLength);
+
+	uint32_t *right;
+	right = a + pivot + 1;
+	uint32_t rightLength = length - pivot - 1;
+	quickSort(right, rightLength);
 }
 

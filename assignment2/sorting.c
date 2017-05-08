@@ -175,7 +175,7 @@ void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, 
 		{
 			uint32_t moveCount = 0;
 			uint32_t compareCount = 0;
-			// sort here
+			quickSort(a, len);
 			if (printFlag)
 			{
 				printf("Quick Sort\n");
