@@ -7,6 +7,7 @@
 # include "bubblesort.h"    // bubblesort
 # include "insertionsort.h" // insertionsort
 # include "quicksort.h"     // quicksort
+# include "mergesort.h"     // mergesort
 
 enum sortingAlgorithms { UNSORTED, MIN, BUBBLE, INSERTION, QUICK, MERGE, END };
 
@@ -204,7 +205,7 @@ void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, 
 		{
 			uint32_t moveCount = 0;
 			uint32_t compareCount = 0;
-			// sort it
+			mergeSort(a, len, &moveCount, &compareCount);
 			if (printFlag)
 			{
 				printf("Merge Sort\n");
