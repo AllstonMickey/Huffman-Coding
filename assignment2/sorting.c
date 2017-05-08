@@ -1,11 +1,12 @@
-# include <stdio.h>      // printf, perror
-# include <stdlib.h>     // atoi, rand & srand, malloc/calloc/realloc/free
-# include <getopt.h>     // getopt
-# include <errno.h>      // errno
-# include "bv.h"         // bitVectors
-# include "minsort.h"    // minsort
-# include "bubblesort.h" // bubblesort
+# include <stdio.h>         // printf, perror
+# include <stdlib.h>        // atoi, rand & srand, malloc/calloc/realloc/free
+# include <getopt.h>        // getopt
+# include <errno.h>         // errno
+# include "bv.h"            // bitVectors
+# include "minsort.h"       // minsort
+# include "bubblesort.h"    // bubblesort
 # include "insertionsort.h" // insertionsort
+# include "quicksort.h"     // quicksort
 
 enum sortingAlgorithms { UNSORTED, MIN, BUBBLE, INSERTION, QUICK, MERGE, END };
 
@@ -26,6 +27,7 @@ int main(int argc, char *argv[])
 			case 'A':
 			{
 				oneVec(sortFlags);
+				clrBit(sortFlags, UNSORTED); // to mimic Darrell's -A option
 				break;
 			}
 			case 'u':
@@ -171,7 +173,14 @@ void sortArray(uint32_t a[], uint32_t len, uint8_t sortType, uint8_t printFlag, 
 		}
 		case QUICK:
 		{
-
+			uint32_t moveCount = 0;
+			uint32_t compareCount = 0;
+			// sort here
+			if (printFlag)
+			{
+				printf("Quick Sort\n");
+				printArray(a, len, printLen, moveCount, compareCount);
+			}
 			break;
 		}
 		case MERGE:
