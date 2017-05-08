@@ -13,7 +13,8 @@
  * @param rightLength The length of the right array
  * @return void
  */
-void merge(uint32_t a[], uint32_t left[], uint32_t right[], uint32_t length, uint32_t leftLength, uint32_t rightLength, uint32_t *moves, uint32_t *compares)
+void merge(uint32_t a[], uint32_t left[], uint32_t right[],
+        uint32_t length, uint32_t leftLength, uint32_t rightLength, uint32_t *moves, uint32_t *compares)
 {
 	uint32_t l = 0; // current index of left[]
 	uint32_t r = 0; // current index of right[]
@@ -41,7 +42,6 @@ void merge(uint32_t a[], uint32_t left[], uint32_t right[], uint32_t length, uin
 		{
 			a[i] = left[l];
 			l += 1;
-			*compares += 1;
 		}
 		// case 3: only the right array has elements
 		else

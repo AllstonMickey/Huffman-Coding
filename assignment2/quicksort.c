@@ -23,11 +23,10 @@ uint32_t partition(uint32_t a[], uint32_t length, uint32_t *moves, uint32_t *com
  	 */
 	while (!partitioned)
 	{
-		*compares += 1;
 		while ((left < right) && (a[left] <= pivot)) // prevents segfaults if left goes out of length
 		{
 			left += 1;
-			*compares += 2;
+			*compares += 1;
 		}
 		while (a[right] > pivot)
 		{
@@ -45,7 +44,6 @@ uint32_t partition(uint32_t a[], uint32_t length, uint32_t *moves, uint32_t *com
 		{
 			partitioned = 1;
 		}
-		*compares += 1;
 	}
 	SWAP(a[0], a[right]);
 	*moves += 3;

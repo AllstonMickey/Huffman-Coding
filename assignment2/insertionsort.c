@@ -8,7 +8,6 @@
 void insert(uint32_t b[], uint32_t length, uint32_t *moves, uint32_t *compares)
 {
 	uint32_t num = b[length - 1];
-	*moves += 1;
 
 	int32_t i;
 	for (i = length - 1; i >= 1 && num < b[i-1]; i -= 1)
