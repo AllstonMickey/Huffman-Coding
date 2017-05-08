@@ -17,7 +17,7 @@ void merge(uint32_t a[], uint32_t left[], uint32_t right[], uint32_t length, uin
 {
 	uint32_t l = 0; // current index of left[]
 	uint32_t r = 0; // current index of right[]
-	for (uint32_t i = 0; i < length; i++)
+	for (uint32_t i = 0; i < length; i += 1)
 	{
 		// case 1: both arrays have elements
 		if (l < leftLength && r < rightLength)
@@ -59,7 +59,7 @@ void mergeSort(uint32_t a[], uint32_t length, uint32_t *moves, uint32_t *compare
 	{
 		uint32_t leftLength = length/2;
 		uint32_t *left = (uint32_t *) malloc(leftLength * sizeof(uint32_t));
-		for (uint32_t i = 0; i < leftLength; i++)
+		for (uint32_t i = 0; i < leftLength; i += 1)
 		{
 			left[i] = a[i];
 			*moves += 1;
@@ -68,7 +68,7 @@ void mergeSort(uint32_t a[], uint32_t length, uint32_t *moves, uint32_t *compare
 		uint32_t rightLength = length - leftLength;
 		uint32_t *right = (uint32_t *) malloc(rightLength * sizeof(uint32_t));
 		uint32_t *temp = a + leftLength;
-		for (uint32_t i = 0; i < rightLength; i++)
+		for (uint32_t i = 0; i < rightLength; i += 1)
 		{
 			right[i] = temp[i];
 			*moves += 1;
@@ -80,9 +80,12 @@ void mergeSort(uint32_t a[], uint32_t length, uint32_t *moves, uint32_t *compare
 
 		free(left);
 		free(right);
+		left = NULL;
+		right = NULL;
 	}
 	else
 	{
 		return;
 	}
 }
+
