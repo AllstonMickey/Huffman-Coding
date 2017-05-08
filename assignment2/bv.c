@@ -25,14 +25,15 @@ void delVec(bitV *vec) // deletes a vector
 	{
 		perror("free: vector");
 	}
+	vec->v = NULL;
+
 	free(vec);
 	if (vec == NULL)
 	{
 		perror("free: bitV");
 	}
-
-	vec->v = NULL;
 	vec = NULL;
+
 }
 
 void oneVec(bitV *vec) // sets a vector to all 1
