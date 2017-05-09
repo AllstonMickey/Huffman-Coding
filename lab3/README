@@ -1,0 +1,10 @@
+In main(), firstPoint and secondPoint would hold a NULL address.
+This is because makePoint() returns the address of thisCoordinate,
+but thisCoordinate does not hold an address that is outside of the scope
+of makePoint() when it is returned, causing any value it returns to be garbage.
+
+To fix this, we can simply change thisCoordinate to a pointer to a struct
+cartesianCoordinate, and then initialize it by allocating space on the heap through malloc.
+This preserves the address that we allocated even after makePoint() returns its pointer,
+and therefore, allows firstPoint and secondPoint to correctly hold a valid address with their
+respective x and y coordinates.
