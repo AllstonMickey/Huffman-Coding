@@ -10,8 +10,8 @@ and therefore, allows firstPoint and secondPoint to correctly hold a valid addre
 respective x and y coordinates.
 
 After the program's use of firstPoint and secondPoint are done, we must then free the allocated
-space.  Then, thanks to gdb, the values of firstPoint and secondPoint remain, despite being unallocated.
-Therefore, for extra security, we must set both to NULL.
+space.  Then, thanks to gdb, we can see that the values of firstPoint and secondPoint remain,
+despite being unallocated.  Therefore, for extra security, both must be set to NULL.
 
 Files:
 gdbLab.c
