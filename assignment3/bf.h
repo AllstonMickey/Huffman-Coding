@@ -7,6 +7,7 @@
 # include <stdint.h>
 # include <stdlib.h>
 # include <stdio.h>
+# include <string.h>
 
 typedef struct bloomF
 {
@@ -40,8 +41,6 @@ static inline bloomF *newBF(uint32_t len, uint32_t hashes[])
 			bf->s[1] = hashes[1];
 			bf->s[2] = hashes[2];
 			bf->s[3] = hashes[3];
-			printf("%u\n", bf->s[2]);
-			printf("%u\n", bf->l);
 		}
 		else
 		{
@@ -133,6 +132,8 @@ static inline uint32_t countBF(bloomF *bf)
 	return count;
 }
 
+/*
+
 static inline void setBF(bloomF *bf, char *key)
 {
 	// Code
@@ -163,5 +164,7 @@ static inline void printBF(bloomF *bf)
 		}
 	}
 }
+
+*/
 
 # endif
