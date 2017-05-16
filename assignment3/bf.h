@@ -1,3 +1,8 @@
+/* 
+ * bf.h - Bloom Filter
+ * Interface Author: Galdrafoor
+ */
+
 # ifndef NIL
 # define NIL (void *) 0
 # endif
