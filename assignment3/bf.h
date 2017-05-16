@@ -2,17 +2,17 @@
 # define NIL (void *) 0
 # endif
 
-/*
- * SETBIT:
- * @param v Array of bytes
- * @param b Bit position to set
- */
-# ifndef SETBIT
-# define SETBIT(vec, bit) (vec[bit >> 3] |= (0x1 << (bit % 8)))
-# endif
-
 # ifndef _BF_H
 # define _BF_H
+
+# ifndef SETBIT
+# define SETBIT(vec, bit) (vec[bit >> 3] |= (0x1 << (bit % 8)))
+# endif // end of SETBIT
+
+# ifndef CLRBIT
+# define CLRBIT(vec, bit) (vec[bit >> 3] &= ~(0x1 << (bit % 8)))
+# endif // end of CLRBIT
+
 # include <stdint.h>
 # include <stdlib.h>
 # include <stdio.h>
@@ -151,8 +151,8 @@ static inline uint32_t countBF(bloomF *bf)
  * Hashes a key string to a 2 byte unsigned integer.
  * Sets the BF vector's bit to 1 in the index of the hashed value.
  *
- * @param bf  Bloom Filter to set bits in
- * @param key String to hash into an index for the BF.
+ * @param bf  Bloom Filter to set bit in
+ * @param key String to hash into an index for the BF vector
  *
  * @return void
  */
@@ -163,13 +163,20 @@ static inline void setBF(bloomF *bf, const char *key)
 
 
 /*
-// Clear an entry in the Bloom filter
-
-static inline void clrBF(bloomF *x, char *key)
+ * Hashes a key string to a 2 byte unsigned integer.
+ * Clears the BF vector's bit to 0 in the index of the hased value.
+ *
+ * @param bf  Bloom Filter to clear bit in
+ * @param key String to hash into an index for the BF vector
+ * 
+ * @return void
+ */
+static inline void clrBF(bloomF *bf, const char *key)
 {
-	// Code
+	CLRBIT(bf->v, hash(bf->s, key) % 16);
 }
 
+/*
 // Check membership in the Bloom filter
 
 static inline uint32_t memBF(bloomF *bf, char *key)
@@ -191,4 +198,4 @@ static inline void printBF(bloomF *bf)
 	}
 }
 
-# endif
+# endif // end of _BF_H
