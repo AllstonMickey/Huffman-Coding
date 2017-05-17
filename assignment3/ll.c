@@ -49,13 +49,33 @@ void delNode(listNode *node)
 		node = NIL;
 	}
 }
-/*
-void delLL(listNode *);
 
+void delLL(listNode *head)
+{
+	listNode *curr = head;
+	while (curr->next != NIL)
+	{
+		delNode(curr);
+		curr = curr->next;
+	}
+	delNode(curr);
+}
+
+/*
 listNode *insertLL(listNode **, const char *, const char *);
 
 listNode *findLL(listNode **, const char *);
-
-void printfLL(listNode *);
 */
+
+void printLL(listNode *head)
+{
+	listNode *curr = head;
+	while (curr != NIL)
+	{
+		printf("node: %p\n", (void *) curr);
+		printf("\tnext:    %p\n", (void *) curr->next);
+		printf("\twords:   %s -> %s\n", curr->oldspeak, curr->newspeak);
+		curr = curr->next;
+	}
+}
 

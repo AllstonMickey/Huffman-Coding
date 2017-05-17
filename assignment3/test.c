@@ -30,9 +30,10 @@ int main(void)
 	printBF(b);
 
 	listNode *head = newNode("faggot", "gay");
-	printf("%s %s %p %p\n", head->oldspeak, head->newspeak, (void *) head, (void *) head->next);
-	delNode(head);
+	printLL(head);
 
-	printf("%s %s %p %p\n", head->oldspeak, head->newspeak, (void *) head, (void *) head->next);
+	listNode *second = newNode("pols", "redditors");
+	head->next = second;
+	printLL(head);
 	return 0;
 }

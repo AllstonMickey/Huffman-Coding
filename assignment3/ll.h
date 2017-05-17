@@ -25,12 +25,12 @@ listNode *newNode(const char *word, const char *tran);
 
 void delNode(listNode *node);
 
-void delLL(listNode *);
+void delLL(listNode *head);
 
 listNode *insertLL(listNode **, const char *, const char *);
 
 listNode *findLL(listNode **, const char *);
 
-void printfLL(listNode *);
+void printLL(listNode *head);
 
 # endif
