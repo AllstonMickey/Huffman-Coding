@@ -206,6 +206,7 @@ static inline void printBF(bloomF *bf)
 			printf(" ");
 		}
 	}
+	printf("\n");
 }
 
 # endif
