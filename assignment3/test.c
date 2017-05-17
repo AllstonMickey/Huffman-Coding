@@ -12,11 +12,6 @@ int main(void)
 
 	uint32_t initA[] = {0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0aB0a}; // first set of salts
 	bloomF *a = newBF(pow(2, 16), initA); // new bloom filter of 65k entries with initA hashes as salts
-
-	// set BF(a) - hashes the keys into indeces and turns on those indeces
-	// print the hash values
-	// print the BF
-	// make sure they match
 	for (int i = 0; i < keyLen; i += 1)
 	{
 		printf("%u\n", hash(a->s, keys[i]) & MASK);
@@ -25,12 +20,6 @@ int main(void)
 	printBF(a);
 
 	printf("\n\n--------- SECOND SALT STARTING ----------\n");
-
-	// set BF(b) - hashes the keys into indeces and turns on those indeces
-	// print the hash values (should be different than part 1)
-	// print the BF
-	// make sure they match
-
 	uint32_t initB[] = {0xDeadBeef, 0xFadedB0a, 0xCafeD00d, 0xC0c0aB0a}; // second set of salts
 	bloomF *b = newBF(pow(2, 16), initB);
 	for (int i = 0; i < keyLen; i += 1)
@@ -40,7 +29,10 @@ int main(void)
 	}
 	printBF(b);
 
-	// if still on, it's found
-	printf("\n");
+	listNode *head = newNode("faggot", "gay");
+	printf("%s %s %p %p\n", head->oldspeak, head->newspeak, (void *) head, (void *) head->next);
+	delNode(head);
+
+	printf("%s %s %p %p\n", head->oldspeak, head->newspeak, (void *) head, (void *) head->next);
 	return 0;
 }

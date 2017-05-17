@@ -31,9 +31,25 @@ listNode *newNode(const char *word, const char *tran)
 	return node;
 }
 
+void delNode(listNode *node)
+{
+	if (node != NIL)
+	{
+		if (node->oldspeak != NIL)
+		{
+			free(node->oldspeak);
+			node->oldspeak = NIL;
+		}
+		if (node->newspeak != NIL)
+		{
+			free(node->newspeak);
+			node->newspeak = NIL;
+		}
+		free(node);
+		node = NIL;
+	}
+}
 /*
-void delNode(listNode *);
-
 void delLL(listNode *);
 
 listNode *insertLL(listNode **, const char *, const char *);

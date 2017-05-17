@@ -21,9 +21,9 @@ struct listNode
 	listNode *next;
 };
 
-listNode *newNode(const char *, const char *);
+listNode *newNode(const char *word, const char *tran);
 
-void delNode(listNode *);
+void delNode(listNode *node);
 
 void delLL(listNode *);
 
