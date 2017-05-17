@@ -3,7 +3,6 @@
 
 # include <stdint.h>
 # include <stdlib.h>
-# include <string.h>
 
 /*
  * Copies a string's pointer to malloc'd memory.
@@ -11,14 +10,18 @@
  * @param str String to copy
  * @return Pointer to the newly allocated memory.
  */
-static inline char *strClone(const char *str)
+static inline char *strclone(const char *str)
 {
-	char *copy = malloc(strlen(str) + 1);
-	for (uint32_t i = 0; i < strlen(str); i += 1)
+	uint32_t len = 0;
+	while (*(str + len) != '\0')
 	{
-		*(copy + i) = *(str + i);
+		len += 1;
 	}
-	return copy;
+	
+	char *tmp = malloc((sizeof(uint8_t) * len) + 1);
+	char *clone = tmp;
+	while (*tmp++ = *str++);
+	return clone;
 }
 
 # endif

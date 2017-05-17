@@ -1,6 +1,6 @@
 # include <stdlib.h>
 # include <stdio.h>
-# include "strClone.h"
+# include "strclone.h" // strdup() from <strings.h> implementation because not supported in -std=c99
 # include "ll.h"
 
 extern bool moveToFront;
@@ -14,13 +14,13 @@ listNode *newNode(const char *old, const char *new)
 	}
 	else
 	{
-		node->oldspeak = strClone(old);
+		node->oldspeak = strclone(old);
 		if (node->oldspeak == NIL)
 		{
 			perror("malloc error (strdup) [ll.c:23]: node->oldspeak is NIL\n");
 		}
 
-		node->newspeak = strClone(new);
+		node->newspeak = strclone(new);
 		if (node->newspeak == NIL)
 		{
 			perror("malloc error (strdup) [ll.c:29]: node->newspeak is NIL\n");
