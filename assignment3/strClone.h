@@ -5,6 +5,12 @@
 # include <stdlib.h>
 # include <string.h>
 
+/*
+ * Copies a string's pointer to malloc'd memory.
+ *
+ * @param str String to copy
+ * @return Pointer to the newly allocated memory.
+ */
 static inline char *strClone(const char *str)
 {
 	char *copy = malloc(strlen(str) + 1);
