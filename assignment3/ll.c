@@ -5,25 +5,25 @@
 
 extern bool moveToFront;
 
-listNode *newNode(const char *old, const char *new)
+listNode *newNode(const char *word, const char *tran)
 {
 	listNode *node = (listNode *) malloc(sizeof(listNode));
 	if (node == NIL)
 	{
-		perror("malloc error [ll.c:16]: node is NIL\n");
+		perror("malloc error [ll.c:10]: node is NIL\n");
 	}
 	else
 	{
-		node->oldspeak = strclone(old);
+		node->oldspeak = strclone(word);
 		if (node->oldspeak == NIL)
 		{
-			perror("malloc error (strdup) [ll.c:23]: node->oldspeak is NIL\n");
+			perror("malloc error (strclone) [ll.c:17]: node->oldspeak is NIL\n");
 		}
 
-		node->newspeak = strclone(new);
+		node->newspeak = strclone(tran);
 		if (node->newspeak == NIL)
 		{
-			perror("malloc error (strdup) [ll.c:29]: node->newspeak is NIL\n");
+			perror("malloc error (strclone) [ll.c:23]: node->newspeak is NIL\n");
 		}
 
 		node->next = NIL;
