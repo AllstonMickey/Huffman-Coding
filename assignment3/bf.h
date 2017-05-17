@@ -10,14 +10,6 @@
 # ifndef _BF_H
 # define _BF_H
 
-# ifndef SETBIT
-# define SETBIT(vec, bit) (vec[bit >> 3] |= (0x1 << (bit % 8)))
-# endif // end of SETBIT
-
-# ifndef CLRBIT
-# define CLRBIT(vec, bit) (vec[bit >> 3] &= ~(0x1 << (bit % 8)))
-# endif // end of CLRBIT
-
 # include <stdint.h>
 # include <stdlib.h>
 # include <stdio.h>
@@ -40,8 +32,7 @@ uint32_t hashBF(bloomF *, char *);
  *
  * @param len     Length, number of bits to allocate to the new BF
  * @param hashes  Hash functions
- *
- * @return bloomF The new BF
+ * @return bloomF The pointer to the new BF
  */
 static inline bloomF *newBF(uint32_t len, uint32_t hashes[])
 {
@@ -108,22 +99,20 @@ static inline void delBF(bloomF *bf)
 /*
  * Returns the value of the kth bit in the Bloom Filter
  *
- * @param bf Bloom Filter to check
- * @param k  kth bit position, 0 to (bf->l - 1) inclusive.
- *
+ * @param bf  Bloom Filter to check
+ * @param bit Index of the bit, 0 to (bf->l - 1) inclusive.
  * @return 0: bit is turned off
  *         1: bit is turned on
  */
-static inline uint32_t valBF(bloomF *bf, uint32_t k)
+static inline uint8_t valBF(bloomF *bf, uint32_t bit)
 {
-	return ((bf->v)[k >> 3] & (0x1 << (k % 8))) >> (k % 8);
+	return ((bf->v)[bit >> 3] & (0x1 << (bit % 8))) >> (bit % 8);
 }
 
 /*
  * Returns the length of the Bloom Filter
  *
  * @param bf Bloom Filter to check
- * 
  * @return Length, number of total bits allocated to the BF
  */
 static inline uint32_t lenBF(bloomF *bf)
@@ -136,7 +125,6 @@ static inline uint32_t lenBF(bloomF *bf)
  * For each bit, if it's turned on (1), count it.
  *
  * @param bf Bloom Filter to check
- *
  * @return Number of set bits in BF
  */
 static inline uint32_t countBF(bloomF *bf)
@@ -158,12 +146,12 @@ static inline uint32_t countBF(bloomF *bf)
  *
  * @param bf  Bloom Filter to set bit in
  * @param key String to hash into an index for the BF vector
- *
  * @return void
  */
 static inline void setBF(bloomF *bf, const char *key)
 {
-	SETBIT(bf->v, hash(bf->s, key) % 16);
+	uint16_t bit = hash(bf->s, key) & MASK;
+	bf->v[bit >> 3] |= (0x1 << (bit % 8));
 }
 
 
@@ -173,34 +161,51 @@ static inline void setBF(bloomF *bf, const char *key)
  *
  * @param bf  Bloom Filter to clear bit in
  * @param key String to hash into an index for the BF vector
- * 
  * @return void
  */
 static inline void clrBF(bloomF *bf, const char *key)
 {
-	CLRBIT(bf->v, hash(bf->s, key) % 16);
+	uint16_t bit = hash(bf->s, key) & MASK;
+	bf->v[bit >> 3] &= ~(0x1 << (bit % 8));
 }
 
 /*
-// Check membership in the Bloom filter
-
-static inline uint32_t memBF(bloomF *bf, char *key)
+ * Check membership in the Bloom Filter by hashing the key
+ * and returning the value of its bit.
+ *
+ * @param bf  Bloom Filter to check
+ * @param key Key to check
+ * @return 0: bit is turned off
+ *         1: bit is turned on
+ */
+static inline uint8_t memBF(bloomF *bf, char *key)
 {
-	// Code
+	uint16_t bit = hash(bf->s, key) & MASK;
+	return valBF(bf, bit);
 }
 
-*/
-
+/*
+ * Prints values of bits in BF with
+ *   - 3 bytes per new line
+ *   - 4 bit separations
+ *
+ * @param bf Bloom Filter to print
+ * @return void
+ */
 static inline void printBF(bloomF *bf)
 {
 	for (uint32_t i = 0; i < bf->l; i += 1)
 	{
 		printf("%u", valBF(bf, i));
-		if ((i + 1) % 25 == 0)
+		if ((i + 1) % 24 == 0)
 		{
 			printf("\n");
+		}
+		if ((i + 1) % 4 == 0)
+		{
+			printf(" ");
 		}
 	}
 }
 
-# endif // end of _BF_H
+# endif
