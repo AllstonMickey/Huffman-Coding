@@ -2,7 +2,6 @@
 # include "bf.h"    // Bloom Filters
 # include <math.h>  // pow
 # include "ll.h"
-
 int main(void)
 {
 	const char *keys[5] = { "fucking nerd", "darrell is amazing", "test key", "unixislove", "test key" };
@@ -29,11 +28,19 @@ int main(void)
 	}
 	printBF(b);
 
+	
 	listNode *head = newNode("faggot", "gay");
 	printLL(head);
-
+	
 	listNode *second = newNode("pols", "redditors");
 	head->next = second;
+	
+	listNode *third = newNode("darrell", "god");
+	second->next = third;
 	printLL(head);
+
+	delLL(head);
+	printLL(head);
+
 	return 0;
 }
