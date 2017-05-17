@@ -37,10 +37,18 @@ uint32_t hashBF(bloomF *, char *);
 static inline bloomF *newBF(uint32_t len, uint32_t hashes[])
 {
 	bloomF *bf = (bloomF *) malloc(sizeof(bloomF));
-	if (bf != NIL)
+	if (bf == NIL)
+	{
+		perror("malloc error [bf.h:39]: bf is NIL\n");
+	}
+	else
 	{
 		bf->v = (uint8_t *) calloc((len / 8) + 1, sizeof(uint8_t));
-		if (bf->v != NIL)
+		if (bf->v == NIL)
+		{
+			perror("calloc error [bf.h:46]: bf->v is NIL\n");
+		}
+		else
 		{
 			bf->l    = len;
 			bf->s[0] = hashes[0];
@@ -48,21 +56,14 @@ static inline bloomF *newBF(uint32_t len, uint32_t hashes[])
 			bf->s[2] = hashes[2];
 			bf->s[3] = hashes[3];
 		}
-		else
-		{
-			perror("calloc error [bf.h:XX]: bf->v == NIL\n");
-		}
-	}
-	else
-	{
-		perror("malloc error [bf.h:XX]: bf == NIL\n");
 	}
 	return bf;
 }
 
 /*
  * Deletes a Bloom Filter.
- * If there is something to memory to free (not NIL), free it and set to NIL.
+ * If there is something of the Bloom Filter in memory to free (not NIL), 
+ * free it and set to NIL.
  * 
  * @param bf Bloom Filter to delete
  * @return void
@@ -80,18 +81,9 @@ static inline void delBF(bloomF *bf)
 			bf->l    = 0;
 			
 			free(bf->v);
-			if (bf->v == NIL)
-			{
-				perror("free error [bf.h:XX]: bf->v == NIL\n");
-			}
 			bf->v = NIL;
 		}
-
 		free(bf);
-		if (bf == NIL)
-		{
-			perror("free error [bf.h:XX]: bf == NIL\n");
-		}
 		bf = NIL;
 	}
 }
