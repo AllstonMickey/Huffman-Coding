@@ -30,17 +30,13 @@ int main(void)
 
 	
 	listNode *head = newNode("faggot", "gay");
-	printLL(head);
-	
 	listNode *second = newNode("pols", "redditors");
 	head->next = second;
+	printLL(head);
+
+
+	listNode *newHead = insertLL(&head, "darrell", "god");
+	printLL(newHead);
 	
-	listNode *third = newNode("darrell", "god");
-	second->next = third;
-	printLL(head);
-
-	delLL(head);
-	printLL(head);
-
 	return 0;
 }

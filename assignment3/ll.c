@@ -6,11 +6,11 @@
 extern bool moveToFront;
 
 /*
- * Creates a new node.  DOES NOT INSERT it into the list.
+ * Creates a pointer to a new node.  DOES NOT INSERT it into the list.
  *
  * @param word Oldspeak
  * @param tran Newspeak, translation of word
- * @return The new node
+ * @return A pointer to the new node
  */
 listNode *newNode(const char *word, const char *tran)
 {
@@ -59,7 +59,7 @@ void delNode(listNode *node)
  * @param head The 0th node/head of the list
  * @return void
  *
- * It is recommended to set the head to NIL after this call to prevent access to its address.
+ * It is recommended to set the head to NIL after this call to prevent access to the its address.
  */
 void delLL(listNode *head)
 {
@@ -73,10 +73,25 @@ void delLL(listNode *head)
 }
 
 /*
-listNode *insertLL(listNode **, const char *, const char *);
+ * Prepends a node to the front of a list.
+ *
+ * @param head The 0th node/head of the list.
+ * @param word Oldspeak word for the new node.
+ * @param tran Newspeak, translation of word for the new node.
+ * @return Pointer to the new head of the list.
+ */
+listNode *insertLL(listNode **head, const char *word, const char *tran)
+{
+	listNode *newHead = newNode(word, tran);
+	newHead->next = *head;
+	return newHead;
+}
 
-listNode *findLL(listNode **, const char *);
-*/
+// TODO
+listNode *findLL(listNode **, const char *)
+{
+
+}
 
 /*
  * Prints each node's address, members, and addresses of members.
