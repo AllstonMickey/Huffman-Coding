@@ -1,9 +1,8 @@
 # include <stdlib.h>
 # include <stdio.h>
+# include <string.h>
 # include "strclone.h" // strdup() from <strings.h> implementation because not supported in -std=c99
 # include "ll.h"
-
-extern bool moveToFront;
 
 /*
  * Creates a pointer to a new node.  DOES NOT INSERT it into the list.
@@ -82,15 +81,51 @@ void delLL(listNode *head)
  */
 listNode *insertLL(listNode **head, const char *word, const char *tran)
 {
-	listNode *newHead = newNode(word, tran);
+	listNode *newHead = newNode(word, tran);	
 	newHead->next = *head;
 	return newHead;
 }
 
-// TODO
-listNode *findLL(listNode **, const char *)
+/*
+ * Finds a word in a list.
+ * Depending on moveToFront, may move the node containing the word to the head.
+ *
+ * @param head The 0th node/head of the list.
+ * @param word Oldspeak, key to search the list for.
+ * @return Pointer to the found node.
+ */
+listNode *findLL(listNode **head, const char *word)
 {
+	bool found = false;
 
+	listNode *prev;
+	listNode *curr = *head;
+	while (curr != NIL && !found)
+	{
+		if (strcmp(word, curr->oldspeak) == 0)
+		{
+			found = true;
+		}
+		else
+		{
+			prev = curr;
+			curr = curr->next;
+		}
+	}
+
+	if (found)
+	{
+		if (moveToFront)
+		{
+			if (curr != *head)
+			{
+				prev->next = curr->next;
+				curr->next = *head;
+			}
+		}
+		return curr;
+	}
+	return NIL;
 }
 
 /*

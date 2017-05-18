@@ -2,6 +2,9 @@
 # include "bf.h"    // Bloom Filters
 # include <math.h>  // pow
 # include "ll.h"
+
+bool moveToFront;
+
 int main(void)
 {
 	const char *keys[5] = { "fucking nerd", "darrell is amazing", "test key", "unixislove", "test key" };
@@ -28,15 +31,35 @@ int main(void)
 	}
 	printBF(b);
 
-	
+	moveToFront = true;
+		
 	listNode *head = newNode("faggot", "gay");
 	listNode *second = newNode("pols", "redditors");
 	head->next = second;
 	printLL(head);
 
-
 	listNode *newHead = insertLL(&head, "darrell", "god");
 	printLL(newHead);
-	
+
+	char *key = "pols";
+	listNode *found = findLL(&newHead, key);	
+	if (found != NIL)
+	{
+		printf("\nfound key!: %s\n", key);
+		printf("found address: %p\n", (void *) found);
+		if (moveToFront)
+		{
+			printLL(found);
+		}
+		else
+		{
+			printLL(newHead); 
+		}
+	}
+	else
+	{
+		printf("\nnot found!: %s\n", key);
+		printLL(newHead);
+	}
 	return 0;
 }
