@@ -10,7 +10,6 @@
 # define _HASH_H
 
 # include <stdint.h>
-# include "hashFunc.h" // hash function
 # include "ll.h"   // linked list interface
 
 typedef struct hashTable

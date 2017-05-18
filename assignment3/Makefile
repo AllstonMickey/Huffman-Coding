@@ -2,8 +2,8 @@ CC = gcc
 #REMEMBER TO ADD -WERROR BACK INTO CFLAGS
 CFLAGS = -Wall -Wextra -Wpedantic -std=c99
 RM = rm -f
-HEADERS = bf.h hashFunc.h aes.h ll.h
-OBJECTS = test.o aes.o ll.o
+HEADERS = bf.h hashFunc.h aes.h ll.h hash.h
+OBJECTS = test.o aes.o ll.o hash.o
 
 .PHONY: all
 all : test
@@ -13,6 +13,9 @@ test : $(OBJECTS)
 
 test.o : test.c $(HEADERS)
 	$(CC) $(CFLAGS) test.c -c
+
+hash.o : hash.c hash.h hashFunc.h
+	$(CC) $(CFLAGS) hash.c -c
 
 aes.o : aes.c aes.h
 	$(CC) $(CFLAGS) aes.c -c
