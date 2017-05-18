@@ -7,6 +7,10 @@
 # define NIL (void *) 0
 # endif
 
+# ifndef MASK
+# define MASK 0x0000FFFF
+# endif
+
 # ifndef _BF_H
 # define _BF_H
 

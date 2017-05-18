@@ -1,24 +1,50 @@
-# include "hashFunc.h" // hash function
-# include "ll.h"   // linked list interface
+# include "hash.h" // hash function interface
 
-typedef struct hashTable
-{
-	listNode **h;  // Array of pointers to heads of linked lists
-	uint32_t s[4]; // Salt
-	uint32_t l;    // Length
-} hashTable;
-
-uint16_t hashHT(hashTable *, const char *)
+/*
+ *
+ */
+uint16_t hashHT(hashTable *ht, const char *key)
 {
 
 }
 
 /*
-hashTable *newHT(uint32_t, uint32_t []);
+ *
+ */
+hashTable *newHT(uint32_t len, uint32_t hashes[])
+{
 
-void delHT(hashTable *);
+}
 
-listNode *findHT(hashTable *, const char *);
-
-void insertHT(hashTable *, const char *, const char *);
 /*
+ *
+ */
+void delHT(hashTable *ht)
+{
+
+}
+
+/*
+ *
+ */
+listNode *findHT(hashTable *ht, const char *key)
+{
+
+}
+
+/*
+ *
+ */
+void insertHT(hashTable *ht, const char *word, const char *tran)
+{
+
+}
+
+/*
+ *
+ */
+void printHT(const hashTable *ht)
+{
+
+}
+

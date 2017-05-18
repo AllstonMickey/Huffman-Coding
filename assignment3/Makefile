@@ -1,7 +1,6 @@
 CC = gcc
 #REMEMBER TO ADD -WERROR BACK INTO CFLAGS
 CFLAGS = -Wall -Wextra -Wpedantic -std=c99
-MASK= -DMASK=0x0000FFFF
 RM = rm -f
 HEADERS = bf.h hashFunc.h aes.h ll.h
 OBJECTS = test.o aes.o ll.o
@@ -13,7 +12,7 @@ test : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o test
 
 test.o : test.c $(HEADERS)
-	$(CC) $(CFLAGS) $(MASK) test.c -c
+	$(CC) $(CFLAGS) test.c -c
 
 aes.o : aes.c aes.h
 	$(CC) $(CFLAGS) aes.c -c
