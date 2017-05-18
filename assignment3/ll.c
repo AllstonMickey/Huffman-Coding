@@ -62,13 +62,12 @@ void delNode(listNode *node)
  */
 void delLL(listNode *head)
 {
-	listNode *curr = head;
-	while (curr->next != NIL)
+	while (head != NIL)
 	{
-		delNode(curr);
-		curr = curr->next;
+		listNode *next = head->next;
+		delNode(head);
+		head = next;
 	}
-	delNode(curr);
 }
 
 /*
