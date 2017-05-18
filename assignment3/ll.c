@@ -1,6 +1,6 @@
-# include <stdlib.h>
-# include <stdio.h>
-# include <string.h>
+# include <stdlib.h>   // malloc, free
+# include <stdio.h>    // printing
+# include <string.h>   // strcmp
 # include "strclone.h" // strdup() from <strings.h> implementation because not supported in -std=c99
 # include "ll.h"
 
@@ -136,7 +136,6 @@ listNode *findLL(listNode **head, const char *word)
  */
 void printLL(listNode *head)
 {
-	printf("\n------- new -------\n");
 	listNode *curr = head;
 	while (curr != NIL)
 	{

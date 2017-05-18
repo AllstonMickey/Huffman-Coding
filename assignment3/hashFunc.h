@@ -6,8 +6,8 @@
 # define _HASHFUNC_H
 
 # include <stdint.h>
-# include <stdlib.h>
-# include <string.h>
+# include <stdlib.h> // calloc, free
+# include <string.h> // strlen, memcpy
 # include "aes.h"
 
 /*
