@@ -16,7 +16,7 @@ int main(void)
 	bloomF *a = newBF(pow(2, 16), initA); // new bloom filter of 65k entries with initA hashes as salts
 	for (int i = 0; i < keyLen; i += 1)
 	{
-		printf("%u\n", hash(a->s, keys[i]) & MASK);
+		printf("%u\n", hashBF(a, keys[i]));
 		setBF(a, keys[i]);
 	}
 	printBF(a);
@@ -26,7 +26,7 @@ int main(void)
 	bloomF *b = newBF(pow(2, 16), initB);
 	for (int i = 0; i < keyLen; i += 1)
 	{
-		printf("%u\n", hash(b->s, keys[i]) & MASK);
+		printf("%u\n", hashBF(b, keys[i]));
 		setBF(b, keys[i]);
 	}
 	printBF(b);

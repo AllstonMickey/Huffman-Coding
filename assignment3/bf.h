@@ -14,7 +14,7 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <string.h>
-# include "hash.h"
+# include "hashFunc.h"
 
 typedef struct bloomF
 {
@@ -23,15 +23,23 @@ typedef struct bloomF
 	uint32_t s[4]; // Salt
 } bloomF;
 
-// Each function has its own has function, determined by the salt.
-
-uint32_t hashBF(bloomF *, char *);
+/*
+ * Hashes a key into a 16 bit unsigned integer.
+ *
+ * @param bf  Bloom Filter which contains the 4 salts for the hash function
+ * @param key Key to hash.
+ * @return Hashed value of key.
+ */
+uint16_t hashBF(bloomF *bf, const char *key)
+{
+	return hash(bf->s, key) & MASK;
+}
 
 /*
  * Create a new Bloom Filter
  *
  * @param len     Length, number of bits to allocate to the new BF
- * @param hashes  Hash functions
+ * @param hashes  Array of hash functions (must be size of 4!)
  * @return bloomF The pointer to the new BF
  */
 static inline bloomF *newBF(uint32_t len, uint32_t hashes[])
@@ -142,10 +150,9 @@ static inline uint32_t countBF(bloomF *bf)
  */
 static inline void setBF(bloomF *bf, const char *key)
 {
-	uint16_t bit = hash(bf->s, key) & MASK;
+	uint16_t bit = hashBF(bf, key);
 	bf->v[bit >> 3] |= (0x1 << (bit % 8));
 }
-
 
 /*
  * Hashes a key string to a 2 byte unsigned integer.
@@ -157,7 +164,7 @@ static inline void setBF(bloomF *bf, const char *key)
  */
 static inline void clrBF(bloomF *bf, const char *key)
 {
-	uint16_t bit = hash(bf->s, key) & MASK;
+	uint16_t bit = hashBF(bf, key);
 	bf->v[bit >> 3] &= ~(0x1 << (bit % 8));
 }
 
@@ -170,9 +177,9 @@ static inline void clrBF(bloomF *bf, const char *key)
  * @return 0: bit is turned off
  *         1: bit is turned on
  */
-static inline uint8_t memBF(bloomF *bf, char *key)
+static inline uint8_t memBF(bloomF *bf, const char *key)
 {
-	uint16_t bit = hash(bf->s, key) & MASK;
+	uint16_t bit = hashBF(bf, key);
 	return valBF(bf, bit);
 }
 

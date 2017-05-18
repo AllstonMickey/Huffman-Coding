@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Wpedantic -std=c99
 MASK= -DMASK=0x0000FFFF
 RM = rm -f
-HEADERS = bf.h hash.h aes.h ll.h
+HEADERS = bf.h hashFunc.h aes.h ll.h
 OBJECTS = test.o aes.o ll.o
 
 .PHONY: all
@@ -20,7 +20,6 @@ aes.o : aes.c aes.h
 
 ll.o : ll.c ll.h strclone.h
 	$(CC) $(CFLAGS) ll.c -c
-
 
 .PHONY: clean
 clean :
