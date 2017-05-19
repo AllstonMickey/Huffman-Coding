@@ -48,7 +48,7 @@ int main(void)
 	
 	printHT(table);
 	printf("\n######## findHT result: ########\n");
-	printLL(findHT(table, keys[3]));
+	printLL(findHT(table, keys[1]));
 	
 	printf("\n\n");
 	printHT(table);

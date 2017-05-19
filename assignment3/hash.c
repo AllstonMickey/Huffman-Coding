@@ -81,7 +81,14 @@ listNode *findHT(hashTable *ht, const char *key)
 {
 	uint32_t index = hashHT(ht, key);
 	listNode *head = ht->h[index];
-	return findLL(&head, key);
+	listNode *found = findLL(&head, key);
+
+	if (moveToFront && found)
+	{
+		ht->h[index] = found;
+	}
+
+	return found;
 }
 
 /*
