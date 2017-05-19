@@ -7,7 +7,8 @@ bool moveToFront;
 
 int main(void)
 {
-	const char *keys[5] = { "fucking nerd", "darrell is amazing", "test key", "unixislove", "test key" };
+	const char *keys[5] = { "fucking nerd",  "darrell is amazing", "test key", "windowsIsLove", "redditors" };
+	const char *tran[5] = { "jimmy neutron", "darrell is Odin",    "test key", "unixIsLife",    "poltards"  };
 	uint8_t keyLen = 5;
 	uint32_t entries = pow(2, 16);
 
@@ -20,7 +21,7 @@ int main(void)
 		printf("%u\n", hashBF(a, keys[i]));
 		setBF(a, keys[i]);
 	}
-	printBF(a);
+//	printBF(a);
 
 	printf("\n\n--------- SECOND SALT STARTING ----------\n");
 	uint32_t initB[] = {0xDeadBeef, 0xFadedB0a, 0xCafeD00d, 0xC0c0aB0a}; // second set of salts
@@ -30,13 +31,20 @@ int main(void)
 		printf("%u\n", hashBF(b, keys[i]));
 		setBF(b, keys[i]);
 	}
-	printBF(b);
-
+//	printBF(b);
+	delBF(a);
+	delBF(b);
 	moveToFront = false;
 
 	uint32_t initH[] = {0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0Babe}; // salts for hash table
 	hashTable *table = newHT(entries, initH);
+	
+	for (int i = 0; i < 5; i += 1)
+	{
+		insertHT(table, keys[i], tran[i]);
+	}
+	
 	printHT(table);
-
+	delHT(table);
 	return 0;
 }

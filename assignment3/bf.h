@@ -82,22 +82,11 @@ static inline bloomF *newBF(uint32_t len, uint32_t hashes[])
  */
 static inline void delBF(bloomF *bf)
 {
-	if (bf != NIL)
-	{
-		if (bf->v != NIL)
-		{
-			bf->s[0] = 0;
-			bf->s[1] = 0;
-			bf->s[2] = 0;
-			bf->s[3] = 0;
-			bf->l    = 0;
-			
-			free(bf->v);
-			bf->v = NIL;
-		}
-		free(bf);
-		bf = NIL;
-	}
+	free(bf->v);
+	bf->v = NIL;
+	
+	free(bf);
+	bf = NIL;
 }
 
 /*
