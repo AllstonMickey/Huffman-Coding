@@ -3,16 +3,16 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Wpedantic -std=c99
 RM = rm -f
 HEADERS = bf.h hashFunc.h aes.h ll.h hash.h
-OBJECTS = test.o aes.o ll.o hash.o
+OBJECTS = banhammer.o aes.o ll.o hash.o
 
 .PHONY: all
-all : test
+all : banhammer
 
-test : $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o test
+banhammer : $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o banhammer
 
-test.o : test.c $(HEADERS)
-	$(CC) $(CFLAGS) test.c -c
+banhammer.o : banhammer.c $(HEADERS)
+	$(CC) $(CFLAGS) banhammer.c -c
 
 hash.o : hash.c hash.h hashFunc.h
 	$(CC) $(CFLAGS) hash.c -c
@@ -25,4 +25,4 @@ ll.o : ll.c ll.h strclone.h
 
 .PHONY: clean
 clean :
-	$(RM) test $(OBJECTS)
+	$(RM) banhammer test $(OBJECTS)

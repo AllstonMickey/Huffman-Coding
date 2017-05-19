@@ -34,7 +34,7 @@ int main(void)
 	delBF(a);
 	delBF(b);
 
-	moveToFront = true;
+	moveToFront = false;
 
 	uint32_t initH[] = {0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0Babe}; // salts for hash table
 	hashTable *table = newHT(entries, initH);
