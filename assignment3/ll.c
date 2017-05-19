@@ -124,7 +124,7 @@ listNode *findLL(listNode **head, const char *word)
 		}
 		return curr;
 	}
-	return NIL;
+	return (listNode *) NIL;
 }
 
 /*
