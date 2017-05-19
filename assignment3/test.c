@@ -34,10 +34,8 @@ int main(void)
 	delBF(a);
 	delBF(b);
 
-	// TODO: this broke for some reason?	
 	moveToFront = true;
 
-	/*
 	uint32_t initH[] = {0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0Babe}; // salts for hash table
 	hashTable *table = newHT(entries, initH);
 	
@@ -49,24 +47,12 @@ int main(void)
 	}
 	
 	printHT(table);
-	findHT(table, keys[3]);
+	printf("\n######## findHT result: ########\n");
+	printLL(findHT(table, keys[3]));
+	
+	printf("\n\n");
 	printHT(table);
 	delHT(table);
-	*/
 
-	
-	listNode *head1 = newNode(keys[0], tran[0]);
-
-	listNode *head2 = newNode(keys[4], tran[4]);
-	listNode *third = newNode(keys[3], tran[3]);
-	head2->next = third;
-	listNode *first = newNode(keys[1], tran[1]);
-	third->next = first;
-
-	listNode *head3 = newNode(keys[2], tran[2]);
-	
-	printf("---- new ----\n"); printLL(head1); printf("\n"); printLL(head2); printf("\n"); printLL(head3);
-	findLL(&head2, keys[3]);
-	printf("\n---- new ----\n"); printLL(head1); printf("\n"); printLL(head2); printf("\n"); printLL(head3);
 	return 0;
 }
