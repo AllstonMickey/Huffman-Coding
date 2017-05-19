@@ -2,10 +2,6 @@
 # define NIL (void *) 0
 # endif
 
-# ifndef MASK
-# define MASK 0x0000FFFF
-# endif
-
 # ifndef _HASH_H
 # define _HASH_H
 
@@ -19,7 +15,7 @@ typedef struct hashTable
 	uint32_t l;    // Length
 } hashTable;
 
-uint16_t hashHT(hashTable *ht, const char *key);
+uint32_t hashHT(hashTable *ht, const char *key);
 
 hashTable *newHT(uint32_t len, uint32_t hashes[]);
 

@@ -114,17 +114,19 @@ listNode *findLL(listNode **head, const char *word)
 
 	if (found)
 	{
+		printf("found!: %p %s\n", (void *) curr, curr->oldspeak);
 		if (moveToFront)
 		{
 			if (curr != *head)
 			{
-				prev->next = curr->next;
+				listNode *next = curr->next;
+				prev->next = next;
 				curr->next = *head;
 			}
 		}
 		return curr;
 	}
-	return (listNode *) NIL;
+	return NIL;
 }
 
 /*

@@ -7,10 +7,6 @@
 # define NIL (void *) 0
 # endif
 
-# ifndef MASK
-# define MASK 0x0000FFFF
-# endif
-
 # ifndef _BF_H
 # define _BF_H
 
@@ -28,15 +24,15 @@ typedef struct bloomF
 } bloomF;
 
 /*
- * Hashes a key into a 16 bit unsigned integer.
+ * Hashes a key that into a value that is less than the number of bits in the Bloom Filter.
  *
  * @param bf  Bloom Filter which contains the 4 salts for the hash function
  * @param key Key to hash.
  * @return Hashed value of key.
  */
-uint16_t hashBF(bloomF *bf, const char *key)
+uint32_t hashBF(bloomF *bf, const char *key)
 {
-	return hash(bf->s, key) & MASK;
+	return hash(bf->s, key) % bf->l;
 }
 
 /*
@@ -143,7 +139,7 @@ static inline uint32_t countBF(bloomF *bf)
  */
 static inline void setBF(bloomF *bf, const char *key)
 {
-	uint16_t bit = hashBF(bf, key);
+	uint32_t bit = hashBF(bf, key);
 	bf->v[bit >> 3] |= (0x1 << (bit % 8));
 }
 
@@ -157,7 +153,7 @@ static inline void setBF(bloomF *bf, const char *key)
  */
 static inline void clrBF(bloomF *bf, const char *key)
 {
-	uint16_t bit = hashBF(bf, key);
+	uint32_t bit = hashBF(bf, key);
 	bf->v[bit >> 3] &= ~(0x1 << (bit % 8));
 }
 
@@ -172,7 +168,7 @@ static inline void clrBF(bloomF *bf, const char *key)
  */
 static inline uint8_t memBF(bloomF *bf, const char *key)
 {
-	uint16_t bit = hashBF(bf, key);
+	uint32_t bit = hashBF(bf, key);
 	return valBF(bf, bit);
 }
 
@@ -193,7 +189,7 @@ static inline void printBF(bloomF *bf)
 		{
 			printf("\n");
 		}
-		if ((i + 1) % 4 == 0)
+		if (i % 4 == 0)
 		{
 			printf(" ");
 		}

@@ -4,22 +4,22 @@
 # include "hashFunc.h"
 
 /*
- * Hashes a key into a 16 bit unsigned integer.
+ * Hashes a key into a value that is less than the length of the Hash Table.
  *
  * @param ht  Hash Table which contains the four salts required to hash
  * @param key Key to hash
  * @return Hashed value of key.
  */
-uint16_t hashHT(hashTable *ht, const char *key)
+uint32_t hashHT(hashTable *ht, const char *key)
 {
-	return hash(ht->s, key) & MASK;
+	return hash(ht->s, key) % ht->l;
 }
 
 /*
  * Creates a new Hash Table
  *
  * @param len  Length of HT, number of bits/entries
- * @param hashes An array of 4 uin32_t hashes to be used as salts when hashing keys.
+ * @param hashes An array of 4 uint32_t hashes to be used as salts when hashing keys.
  */
 hashTable *newHT(uint32_t len, uint32_t hashes[])
 {
@@ -70,20 +70,49 @@ void delHT(hashTable *ht)
 }
 
 /*
-   listNode *findHT(hashTable *ht, const char *key)
-   {
+ * Finds a key in a Hash Table
+ * 
+ * @param ht  Hash Table to search in
+ * @param key Key to search for
+ * @return The Node of the Linked List which contains the key
+ * 	       returns (listNode *) NIL on failure.
+ */
+listNode *findHT(hashTable *ht, const char *key)
+{
+	uint32_t index = hashHT(ht, key);
+	listNode *head = ht->h[index];
+	return findLL(&head, key);
+}
 
-   }
-   */
-
+/*
+ * Inserts a word and its translation into a Hash Table
+ *
+ * @param ht Hash Table to insert into
+ * @param word Key value
+ * @param tran Translation of the key value/word
+ * @return void
+ */
 void insertHT(hashTable *ht, const char *word, const char *tran)
 {
-	uint16_t index = hashHT(ht, word);
-	ht->h[index] = newNode(word, tran);
+	uint32_t index = hashHT(ht, word);
+	listNode *head = ht->h[index];
+	if (head == NIL)
+	{
+		head = newNode(word, tran);
+	}
+	else
+	{
+		head = insertLL(&head, word, tran);
+	}
+	
+	ht->h[index] = head;
 }
 
 /*
  * For each index of the Hash Table, print its linked list.
+ * 
+ * @param ht Hash Table to print
+ * @return void
  */
 void printHT(const hashTable *ht)
 {
