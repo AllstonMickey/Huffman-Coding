@@ -25,7 +25,7 @@ char *stol(char *s);
 
 bool moveToFront;    // global variable flag shared with ll.h
 
-FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2); // hashes keys into Bloom Filters
+FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into Bloom Filters
 FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht);
 void thoughtcrimeLetter();
 void goodspeakLetter();
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 	uint32_t initH[] = { 0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0Babe }; // Hash Table salts
 	hashTable *table = newHT(hashLen, initH);
 	
-	FILE *badspeakf = gatherBadspeak(filterA, filterB);
+	FILE *badspeakf = gatherBadspeak(filterA, filterB, table);
 	if (!badspeakf)
 	{
 		return errno;
@@ -106,6 +106,9 @@ int main(int argc, char **argv)
 	 * Get input from stdin using a scanner defined by flex
 	 */
 
+	listNode *badspeakList = NIL;
+	listNode *newspeakList = NIL;
+
 	yyin = stdin;
 	printf("entering yylex...\n");
 	while (yylex() != -1)
@@ -119,10 +122,47 @@ int main(int argc, char **argv)
 		if (memBF(filterA, key) && memBF(filterB, key))
 		{
 			printf("passed both blooms\n");
+			listNode *found = findHT(table, key);
+			if (found)
+			{
+				if (strcmp(found->newspeak, INVALID) == 0)
+				{
+					printf("no translation\n");
+					if (badspeakList == NIL)
+					{
+						// first node
+						printf("adding first node\n");
+						badspeakList = newNode(found->oldspeak, found->newspeak);
+					}
+					else // there are other nodes
+					{
+						printf("inserting node\n");
+						badspeakList = insertLL(&badspeakList, found->oldspeak, found->newspeak);
+					}
+				}
+				else
+				{
+					printf("translation\n");
+					if (newspeakList == NIL)
+					{
+						printf("adding first node\n");
+						newspeakList = newNode(found->oldspeak, found->newspeak);
+					}
+					else
+					{
+						printf("inserting node\n");
+						newspeakList = insertLL(&newspeakList, found->oldspeak, found->newspeak);
+					}
+				}
+			}
 		}
 		printf("%u %u\n", memBF(filterA, key), memBF(filterB, key));
-		free(key);
 	}
+	printf("\n-------- badspeak printing... --------\n");
+	printLL(badspeakList);
+	printf("\n-------- newspeak printing... --------\n");
+	printLL(newspeakList);
+
 
 	delHT(table);
 	delBF(filterB);
@@ -157,7 +197,7 @@ char *stol(char *s)
  * @param bf1      First Bloom Filter
  * @param bf2      Second Bloom Filter
  */
-FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2)
+FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 {
 	FILE *badf;
 	if (!(badf = fopen("/afs/cats.ucsc.edu/users/g/darrell/badspeak.txt", "r")))
@@ -174,6 +214,7 @@ FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2)
 	{
 		setBF(bf1, old);
 		setBF(bf2, old);
+		insertHT(ht, old, INVALID);
 	}
 
 	return badf;
