@@ -6,19 +6,29 @@
 # include "bf.h"     // Bloom Filters, stdint, stdio, stdlib, and the hash function
 # include "hash.h"   // Hash Tables, Linked Lists, stdint, and stdbool
 
+// TODO: document functions
+// 	    implement searching the file and printing what matched
+
 # ifndef MAXBUFFER
 # define MAXBUFFER 100
+# endif
+
+# ifndef INVALID
+# define INVALID "<%HIS-NAME-WAS-SETH-RICH%>"
 # endif
 
 int yylex(void);     // runs the scanner until it reaches a token.  Returns the token.
 extern char *yytext;  // when yylex returns its token, this holds the char* it found
 extern FILE *yyin;   // file from which the scanner gets input from (def: stdin)
 
+char *stol(char *s);
+
 bool moveToFront;    // global variable flag shared with ll.h
 
-int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into BFs and HTs
-void convertComrade(); // sends a letter about converting your comrade's oldspeak into newspeak
-void joycampComrade(); // sends a letter about their joycamp vacation to your comrade
+FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2); // hashes keys into Bloom Filters
+FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht);
+void thoughtcrimeLetter();
+void goodspeakLetter();
 void printStatistics();
 
 int main(int argc, char **argv)
@@ -34,40 +44,40 @@ int main(int argc, char **argv)
 		switch (opt)
 		{
 			case 'm':
-			{
-				moveToFront = true;
-				break;
-			}
+				{
+					moveToFront = true;
+					break;
+				}
 			case 'b':
-			{
-				moveToFront = false;
-				break;
-			}
+				{
+					moveToFront = false;
+					break;
+				}
 			case 's':
-			{
-				suppress = true;
-				break;
-			}
+				{
+					suppress = true;
+					break;
+				}
 			case 'h':
-			{
-				hashLen = atoi(optarg);
-				break;
-			}
+				{
+					hashLen = atoi(optarg);
+					break;
+				}
 			case 'f':
-			{
-				bfLen = atoi(optarg);
-				break;
-			}
+				{
+					bfLen = atoi(optarg);
+					break;
+				}
 			case '?':
-			{
-				perror("getopt [banhammer.c:XX]: invalid argument");
-				break;
-			}
+				{
+					perror("getopt [banhammer.c:XX]: invalid argument");
+					break;
+				}
 			default:
-			{
-				perror("getopt [banhammer.c:XX]: Something very bad happened");
-				break;
-			}
+				{
+					perror("getopt [banhammer.c:XX]: Something very bad happened");
+					break;
+				}
 		}
 	}
 
@@ -79,23 +89,63 @@ int main(int argc, char **argv)
 
 	uint32_t initH[] = { 0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0Babe }; // Hash Table salts
 	hashTable *table = newHT(hashLen, initH);
+	
+	FILE *badspeakf = gatherBadspeak(filterA, filterB);
+	if (!badspeakf)
+	{
+		return errno;
+	}
 
-	gatherWords(filterA, filterB, table);
+	FILE *newspeakf = gatherNewspeak(filterA, filterB, table);
+	if (!newspeakf)
+	{
+		return errno;
+	}
 
-	// get all words from stdin until EOF
-	bool sendLetter = false;
-	bool sendToJoycamp = false;
+	/*
+	 * Get input from stdin using a scanner defined by flex
+	 */
+
 	yyin = stdin;
+	printf("entering yylex...\n");
 	while (yylex() != -1)
 	{
-		// current word is held in yytext
+		char *key = stol(yytext);
+
+		/*
+		 *
+		 */
+		
+		if (memBF(filterA, key) && memBF(filterB, key))
+		{
+			printf("passed both blooms\n");
+		}
+		printf("%u %u\n", memBF(filterA, key), memBF(filterB, key));
+		free(key);
 	}
-	
+
 	delHT(table);
 	delBF(filterB);
 	delBF(filterA);
 
 	return 0;
+}
+
+char *stol(char *s)
+{
+	char *lower = (char *) malloc(sizeof(char) * strlen(s));
+	for (uint32_t i = 0; i < strlen(s); i += 1)
+	{
+		if (s[i] > 64 && s[i] < 91)
+		{
+			lower[i] = s[i] + 32;
+		}
+		else
+		{
+			lower[i] = s[i];
+		}
+	}
+	return lower;
 }
 
 /*
@@ -106,119 +156,80 @@ int main(int argc, char **argv)
  *
  * @param bf1      First Bloom Filter
  * @param bf2      Second Bloom Filter
- * @param ht       Hash Table of pointers to heads of Linked Lists
- * @return errno:  An error occurred while opening or closing a file.
- *         0:      Success
  */
-int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht)
+FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2)
 {
-	/*
-	 * Try to open badspeak from Darrell's directory.
-	 * If it fails, read from my directory.
-	 * If that fails, return errno.
-	 */
-
-	FILE *badspeakf;
-	badspeakf = fopen("/afs/cats.ucsc.edu/users/g/darrell/badspeak.txt", "r");
-	if (badspeakf == NIL)
+	FILE *badf;
+	if (!(badf = fopen("/afs/cats.ucsc.edu/users/g/darrell/badspeak.txt", "r")))
 	{
-		badspeakf = fopen("/afs/cats.ucsc.edu/users/j/amickey/cmps12b/assignment3/badspeak.txt", "r");
-		if (badspeakf == NIL)
+		if (!(badf = fopen("/afs/cats.ucsc.edu/users/j/amickey/cmps12b/assignment3/badspeak.txt", "r")))
 		{
-			perror("badspeakf [banhammer.c:XX]: badspeakf is NIL, could not be opened");
-			return errno;
+			perror("badf [banhammer.c:XX]: could not open badspeak.txt");
+			return NIL;
 		}
 	}
 
-	/*
-	 * badspeak.txt is opened
-	 * read words from badspeak.txt and set the Bloom Filters
-	 */
-	
-	char *old = malloc(sizeof(char) * MAXBUFFER);
-	while (fscanf(badspeakf, "%s \n", old) != EOF)
+	char old[MAXBUFFER];
+	while (fscanf(badf, "%s \n", old) != EOF)
 	{
 		setBF(bf1, old);
 		setBF(bf2, old);
 	}
 
-	/*
-	 * Close badspeak. 
-	 * If failed, set the FILE* to NIL and return errno.
-	 */
+	return badf;
+}
 
-	if (fclose(badspeakf))
+FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
+{
+	FILE *newf;
+	if (!(newf = fopen("/afs/cats.ucsc.edu/users/g/darrell/newspeak.txt", "r")))
 	{
-		badspeakf = NIL;
-		perror("badspeakf [banhammer.c:XX]: badspeakf could not be closed, pointer has been set to NIL");
-		return errno;
-	}
-
-	/*
-	 * Do the same with newspeak.txt but insert the oldspeak and
-	 * newspeak words (key and translation) into a Hash Table
-	 */
-
-	FILE *newspeakf;
-	newspeakf = fopen("/afs/cats.ucsc.edu/users/g/darrell/newspeak.txt", "r");
-	if (newspeakf == NIL)
-	{
-		newspeakf = fopen("/afs/cats.ucsc.edu/users/j/amickey/cmps12b/assignment3/newspeak.txt", "r");
-		if (newspeakf == NIL)
+		if (!(newf = fopen("/afs/cats.ucsc.edu/users/j/amickey/cmps12b/assignment3/newspeak.txt", "r")))
 		{
-			perror("newspeakf [banhammer.c:XX]: newspeakf is NIL, could not be opened");
-			return errno;
+			perror("newf [banhammer.c:XX]: could not open newspeak.txt");
+			return NIL;
 		}
 	}
 
-
-	char *new = malloc(sizeof(char) * MAXBUFFER);
-	while (fscanf(newspeakf, "%s %s \n", old, new) != EOF)
+	char old[MAXBUFFER];
+	char new[MAXBUFFER];
+	while (fscanf(newf, "%s %s \n", old, new) != EOF)
 	{
 		setBF(bf1, old);
 		setBF(bf2, old);
 		insertHT(ht, old, new);
 	}
 
-	if (fclose(newspeakf))
-	{
-		newspeakf = NIL;
-		perror("newspeakf [banhammer.c:XX]: newspeakf could not be closed, pointer has been set to NIL");
-		return errno;
-	}
-
-	free(new);
-	free(old);
-	return 0; // success
+	return newf;
 }
 
-void convertComrade() // sends a letter about converting your comrade's oldspeak into newspeak
+void thoughtcrimeLetter() // sends a letter to your comrade
 {
 	char *letter[] = { "Dear Comrade,\n",
-			   "Submitting your text helps to preserve feelings and prevent",
-			   "badthink. Some of the words that you used are not goodspeak.",
-			   "The list shows how to turn the oldspeak words into newspeak." };
-
-	for (int line = 0; line < 4; line += 1)
-	{
-		printf("%s\n", letter[line]);
-	}
-}
-
-void joycampComrade() // sends a letter to your comrade
-{
-	char *letter[] = { "Dear Comrade,\n",
-			   "You have chosen to use degenerate words that may cause hurt",
-			   "feelings or cause your comrades to think unpleasant thoughts.",
-			   "This is doubleplus bad. To correct your wrongthink and",
-			   "save community consensus we will be sending you to joycamp",
-			   "administered by Miniluv." };
+		"You have chosen to use degenerate words that may cause hurt",
+		"feelings or cause your comrades to think unpleasant thoughts.",
+		"This is doubleplus bad. To correct your wrongthink and",
+		"save community consensus we will be sending you to joycamp",
+		"administered by Miniluv." };
 
 	for (int line = 0; line < 6; line += 1)
 	{
 		printf("%s\n", letter[line]);
 	}
 
+}
+
+void goodspeakLetter() // sends a letter about converting your comrade's oldspeak into newspeak
+{
+	char *letter[] = { "Dear Comrade,\n",
+		"Submitting your text helps to preserve feelings and prevent",
+		"badthink. Some of the words that you used are not goodspeak.",
+		"The list shows how to turn the oldspeak words into newspeak." };
+
+	for (int line = 0; line < 4; line += 1)
+	{
+		printf("%s\n", letter[line]);
+	}
 }
 
 void printStatistics()

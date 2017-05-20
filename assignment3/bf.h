@@ -139,7 +139,7 @@ static inline uint32_t countBF(bloomF *bf)
 static inline void setBF(bloomF *bf, const char *key)
 {
 	uint32_t bit = hashBF(bf, key);
-	bf->v[bit >> 3] |= (0x1 << (bit % 8));
+	(bf->v)[bit >> 3] |= (0x1 << (bit % 8));
 }
 
 /*
