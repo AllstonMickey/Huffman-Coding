@@ -6,13 +6,18 @@
 # include "bf.h"     // Bloom Filters, stdint, stdio, stdlib, and the hash function
 # include "hash.h"   // Hash Tables, Linked Lists, stdint, and stdbool
 
+# ifndef MAXBUFFER
+# define MAXBUFFER 100
+# endif
+
 int yylex(void);     // runs the scanner until it reaches a token.  Returns the token.
-extern char *yytex;  // when yylex returns its token, this holds the char* it found
+extern char *yytext;  // when yylex returns its token, this holds the char* it found
 extern FILE *yyin;   // file from which the scanner gets input from (def: stdin)
 
 bool moveToFront;    // global variable flag shared with ll.h
 
 int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into BFs and HTs
+void messageComrade(bloomF *bf1, bloomF *bf2, hashTable *ht); // sends a letter to your comrade
 
 int main(int argc, char **argv)
 {
@@ -63,7 +68,6 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-	
 
 	uint32_t initA[] = { 0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0aB0a }; // first Bloom Filter salts
 	bloomF *filterA = newBF(bfLen, initA);
@@ -75,10 +79,7 @@ int main(int argc, char **argv)
 	hashTable *table = newHT(hashLen, initH);
 
 	gatherWords(filterA, filterB, table);
-	
-	//printBF(filterA);
-	//printBF(filterB);
-	printHT(table);
+	messageComrade(filterA, filterB, table);
 
 	delHT(table);
 	delBF(filterB);
@@ -124,7 +125,7 @@ int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	 * read words from badspeak.txt and set the Bloom Filters
 	 */
 	
-	char *old = malloc(sizeof(char) * 100);
+	char *old = malloc(sizeof(char) * MAXBUFFER);
 	while (fscanf(badspeakf, "%s \n", old) != EOF)
 	{
 		setBF(bf1, old);
@@ -161,7 +162,7 @@ int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	}
 
 
-	char *new = malloc(sizeof(char) * 100);
+	char *new = malloc(sizeof(char) * MAXBUFFER);
 	while (fscanf(newspeakf, "%s %s \n", old, new) != EOF)
 	{
 		setBF(bf1, old);
@@ -180,3 +181,18 @@ int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	free(old);
 	return 0; // success
 }
+
+void messageComrade(bloomF *bf1, bloomF *bf2, hashTable *ht)
+{
+
+	// get all words from stdin until EOF
+	yyin = stdin;
+	while (yylex() != -1)
+	{
+		// current word is held in yytext
+		// check BF1
+		// check BF2
+		// find LL
+	}
+}
+
