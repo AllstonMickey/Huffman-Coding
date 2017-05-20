@@ -26,8 +26,6 @@ test : aes.o ll.o hash.o test.o
 test.o : test.c $(HEADERS)
 	$(CC) $(CFLAGS) test.c -c
 
-
-
 hash.o : hash.c hash.h hashFunc.h
 	$(CC) $(CFLAGS) hash.c -c
 
