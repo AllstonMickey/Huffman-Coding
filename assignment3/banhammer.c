@@ -20,6 +20,7 @@
 int yylex(void);     // runs the scanner until it reaches a token.  Returns the token.
 extern char *yytext;  // when yylex returns its token, this holds the char* it found
 extern FILE *yyin;   // file from which the scanner gets input from (def: stdin)
+int freeFlexScanner(void);
 
 char *stol(char *s);
 
@@ -203,7 +204,7 @@ int main(int argc, char **argv)
 	table = NIL;
 	filterB = NIL;
 	filterA = NIL;
-
+	freeFlexScanner();
 	return 0;
 }
 

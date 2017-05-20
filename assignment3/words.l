@@ -19,3 +19,9 @@ PUNC [~‘!@#$%^&*()_+-={}|\\\[\]:;\"\'\’`<>,./?]
 
 %%
 
+int freeFlexScanner(void)
+{
+	//yy_delete_buffer(YY_CURRENT_BUFFER);
+	yylex_destroy();
+	yyterminate();
+}
