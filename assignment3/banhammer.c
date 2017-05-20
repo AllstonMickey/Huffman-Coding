@@ -12,7 +12,7 @@ extern FILE *yyin;   // file from which the scanner gets input from (def: stdin)
 
 bool moveToFront;    // global variable flag shared with ll.h
 
-void populateBF(bloomF *bf);
+int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into BFs and HTs
 
 int main(int argc, char **argv)
 {
@@ -74,9 +74,39 @@ int main(int argc, char **argv)
 	uint32_t initH[] = { 0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0Babe }; // Hash Table salts
 	hashTable *table = newHT(hashLen, initH);
 
-	// read in dictionaries and set BF1 and BF2
-	// setBF(bf, key)
+	gatherWords(filterA, filterB, table);
 	
+	//printBF(filterA);
+	//printBF(filterB);
+	printHT(table);
+
+	delHT(table);
+	delBF(filterB);
+	delBF(filterA);
+
+	return 0;
+}
+
+/*
+ * Gathers words from badspeak.txt and newspeak.txt
+ * Sets each oldspeak word into a Bloom Filter.
+ * If there is a corresponding newspeak word, insert
+ * the oldspeak and newspeak as a Linked List Node in a Hash Table.
+ *
+ * @param bf1      First Bloom Filter
+ * @param bf2      Second Bloom Filter
+ * @param ht       Hash Table of pointers to heads of Linked Lists
+ * @return errno:  An error occurred while opening or closing a file.
+ *         0:      Success
+ */
+int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht)
+{
+	/*
+	 * Try to open badspeak from Darrell's directory.
+	 * If it fails, read from my directory.
+	 * If that fails, return errno.
+	 */
+
 	FILE *badspeakf;
 	badspeakf = fopen("/afs/cats.ucsc.edu/users/g/darrell/badspeak.txt", "r");
 	if (badspeakf == NIL)
@@ -90,23 +120,33 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * badspeak is opened
-	 * read words from badspeak.txt and set the Bloom Filter
+	 * badspeak.txt is opened
+	 * read words from badspeak.txt and set the Bloom Filters
 	 */
 	
 	char *old = malloc(sizeof(char) * 100);
 	while (fscanf(badspeakf, "%s \n", old) != EOF)
 	{
-		setBF(filterA, old);
-		setBF(filterB, old);
+		setBF(bf1, old);
+		setBF(bf2, old);
 	}
+
+	/*
+	 * Close badspeak. 
+	 * If failed, set the FILE* to NIL and return errno.
+	 */
 
 	if (fclose(badspeakf))
 	{
 		badspeakf = NIL;
-		perror("badspeakf [banhammer.c:XX]: badspeakf could not be closed, set pointer to NIL");
+		perror("badspeakf [banhammer.c:XX]: badspeakf could not be closed, pointer has been set to NIL");
 		return errno;
 	}
+
+	/*
+	 * Do the same with newspeak.txt but insert the oldspeak and
+	 * newspeak words (key and translation) into a Hash Table
+	 */
 
 	FILE *newspeakf;
 	newspeakf = fopen("/afs/cats.ucsc.edu/users/g/darrell/newspeak.txt", "r");
@@ -120,24 +160,23 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/*
-	 * newspeak is opened
-	 * read words and translations from badspeak.txt and set the Bloom Filter
-	 */
 
 	char *new = malloc(sizeof(char) * 100);
 	while (fscanf(newspeakf, "%s %s \n", old, new) != EOF)
 	{
-		setBF(filterA, old);
-		setBF(filterB, old);
-		insertHT(table, old, new);
-		printf("%s %s\n", old, new);
+		setBF(bf1, old);
+		setBF(bf2, old);
+		insertHT(ht, old, new);
 	}
 
-	return 0;
-}
+	if (fclose(newspeakf))
+	{
+		newspeakf = NIL;
+		perror("newspeakf [banhammer.c:XX]: newspeakf could not be closed, pointer has been set to NIL");
+		return errno;
+	}
 
-void populateBF(bloomF *bf)
-{
-
+	free(new);
+	free(old);
+	return 0; // success
 }

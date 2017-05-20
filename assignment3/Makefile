@@ -39,4 +39,4 @@ ll.o : ll.c ll.h strclone.h
 
 .PHONY: clean
 clean :
-	$(RM) banhammer test $(OBJECTS) test.o
+	$(RM) banhammer test $(OBJECTS) test.o lex.yy.c
