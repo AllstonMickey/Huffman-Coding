@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 
 	uint32_t initH[] = { 0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0Babe }; // Hash Table salts
 	hashTable *table = newHT(hashLen, initH);
-	
+
 	FILE *badspeakf = gatherBadspeak(filterA, filterB, table);
 	if (!badspeakf)
 	{
@@ -108,72 +108,111 @@ int main(int argc, char **argv)
 
 	listNode *badspeakList = NIL;
 	listNode *newspeakList = NIL;
-
+	char *key;
 	yyin = stdin;
-	printf("entering yylex...\n");
 	while (yylex() != -1)
 	{
-		char *key = stol(yytext);
+		char *temp = stol(yytext);
+		key = temp;
 
-		/*
-		 *
-		 */
-		
 		if (memBF(filterA, key) && memBF(filterB, key))
 		{
-			printf("passed both blooms\n");
 			listNode *found = findHT(table, key);
 			if (found)
 			{
-				if (strcmp(found->newspeak, INVALID) == 0)
+				if (strcmp(found->newspeak, INVALID) == 0) // if badspeak
 				{
-					printf("no translation\n");
 					if (badspeakList == NIL)
 					{
-						// first node
-						printf("adding first node\n");
 						badspeakList = newNode(found->oldspeak, found->newspeak);
 					}
-					else // there are other nodes
+					else
 					{
-						printf("inserting node\n");
-						badspeakList = insertLL(&badspeakList, found->oldspeak, found->newspeak);
+						if (findLL(&badspeakList, found->oldspeak) == NIL)
+						{
+							badspeakList = insertLL(&badspeakList,
+									found->oldspeak, found->newspeak);
+						}
 					}
 				}
 				else
 				{
-					printf("translation\n");
 					if (newspeakList == NIL)
 					{
-						printf("adding first node\n");
 						newspeakList = newNode(found->oldspeak, found->newspeak);
 					}
 					else
 					{
-						printf("inserting node\n");
-						newspeakList = insertLL(&newspeakList, found->oldspeak, found->newspeak);
+						if (findLL(&newspeakList, found->oldspeak) == NIL)
+						{
+							newspeakList = insertLL(&newspeakList,
+									found->oldspeak, found->newspeak);
+						}
 					}
+
 				}
 			}
 		}
-		printf("%u %u\n", memBF(filterA, key), memBF(filterB, key));
+		free(temp);
 	}
-	printf("\n-------- badspeak printing... --------\n");
-	printLL(badspeakList);
-	printf("\n-------- newspeak printing... --------\n");
-	printLL(newspeakList);
 
+	listNode *curr;
+	if (badspeakList)
+	{
+		thoughtcrimeLetter();
+		printf("\nYour errors:\n\n");
 
+		curr = badspeakList;
+		while (curr != NIL)
+		{
+			printf("%s\n", curr->oldspeak);
+			curr = curr->next;
+		}
+
+		if (newspeakList)
+		{
+			curr = newspeakList;
+			printf("\nThink on these words during your vacation!\n\n");
+			while (curr != NIL)
+			{
+				printf("%s -> %s\n", curr->oldspeak, curr->newspeak);
+				curr = curr->next;
+			}
+		}
+	}
+	else if (newspeakList)
+	{
+		goodspeakLetter();
+		curr = newspeakList;
+		while (curr != NIL)
+		{
+			printf("%s -> %s\n", curr->oldspeak, curr->newspeak);
+			curr = curr->next;
+		}
+	}
+
+	delLL(badspeakList);
+	delLL(newspeakList);
+	fclose(newspeakf);
+	fclose(badspeakf);
 	delHT(table);
 	delBF(filterB);
 	delBF(filterA);
+
+	newspeakList = NIL;
+	badspeakList = NIL;
+	newspeakf = NIL;
+	badspeakf = NIL;
+	table = NIL;
+	filterB = NIL;
+	filterA = NIL;
 
 	return 0;
 }
 
 char *stol(char *s)
 {
-	char *lower = (char *) malloc(sizeof(char) * strlen(s));
+	char *lower = (char *) calloc(strlen(s), sizeof(char));
 	for (uint32_t i = 0; i < strlen(s); i += 1)
 	{
 		if (s[i] > 64 && s[i] < 91)
