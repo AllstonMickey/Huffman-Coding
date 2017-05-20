@@ -17,7 +17,9 @@ extern FILE *yyin;   // file from which the scanner gets input from (def: stdin)
 bool moveToFront;    // global variable flag shared with ll.h
 
 int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into BFs and HTs
-void messageComrade(bloomF *bf1, bloomF *bf2, hashTable *ht); // sends a letter to your comrade
+void convertComrade(); // sends a letter about converting your comrade's oldspeak into newspeak
+void joycampComrade(); // sends a letter about their joycamp vacation to your comrade
+void printStatistics();
 
 int main(int argc, char **argv)
 {
@@ -79,8 +81,16 @@ int main(int argc, char **argv)
 	hashTable *table = newHT(hashLen, initH);
 
 	gatherWords(filterA, filterB, table);
-	messageComrade(filterA, filterB, table);
 
+	// get all words from stdin until EOF
+	bool sendLetter = false;
+	bool sendToJoycamp = false;
+	yyin = stdin;
+	while (yylex() != -1)
+	{
+		// current word is held in yytext
+	}
+	
 	delHT(table);
 	delBF(filterB);
 	delBF(filterA);
@@ -182,17 +192,37 @@ int gatherWords(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	return 0; // success
 }
 
-void messageComrade(bloomF *bf1, bloomF *bf2, hashTable *ht)
+void convertComrade() // sends a letter about converting your comrade's oldspeak into newspeak
+{
+	char *letter[] = { "Dear Comrade,\n",
+			   "Submitting your text helps to preserve feelings and prevent",
+			   "badthink. Some of the words that you used are not goodspeak.",
+			   "The list shows how to turn the oldspeak words into newspeak." };
+
+	for (int line = 0; line < 4; line += 1)
+	{
+		printf("%s\n", letter[line]);
+	}
+}
+
+void joycampComrade() // sends a letter to your comrade
+{
+	char *letter[] = { "Dear Comrade,\n",
+			   "You have chosen to use degenerate words that may cause hurt",
+			   "feelings or cause your comrades to think unpleasant thoughts.",
+			   "This is doubleplus bad. To correct your wrongthink and",
+			   "save community consensus we will be sending you to joycamp",
+			   "administered by Miniluv." };
+
+	for (int line = 0; line < 6; line += 1)
+	{
+		printf("%s\n", letter[line]);
+	}
+
+}
+
+void printStatistics()
 {
 
-	// get all words from stdin until EOF
-	yyin = stdin;
-	while (yylex() != -1)
-	{
-		// current word is held in yytext
-		// check BF1
-		// check BF2
-		// find LL
-	}
 }
 

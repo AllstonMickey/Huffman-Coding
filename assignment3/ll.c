@@ -114,7 +114,6 @@ listNode *findLL(listNode **head, const char *word)
 
 	if (found)
 	{
-		printf("found (before): %p %s\n", (void *) curr, curr->oldspeak);
 		if (moveToFront)
 		{
 			if (curr != *head)
