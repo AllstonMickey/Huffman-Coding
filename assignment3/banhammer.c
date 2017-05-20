@@ -7,7 +7,7 @@
 # include "hash.h"   // Hash Tables, Linked Lists, stdint, and stdbool
 
 // TODO: document functions
-// 	    implement searching the file and printing what matched
+//       implement -s flag
 
 # ifndef MAXBUFFER
 # define MAXBUFFER 100
@@ -108,13 +108,10 @@ int main(int argc, char **argv)
 
 	listNode *badspeakList = NIL;
 	listNode *newspeakList = NIL;
-	char *key;
 	yyin = stdin;
 	while (yylex() != -1)
 	{
-		char *temp = stol(yytext);
-		key = temp;
-
+		char *key = stol(yytext);
 		if (memBF(filterA, key) && memBF(filterB, key))
 		{
 			listNode *found = findHT(table, key);
@@ -153,7 +150,7 @@ int main(int argc, char **argv)
 				}
 			}
 		}
-		free(temp);
+		free(key);
 	}
 
 	listNode *curr;
