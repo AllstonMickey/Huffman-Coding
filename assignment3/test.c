@@ -7,8 +7,8 @@ bool moveToFront;
 
 int main(void)
 {
-	const char *keys[5] = { "fucking nerd",  "darrell is amazing", "test key", "windowsIsLove", "redditors" };
-	const char *tran[5] = { "jimmy neutron", "darrell is Odin",    "test key", "unixIsLife",    "poltards"  };
+	const char *keys[5] = { "fucking nerd",  "darrell is amazing", "test key", "windowsIsLove", "test key" };
+	const char *tran[5] = { "jimmy neutron", "darrell is Odin",    "test key", "unixIsLife",    "test key"  };
 	uint8_t keyLen = 5;
 	uint32_t entries = pow(2, 2);
 

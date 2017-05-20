@@ -14,6 +14,12 @@ banhammer : $(OBJECTS)
 banhammer.o : banhammer.c $(HEADERS)
 	$(CC) $(CFLAGS) banhammer.c -c
 
+test : aes.o ll.o hash.o test.o
+	$(CC) $(CFLAGS) aes.o ll.o hash.o test.o -o test
+
+test.o : test.c $(HEADERS)
+	$(CC) $(CFLAGS) test.c -c
+
 hash.o : hash.c hash.h hashFunc.h
 	$(CC) $(CFLAGS) hash.c -c
 
