@@ -6,9 +6,6 @@
 # include "bf.h"     // Bloom Filters, stdint, stdio, stdlib, and the hash function
 # include "hash.h"   // Hash Tables, Linked Lists, stdint, and stdbool
 
-// TODO: document functions
-//       implement -s flag
-
 # ifndef MAXBUFFER
 # define MAXBUFFER 100
 # endif
@@ -20,7 +17,7 @@
 bool moveToFront; // moves found nodes to the front of a linked list if true
 
 /*
- * Statistics Global Variables
+ * Statistic Global Variables
  */
 
 uint32_t seekCount;   // iterations of a linked list
@@ -37,6 +34,10 @@ int yylex(void);     // runs the scanner until it reaches a token.  Returns the 
 extern char *yytext;  // when yylex returns its token, this holds the char* it found
 extern FILE *yyin;   // file from which the scanner gets input from (def: stdin)
 int freeFlexScanner(void);
+
+/*
+ * Function prototypes
+ */
 
 char *stol(char *s); // converts a string to lowercase
 FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into BFs and HT
@@ -85,12 +86,12 @@ int main(int argc, char **argv)
 				}
 			case '?':
 				{
-					perror("getopt [banhammer.c:XX]: invalid argument");
+					perror("getopt [banhammer.c:60]: invalid argument");
 					break;
 				}
 			default:
 				{
-					perror("getopt [banhammer.c:XX]: Something very bad happened");
+					perror("getopt [banhammer.c:60]: Something very bad happened");
 					break;
 				}
 		}
@@ -124,9 +125,7 @@ int main(int argc, char **argv)
 
 	/*
 	 * Get input from stdin using a scanner defined by flex
-	 * 
-	 * If a word is badspeak, add it to its list.
-	 * If a word is newspeak, add it to its list.
+	 * Add each word to its respective Linked List.
 	 */
 
 	listNode *badspeakList = NIL;
@@ -135,13 +134,15 @@ int main(int argc, char **argv)
 	while (yylex() != -1)
 	{
 		textCount += 1;
+	
 		char *key = stol(yytext);
 		if (memBF(filterA, key) && memBF(filterB, key))
 		{
 			listNode *found = findHT(table, key);
 			if (found)
 			{
-				if (strcmp(found->newspeak, INVALID) == 0) // if badspeak
+				// badspeak
+				if (strcmp(found->newspeak, INVALID) == 0) // no translation implies badspeak
 				{
 					if (badspeakList == NIL)
 					{
@@ -152,6 +153,11 @@ int main(int argc, char **argv)
 						listNode *hasDuplicate = findLL(&badspeakList, found->oldspeak);
 						if (hasDuplicate)
 						{
+							/*
+							 * Even though there is a duplicate, finding the node with MTF
+							 * changes the head of the list, so we must set the new head.
+							 */
+
 							if (moveToFront)
 							{
 								badspeakList = hasDuplicate;
@@ -164,6 +170,8 @@ int main(int argc, char **argv)
 						}
 					}
 				}
+
+				// newspeak
 				else
 				{
 					if (newspeakList == NIL)
@@ -175,6 +183,11 @@ int main(int argc, char **argv)
 						listNode *hasDuplicate = findLL(&newspeakList, found->oldspeak);
 						if (hasDuplicate)
 						{
+							/*
+							 * Even though there is a duplicate, finding the node with MTF
+							 * changes the head of the list, so we must set the new head.
+							 */
+							
 							if (moveToFront)
 							{
 								newspeakList = hasDuplicate;
@@ -190,7 +203,7 @@ int main(int argc, char **argv)
 				}
 			}
 		}
-		free(key);
+		free(key); // free the pointer calloc'd by stol(yytext)
 	}
 
 	/*
@@ -241,16 +254,29 @@ int main(int argc, char **argv)
 	filterB = NIL;
 	filterA = NIL;
 	freeFlexScanner();
+
 	return 0;
 }
 
+/*
+ * String to lowercase
+ *
+ * @param  s  String to convert to lowercase
+ * @return    Lowercase version of s
+ */
 char *stol(char *s)
 {
+	// allocate memory for the new string (+1 for the null termination character)
 	char *lower = (char *) calloc(strlen(s) + 1, sizeof(char));
 
 	uint32_t i = 0;
 	while (s[i] != '\0')
 	{
+		/*
+		 * If uppercase, make it lower, set the result.
+		 * If lower, set it.
+		 */
+
 		if (s[i] > 64 && s[i] < 91)
 		{
 			lower[i] = s[i] + 32;
@@ -261,19 +287,22 @@ char *stol(char *s)
 		}
 		i += 1;
 	}
+
+	// must tell C where the new string ends
 	lower[i] = '\0';
 
 	return lower;
 }
 
 /*
- * Gathers words from badspeak.txt and newspeak.txt
- * Sets each oldspeak word into a Bloom Filter.
- * If there is a corresponding newspeak word, insert
- * the oldspeak and newspeak as a Linked List Node in a Hash Table.
+ * Gathers words from badspeak.txt
+ * Sets each word into two Bloom Filters and a Hash Table.
  *
- * @param bf1      First Bloom Filter
- * @param bf2      Second Bloom Filter
+ * @param  bf1    First Bloom Filter
+ * @param  bf2    Second Bloom Filter
+ * @param  ht     Hash Table of Linked Lists
+ * @return NIL    Failure opening file
+ * 	   FILE*  File pointer to the opened file
  */
 FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 {
@@ -282,7 +311,7 @@ FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	{
 		if (!(badf = fopen("/afs/cats.ucsc.edu/users/j/amickey/cmps12b/assignment3/badspeak.txt", "r")))
 		{
-			perror("badf [banhammer.c:XX]: could not open badspeak.txt");
+			perror("badf [banhammer.c:312]: could not open badspeak.txt");
 			return NIL;
 		}
 	}
@@ -299,6 +328,16 @@ FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	return badf;
 }
 
+/*
+ * Gathers words from newspeak.txt
+ * Sets each word into two Bloom Filters and a Hash Table.
+ *
+ * @param  bf1    First Bloom Filter
+ * @param  bf2    Second Bloom Filter
+ * @param  ht     Hash Table of Linked Lists
+ * @return NIL    Failure opening file
+ * 	   FILE*  File pointer to the opened file
+ */
 FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 {
 	FILE *newf;
@@ -306,7 +345,7 @@ FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	{
 		if (!(newf = fopen("/afs/cats.ucsc.edu/users/j/amickey/cmps12b/assignment3/newspeak.txt", "r")))
 		{
-			perror("newf [banhammer.c:XX]: could not open newspeak.txt");
+			perror("newf [banhammer.c:346]: could not open newspeak.txt");
 			return NIL;
 		}
 	}
@@ -324,7 +363,13 @@ FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	return newf;
 }
 
-void thoughtcrimeLetter(void) // sends a letter to your comrade
+/*
+ * Prints a thoughtcrime letter to your comrade
+ * 
+ * @param  void
+ * @return void
+ */
+void thoughtcrimeLetter(void)
 {
 	char *letter[] = { "Dear Comrade,\n",
 		"You have chosen to use degenerate words that may cause hurt",
@@ -340,7 +385,13 @@ void thoughtcrimeLetter(void) // sends a letter to your comrade
 
 }
 
-void goodspeakLetter(void) // sends a letter about converting your comrade's oldspeak into newspeak
+/*
+ * Prints a letter of encouragement to your comrade
+ *
+ * @param  void
+ * @return void
+ */
+void goodspeakLetter(void)
 {
 	char *letter[] = { "Dear Comrade,\n",
 		"Submitting your text helps to preserve feelings and prevent",
@@ -353,6 +404,13 @@ void goodspeakLetter(void) // sends a letter about converting your comrade's old
 	}
 }
 
+/*
+ * Prints words in a Linked List
+ *
+ * @param  h          Head of the Linked List
+ * @param  translate  Whether the words in h have a translation
+ * @return void
+ */
 void printWords(listNode *h, bool translate)
 {
 	listNode *curr = h;
@@ -368,6 +426,13 @@ void printWords(listNode *h, bool translate)
 	}
 }
 
+/*
+ * Prints statistics about the runtime state.
+ *
+ * @param  bf1   First Bloom Filter
+ * @param  bf2   Second Bloom Filter
+ * @return void
+ */
 void printStats(bloomF *bf1, bloomF *bf2)
 {
 	printf("Seeks %u, ", seekCount);
