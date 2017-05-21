@@ -1,3 +1,10 @@
+/* 
+ * Credit to Definition and Rules sections
+ *
+ * Author: Darrell Long
+ * Course: CMPS 12B Spring 2017
+ */
+
 %top{
 # include <stdio.h>
 }
@@ -21,7 +28,6 @@ PUNC [~‘!@#$%^&*()_+-={}|\\\[\]:;\"\'\’`<>,./?]
 
 int freeFlexScanner(void)
 {
-	//yy_delete_buffer(YY_CURRENT_BUFFER);
 	yylex_destroy();
 	yyterminate();
 }

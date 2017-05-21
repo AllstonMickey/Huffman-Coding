@@ -1,12 +1,12 @@
 Files:
 aes.h/c  ------  AES encryption
-hashFunc.h  ---  Hash function converting a key to an integer using AES
+hashFunc.h  ---  Hash function converting a key to an integer using AES (Author: Darrell Long)
 bf.h  ---------  Bloom Filters
 ll.h/c  -------  Linked Lists
 hash.h/c  -----  Hash Tables
 strclone.h  ---  Copies a string, implementation of strdup() because not included in -std=c99
 banhammer.c  --  [MAIN] Reads in dictionaries, badspeak.txt and newspeak.txt, and a file of text.
-words.l  ------  Flex Scanner definition
+words.l  ------  Flex Scanner definition (Author: Darrell Long, CMPS 12B Spring 2017)
 Makefile  -----  Compiles the program and removes unnecessary files when done.
 
 How to compile and run:
