@@ -1,0 +1,34 @@
+Files:
+aes.h/c  ------  AES encryption
+hashFunc.h  ---  Hash function converting a key to an integer using AES
+bf.h  ---------  Bloom Filters
+ll.h/c  -------  Linked Lists
+hash.h/c  -----  Hash Tables
+strclone.h  ---  Copies a string, implementation of strdup() because not included in -std=c99
+banhammer.c  --  [MAIN] Reads in dictionaries, badspeak.txt and newspeak.txt, and a file of text.
+words.l  ------  Flex Scanner definition
+Makefile  -----  Compiles the program and removes unnecessary files when done.
+
+How to compile and run:
+'make', 'make all', or 'make banhammer' to compile the program.
+'make clean' to delete unnecessary object and binary files.
+'./banhammer <optional flags>' to run.
+
+Flags include:
+-s Suppress normal output and print runtime statistics
+-h Number of entries for the Hash Table   (default: 10000)
+-f Number of entries for the Bloom Filter (default: 2^20)
+-m Use the move-to-front rule in Linked Lists
+-b Do not use the move-to-front rule in Linked Lists
+
+
+Description:
+Banhammer reads in a list of forbidden words and their translations, if any.
+It then reads from stdin until it is stopped with ^D.
+When the ^D signal is received, a letter will be printed to your comrade if
+they said any oldspeak words.  These words are divided into two lists:
+badspeak includes the words with no translation because they are so degenerate,
+while newspeak includes words with translations to suggest to your comrade.
+
+Since Banhammer reads from stdin, you can feed it texts through the shell instead
+of manually typing in input.  Ex: "./banhammer < example.txt"
