@@ -2,10 +2,6 @@
 # define NIL (void *) 0
 # endif
 
-# ifndef MTF
-# define MTF true
-# endif
-
 # ifndef _LL_H
 # define _LL_H
 
@@ -23,16 +19,16 @@ struct listNode
 	char *oldspeak, *newspeak;
 	listNode *next;
 };
-
+	
 listNode *newNode(const char *word, const char *tran);
 
 void delNode(listNode *node);
 
 void delLL(listNode *head);
 
-listNode *insertLL(listNode **, const char *, const char *);
+listNode *insertLL(listNode **head, const char *word, const char *tran);
 
-listNode *findLL(listNode **, const char *);
+listNode *findLL(listNode **head, const char *word);
 
 void printLL(listNode *head);
 
