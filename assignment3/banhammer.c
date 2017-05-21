@@ -17,19 +17,22 @@
 # define INVALID "<%HIS-NAME-WAS-SETH-RICH%>"
 # endif
 
+bool moveToFront;    // moves found nodes to the front of a linked list if true
+
+/*
+ * Flex Scanner Global Variables
+ */
+
 int yylex(void);     // runs the scanner until it reaches a token.  Returns the token.
 extern char *yytext;  // when yylex returns its token, this holds the char* it found
 extern FILE *yyin;   // file from which the scanner gets input from (def: stdin)
 int freeFlexScanner(void);
 
 char *stol(char *s);
-
-bool moveToFront;    // global variable flag shared with ll.h
-
 FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into Bloom Filters
 FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht);
-void thoughtcrimeLetter();
-void goodspeakLetter();
+void thoughtcrimeLetter(void);
+void goodspeakLetter(void);
 void printStatistics();
 
 int main(int argc, char **argv)
@@ -91,6 +94,11 @@ int main(int argc, char **argv)
 	uint32_t initH[] = { 0xDeadD00d, 0xFadedBee, 0xBadAb0de, 0xC0c0Babe }; // Hash Table salts
 	hashTable *table = newHT(hashLen, initH);
 
+	/*
+	 * Read in oldspeak and newspeak words.
+	 * Set them in each Bloom Filter and the Hash Table
+	 */
+
 	FILE *badspeakf = gatherBadspeak(filterA, filterB, table);
 	if (!badspeakf)
 	{
@@ -105,6 +113,9 @@ int main(int argc, char **argv)
 
 	/*
 	 * Get input from stdin using a scanner defined by flex
+	 * 
+	 * If a word is badspeak, add it to its list.
+	 * If a word is newspeak, add it to its list.
 	 */
 
 	listNode *badspeakList = NIL;
@@ -126,7 +137,15 @@ int main(int argc, char **argv)
 					}
 					else
 					{
-						if (findLL(&badspeakList, found->oldspeak) == NIL)
+						listNode *hasDuplicate = findLL(&badspeakList, found->oldspeak);
+						if (hasDuplicate)
+						{
+							if (moveToFront)
+							{
+								badspeakList = hasDuplicate;
+							}
+						}
+						else
 						{
 							badspeakList = insertLL(&badspeakList,
 									found->oldspeak, found->newspeak);
@@ -140,8 +159,16 @@ int main(int argc, char **argv)
 						newspeakList = newNode(found->oldspeak, found->newspeak);
 					}
 					else
-					{
-						if (findLL(&newspeakList, found->oldspeak) == NIL)
+					{	
+						listNode *hasDuplicate = findLL(&newspeakList, found->oldspeak);
+						if (hasDuplicate)
+						{
+							if (moveToFront)
+							{
+								newspeakList = hasDuplicate;
+							}
+						}
+						else
 						{
 							newspeakList = insertLL(&newspeakList,
 									found->oldspeak, found->newspeak);
@@ -154,23 +181,44 @@ int main(int argc, char **argv)
 		free(key);
 	}
 
-	listNode *curr;
-	if (badspeakList)
+	/*
+	 * Print output - statistics or a letter to your comrade
+	 */
+
+	if (suppress)
 	{
-		thoughtcrimeLetter();
-		printf("\nYour errors:\n\n");
-
-		curr = badspeakList;
-		while (curr != NIL)
+		// print stats
+	}
+	else
+	{
+		listNode *curr;
+		if (badspeakList)
 		{
-			printf("%s\n", curr->oldspeak);
-			curr = curr->next;
+			thoughtcrimeLetter();
+			printf("\nYour errors:\n\n");
+
+			curr = badspeakList;
+			while (curr != NIL)
+			{
+				printf("%s\n", curr->oldspeak);
+				curr = curr->next;
+			}
+
+			if (newspeakList)
+			{
+				curr = newspeakList;
+				printf("\nThink on these words during your vacation!\n\n");
+				while (curr != NIL)
+				{
+					printf("%s -> %s\n", curr->oldspeak, curr->newspeak);
+					curr = curr->next;
+				}
+			}
 		}
-
-		if (newspeakList)
+		else if (newspeakList)
 		{
+			goodspeakLetter();
 			curr = newspeakList;
-			printf("\nThink on these words during your vacation!\n\n");
 			while (curr != NIL)
 			{
 				printf("%s -> %s\n", curr->oldspeak, curr->newspeak);
@@ -178,16 +226,10 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-	else if (newspeakList)
-	{
-		goodspeakLetter();
-		curr = newspeakList;
-		while (curr != NIL)
-		{
-			printf("%s -> %s\n", curr->oldspeak, curr->newspeak);
-			curr = curr->next;
-		}
-	}
+
+	/*
+	 * Free and set all pointers used in the program to NIL.
+	 */
 
 	delLL(badspeakList);
 	delLL(newspeakList);
@@ -211,7 +253,7 @@ int main(int argc, char **argv)
 char *stol(char *s)
 {
 	char *lower = (char *) calloc(strlen(s) + 1, sizeof(char));
-	
+
 	uint32_t i = 0;
 	while (s[i] != '\0')
 	{
@@ -226,7 +268,7 @@ char *stol(char *s)
 		i += 1;
 	}
 	lower[i] = '\0';
-	
+
 	return lower;
 }
 
@@ -286,7 +328,7 @@ FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	return newf;
 }
 
-void thoughtcrimeLetter() // sends a letter to your comrade
+void thoughtcrimeLetter(void) // sends a letter to your comrade
 {
 	char *letter[] = { "Dear Comrade,\n",
 		"You have chosen to use degenerate words that may cause hurt",
@@ -302,7 +344,7 @@ void thoughtcrimeLetter() // sends a letter to your comrade
 
 }
 
-void goodspeakLetter() // sends a letter about converting your comrade's oldspeak into newspeak
+void goodspeakLetter(void) // sends a letter about converting your comrade's oldspeak into newspeak
 {
 	char *letter[] = { "Dear Comrade,\n",
 		"Submitting your text helps to preserve feelings and prevent",
