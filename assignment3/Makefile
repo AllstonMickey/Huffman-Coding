@@ -1,6 +1,5 @@
 CC = gcc
-#REMEMBER TO ADD -WERROR BACK INTO CFLAGS
-CFLAGS = -Wall -Wextra -Wpedantic -std=c99
+CFLAGS = -Wall -Werror -Wextra -Wpedantic -std=c99
 RM = rm -f
 HEADERS = bf.h hashFunc.h aes.h ll.h hash.h
 OBJECTS = banhammer.o aes.o ll.o hash.o lex.yy.o

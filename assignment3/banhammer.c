@@ -33,6 +33,7 @@ FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys in
 FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht);
 void thoughtcrimeLetter(void);
 void goodspeakLetter(void);
+void printWords(listNode *h, bool translate);
 void printStatistics();
 
 int main(int argc, char **argv)
@@ -191,39 +192,21 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		listNode *curr;
 		if (badspeakList)
 		{
 			thoughtcrimeLetter();
 			printf("\nYour errors:\n\n");
-
-			curr = badspeakList;
-			while (curr != NIL)
-			{
-				printf("%s\n", curr->oldspeak);
-				curr = curr->next;
-			}
-
+			printWords(badspeakList, false);
 			if (newspeakList)
 			{
-				curr = newspeakList;
 				printf("\nThink on these words during your vacation!\n\n");
-				while (curr != NIL)
-				{
-					printf("%s -> %s\n", curr->oldspeak, curr->newspeak);
-					curr = curr->next;
-				}
+				printWords(newspeakList, true);
 			}
 		}
 		else if (newspeakList)
 		{
 			goodspeakLetter();
-			curr = newspeakList;
-			while (curr != NIL)
-			{
-				printf("%s -> %s\n", curr->oldspeak, curr->newspeak);
-				curr = curr->next;
-			}
+			printWords(newspeakList, true);
 		}
 	}
 
@@ -354,6 +337,21 @@ void goodspeakLetter(void) // sends a letter about converting your comrade's old
 	for (int line = 0; line < 4; line += 1)
 	{
 		printf("%s\n", letter[line]);
+	}
+}
+
+void printWords(listNode *h, bool translate)
+{
+	listNode *curr = h;
+	while (curr != NIL)
+	{
+		printf("%s", curr->oldspeak);
+		if (translate)
+		{
+			printf(" -> %s", curr->newspeak);
+		}
+		printf("\n");
+		curr = curr->next;
 	}
 }
 
