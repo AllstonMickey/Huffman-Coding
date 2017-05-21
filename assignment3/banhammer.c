@@ -17,7 +17,17 @@
 # define INVALID "<%HIS-NAME-WAS-SETH-RICH%>"
 # endif
 
-bool moveToFront;    // moves found nodes to the front of a linked list if true
+bool moveToFront; // moves found nodes to the front of a linked list if true
+
+/*
+ * Statistics Global Variables
+ */
+
+uint32_t seekCount;   // iterations of a linked list
+uint32_t findLLCount; // calls to findLL()
+uint32_t dictCount;   // forbidden words in badspeak.txt
+uint32_t tranCount;   // translations in newspeak.txt
+uint32_t textCount;   // words read in from stdin using yylex()
 
 /*
  * Flex Scanner Global Variables
@@ -28,13 +38,13 @@ extern char *yytext;  // when yylex returns its token, this holds the char* it f
 extern FILE *yyin;   // file from which the scanner gets input from (def: stdin)
 int freeFlexScanner(void);
 
-char *stol(char *s);
-FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into Bloom Filters
-FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht);
-void thoughtcrimeLetter(void);
-void goodspeakLetter(void);
+char *stol(char *s); // converts a string to lowercase
+FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into BFs and HT
+FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht); // hashes keys into BFs and HT
+void thoughtcrimeLetter(void); // prints a thoughtcrime message
+void goodspeakLetter(void); // prints a goodspeak message
 void printWords(listNode *h, bool translate);
-void printStatistics();
+void printStats(bloomF *bf1, bloomF *bf2);
 
 int main(int argc, char **argv)
 {
@@ -124,6 +134,7 @@ int main(int argc, char **argv)
 	yyin = stdin;
 	while (yylex() != -1)
 	{
+		textCount += 1;
 		char *key = stol(yytext);
 		if (memBF(filterA, key) && memBF(filterB, key))
 		{
@@ -188,7 +199,7 @@ int main(int argc, char **argv)
 
 	if (suppress)
 	{
-		// print stats
+		printStats(filterA, filterB);
 	}
 	else
 	{
@@ -279,6 +290,7 @@ FILE *gatherBadspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	char old[MAXBUFFER];
 	while (fscanf(badf, "%s \n", old) != EOF)
 	{
+		dictCount += 1;
 		setBF(bf1, old);
 		setBF(bf2, old);
 		insertHT(ht, old, INVALID);
@@ -303,6 +315,7 @@ FILE *gatherNewspeak(bloomF *bf1, bloomF *bf2, hashTable *ht)
 	char new[MAXBUFFER];
 	while (fscanf(newf, "%s %s \n", old, new) != EOF)
 	{
+		tranCount += 1;
 		setBF(bf1, old);
 		setBF(bf2, old);
 		insertHT(ht, old, new);
@@ -355,8 +368,14 @@ void printWords(listNode *h, bool translate)
 	}
 }
 
-void printStatistics()
+void printStats(bloomF *bf1, bloomF *bf2)
 {
-
+	printf("Seeks %u, ", seekCount);
+	printf("Average %lf, ", (double) findLLCount / seekCount);
+	printf("Dictionary %u, ", dictCount);
+	printf("Translations %u, ", tranCount);
+	printf("Text %u, ", textCount);
+	printf("Densities: %lf, %lf\n", (double) countBF(bf1) / lenBF(bf1),
+					(double) countBF(bf2) / lenBF(bf2));
 }
 

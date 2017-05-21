@@ -95,12 +95,14 @@ listNode *insertLL(listNode **head, const char *word, const char *tran)
  */
 listNode *findLL(listNode **head, const char *word)
 {
+	findLLCount += 1;
 	bool found = false;
 
 	listNode *prev;
 	listNode *curr = *head;
 	while (curr != NIL && !found)
 	{
+		seekCount += 1;
 		if (strcmp(word, curr->oldspeak) == 0)
 		{
 			found = true;

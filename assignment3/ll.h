@@ -10,7 +10,10 @@
 # define _LL_H
 
 # include <stdbool.h>
+# include <stdint.h>
 
+extern uint32_t seekCount;
+extern uint32_t findLLCount;
 extern bool moveToFront;
 
 typedef struct listNode listNode;
