@@ -210,8 +210,10 @@ int main(int argc, char **argv)
 
 char *stol(char *s)
 {
-	char *lower = (char *) calloc(strlen(s), sizeof(char));
-	for (uint32_t i = 0; i < strlen(s); i += 1)
+	char *lower = (char *) calloc(strlen(s) + 1, sizeof(char));
+	
+	uint32_t i = 0;
+	while (s[i] != '\0')
 	{
 		if (s[i] > 64 && s[i] < 91)
 		{
@@ -221,7 +223,10 @@ char *stol(char *s)
 		{
 			lower[i] = s[i];
 		}
+		i += 1;
 	}
+	lower[i] = '\0';
+	
 	return lower;
 }
 

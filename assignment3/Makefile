@@ -20,12 +20,6 @@ lex.yy.o : lex.yy.c
 lex.yy.c : words.l
 	flex words.l
 
-test : aes.o ll.o hash.o test.o
-	$(CC) $(CFLAGS) aes.o ll.o hash.o test.o -o test
-
-test.o : test.c $(HEADERS)
-	$(CC) $(CFLAGS) test.c -c
-
 hash.o : hash.c hash.h hashFunc.h
 	$(CC) $(CFLAGS) hash.c -c
 
@@ -37,4 +31,4 @@ ll.o : ll.c ll.h strclone.h
 
 .PHONY: clean
 clean :
-	$(RM) banhammer test $(OBJECTS) test.o lex.yy.c
+	$(RM) banhammer $(OBJECTS) lex.yy.c
