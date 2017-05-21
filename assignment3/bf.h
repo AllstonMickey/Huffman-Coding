@@ -21,11 +21,11 @@ typedef struct bloomF
 } bloomF;
 
 /*
- * Hashes a key that into a value that is less than the number of bits in the Bloom Filter.
+ * Hashes a key into a value that is less than the number of bits in the Bloom Filter.
  *
- * @param bf  Bloom Filter which contains the 4 salts for the hash function
- * @param key Key to hash.
- * @return Hashed value of key.
+ * @param  bf   Bloom Filter which contains the 4 salts for the hash function
+ * @param  key  Key to hash.
+ * @return      Hashed value of key.
  */
 uint32_t hashBF(bloomF *bf, const char *key)
 {
@@ -35,23 +35,23 @@ uint32_t hashBF(bloomF *bf, const char *key)
 /*
  * Create a new Bloom Filter
  *
- * @param len     Length, number of bits to allocate to the new BF
- * @param hashes  Array of hash functions (must be size of 4!)
- * @return bloomF The pointer to the new BF
+ * @param  len     Length, number of bits to allocate to the new BF
+ * @param  hashes  Array of hash functions (must be size of 4!)
+ * @return bloomF  The pointer to the new BF
  */
 static inline bloomF *newBF(uint32_t len, uint32_t hashes[])
 {
 	bloomF *bf = (bloomF *) malloc(sizeof(bloomF));
 	if (bf == NIL)
 	{
-		perror("malloc error [bf.h:39]: bf is NIL\n");
+		perror("malloc error [bf.h:44]: bf is NIL\n");
 	}
 	else
 	{
 		bf->v = (uint8_t *) calloc((len / 8) + 1, sizeof(uint8_t));
 		if (bf->v == NIL)
 		{
-			perror("calloc error [bf.h:46]: bf->v is NIL\n");
+			perror("calloc error [bf.h:51]: bf->v is NIL\n");
 		}
 		else
 		{
@@ -67,11 +67,9 @@ static inline bloomF *newBF(uint32_t len, uint32_t hashes[])
 
 /*
  * Deletes a Bloom Filter.
- * If there is something of the Bloom Filter in memory to free (not NIL), 
- * free it and set to NIL.
  * 
- * @param bf Bloom Filter to delete
- * @return void
+ * @param  bf Bloom Filter to delete
+ * @return    void
  */
 static inline void delBF(bloomF *bf)
 {
@@ -85,10 +83,10 @@ static inline void delBF(bloomF *bf)
 /*
  * Returns the value of the kth bit in the Bloom Filter
  *
- * @param bf  Bloom Filter to check
- * @param bit Index of the bit, 0 to (bf->l - 1) inclusive.
- * @return 0: bit is turned off
- *         1: bit is turned on
+ * @param  bf   Bloom Filter to check
+ * @param  bit  Index of the bit, 0 to (bf->l - 1) inclusive.
+ * @return 0    bit is turned off
+ *         1    bit is turned on
  */
 static inline uint8_t valBF(bloomF *bf, uint32_t bit)
 {
@@ -98,8 +96,8 @@ static inline uint8_t valBF(bloomF *bf, uint32_t bit)
 /*
  * Returns the length of the Bloom Filter
  *
- * @param bf Bloom Filter to check
- * @return Length, number of total bits allocated to the BF
+ * @param  bf  Bloom Filter to check
+ * @return     Length, number of total bits allocated to the BF
  */
 static inline uint32_t lenBF(bloomF *bf)
 {
@@ -110,8 +108,8 @@ static inline uint32_t lenBF(bloomF *bf)
  * Count bits in the Bloom Filter.
  * For each bit, if it's turned on (1), count it.
  *
- * @param bf Bloom Filter to check
- * @return Number of set bits in BF
+ * @param  bf  Bloom Filter to check
+ * @return     Number of set bits in BF
  */
 static inline uint32_t countBF(bloomF *bf)
 {
@@ -127,12 +125,11 @@ static inline uint32_t countBF(bloomF *bf)
 }
 
 /*
- * Hashes a key string to a 2 byte unsigned integer.
- * Sets the BF vector's bit to 1 in the index of the hashed value.
+ * Sets the BF's bit to 1 in the index of the hashed value.
  *
- * @param bf  Bloom Filter to set bit in
- * @param key String to hash into an index for the BF vector
- * @return void
+ * @param  bf   Bloom Filter to set bit in
+ * @param  key  String to hash into an index for the BF vector
+ * @return      void
  */
 static inline void setBF(bloomF *bf, const char *key)
 {
@@ -141,12 +138,11 @@ static inline void setBF(bloomF *bf, const char *key)
 }
 
 /*
- * Hashes a key string to a 2 byte unsigned integer.
- * Clears the BF vector's bit to 0 in the index of the hased value.
+ * Clears the BF's bit to 0 in the index of the hased value.
  *
- * @param bf  Bloom Filter to clear bit in
- * @param key String to hash into an index for the BF vector
- * @return void
+ * @param  bf   Bloom Filter to clear bit in
+ * @param  key  String to hash into an index for the BF vector
+ * @return      void
  */
 static inline void clrBF(bloomF *bf, const char *key)
 {
@@ -158,10 +154,10 @@ static inline void clrBF(bloomF *bf, const char *key)
  * Check membership in the Bloom Filter by hashing the key
  * and returning the value of its bit.
  *
- * @param bf  Bloom Filter to check
- * @param key Key to check
- * @return 0: bit is turned off
- *         1: bit is turned on
+ * @param  bf   Bloom Filter to check
+ * @param  key  Key to check
+ * @return 0    bit is turned off (not a member)
+ *         1    bit is turned on (is a member)
  */
 static inline uint8_t memBF(bloomF *bf, const char *key)
 {
@@ -186,7 +182,7 @@ static inline void printBF(bloomF *bf)
 		{
 			printf("\n");
 		}
-		if (i % 4 == 0)
+		if ((i + 1) % 4 == 0 || i == 0)
 		{
 			printf(" ");
 		}
