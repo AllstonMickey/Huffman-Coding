@@ -7,29 +7,29 @@
 /*
  * Creates a pointer to a new node.  DOES NOT INSERT it into the list.
  *
- * @param word Oldspeak
- * @param tran Newspeak, translation of word
- * @return A pointer to the new node
+ * @param  word  Oldspeak
+ * @param  tran  Newspeak, translation of word
+ * @return       A pointer to the new node
  */
 listNode *newNode(const char *word, const char *tran)
 {
 	listNode *node = (listNode *) malloc(sizeof(listNode));
 	if (node == NIL)
 	{
-		perror("malloc error [ll.c:17]: node is NIL\n");
+		perror("malloc error [ll.c:16]: node is NIL\n");
 	}
 	else
 	{
 		node->oldspeak = strclone(word);
 		if (node->oldspeak == NIL)
 		{
-			perror("malloc error (strclone) [ll.c:24]: node->oldspeak is NIL\n");
+			perror("malloc error (strclone) [ll.c:23]: node->oldspeak is NIL\n");
 		}
 
 		node->newspeak = strclone(tran);
 		if (node->newspeak == NIL)
 		{
-			perror("malloc error (strclone) [ll.c:30]: node->newspeak is NIL\n");
+			perror("malloc error (strclone) [ll.c:29]: node->newspeak is NIL\n");
 		}
 
 		node->next = NIL;
@@ -40,8 +40,8 @@ listNode *newNode(const char *word, const char *tran)
 /*
  * Frees a node and its members from memory.
  * 
- * @param node Node to delete.
- * @return void
+ * @param  node  Node to delete.
+ * @return       void
  *
  * It is recommended to set the node to NIL after this call to prevent access to its address.
  */
@@ -53,10 +53,10 @@ void delNode(listNode *node)
 }
 
 /*
- * Deletes all nodes from a list.
+ * Deletes/Frees all nodes from a list.
  *
- * @param head The 0th node/head of the list
- * @return void
+ * @param  head  Head of the list
+ * @return       void
  *
  * It is recommended to set the head to NIL after this call to prevent access to the its address.
  */
@@ -73,10 +73,10 @@ void delLL(listNode *head)
 /*
  * Prepends a node to the front of a list.
  *
- * @param head The 0th node/head of the list.
- * @param word Oldspeak word for the new node.
- * @param tran Newspeak, translation of word for the new node.
- * @return Pointer to the new head of the list.
+ * @param  head  Head of the list.
+ * @param  word  Oldspeak word for the new node.
+ * @param  tran  Newspeak, translation of word for the new node.
+ * @return       Pointer to the new head of the list.
  */
 listNode *insertLL(listNode **head, const char *word, const char *tran)
 {
@@ -89,9 +89,10 @@ listNode *insertLL(listNode **head, const char *word, const char *tran)
  * Finds a word in a list.
  * Depending on moveToFront, may move the node containing the word to the head.
  *
- * @param head The 0th node/head of the list.
- * @param word Oldspeak, key to search the list for.
- * @return Pointer to the found node.
+ * @param  head  Head of the list
+ * @param  word  Oldspeak, key to search the list for
+ * @return NIL   Node not found
+ *	   node  Pointer to the found node
  */
 listNode *findLL(listNode **head, const char *word)
 {
@@ -132,8 +133,8 @@ listNode *findLL(listNode **head, const char *word)
 /*
  * Prints each node's address, members, and addresses of members.
  *
- * @param head The 0th node/head of the list
- * @return void
+ * @param  head  Head of the list
+ * @return       void
  */
 void printLL(listNode *head)
 {
