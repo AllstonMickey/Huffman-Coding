@@ -18,7 +18,7 @@ static inline char *strclone(const char *str)
 		len += 1;
 	}
 	
-	char *tmp = malloc((sizeof(uint8_t) * len) + 1);
+	char *tmp = malloc((sizeof(char) * len) + 1);
 	char *clone = tmp;
 	while ((*tmp++ = *str++));
 	return clone;

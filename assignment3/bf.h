@@ -10,8 +10,6 @@
 # ifndef _BF_H
 # define _BF_H
 
-# include <stdint.h>
-# include <stdlib.h>
 # include <stdio.h>
 # include "hashFunc.h"
 

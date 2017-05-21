@@ -1,5 +1,4 @@
 # include <stdio.h>  // printing
-# include <stdlib.h> // allocs
 # include "hash.h"   // hash tables and linked lists
 # include "hashFunc.h"
 
