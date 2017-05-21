@@ -396,7 +396,7 @@ void goodspeakLetter(void)
 	char *letter[] = { "Dear Comrade,\n",
 		"Submitting your text helps to preserve feelings and prevent",
 		"badthink. Some of the words that you used are not goodspeak.",
-		"The list shows how to turn the oldspeak words into newspeak." };
+		"The list shows how to turn the oldspeak words into newspeak.\n" };
 
 	for (int line = 0; line < 4; line += 1)
 	{
