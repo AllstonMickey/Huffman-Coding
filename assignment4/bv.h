@@ -3,15 +3,15 @@
  * Course: CMPS 12B Spring 2017
  */
 
-# ifndef NIL
-# define NIL (void *) 0
-# endif
-
 # ifndef _BVector
 # define _BVector
 # include <stdint.h>
 # include <stdlib.h> // malloc, calloc, free
 # include <stdio.h>  // printf
+
+# ifndef NIL
+# define NIL (void *) 0
+# endif
 
 typedef struct bitV {
 	uint8_t *v;
