@@ -3,7 +3,7 @@
 # include "stack.h"
 
 # ifndef MIN_STACK
-# define MIN_STACK 16
+# define MIN_STACK 1
 # endif
 
 /* typedef struct stack

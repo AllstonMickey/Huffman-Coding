@@ -12,6 +12,11 @@ int main(void)
 	printStack(s);
 	printf("&num: %p\n", (void *) &num);
 	printf("&c: %p\n", (void *) &c);
+	
+	char str[] = "string";
+	push(s, &str);
+	printStack(s);
+	printf("&str: %p\n", (void *) &str);
 	delStack(s);
 	return 0;
 }
