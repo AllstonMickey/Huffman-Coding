@@ -19,8 +19,7 @@ stack *newStack(uint32_t nbits, bool fixed)
 	stack *s = (stack *) malloc(sizeof(stack));
 	if (s)
 	{
-		uint32_t nmemb = (nbits / ITEM_NBITS) + 1;
-		s->entries = (item *) calloc(nmemb, sizeof(item));
+		s->entries = (item *) calloc(nbits / ITEM_NBITS, sizeof(item));
 		if (s->entries)
 		{
 			s->fixed = fixed;
@@ -36,9 +35,39 @@ stack *newStack(uint32_t nbits, bool fixed)
    void delStack(stack *s);
  */
 
-// Adds an entry to the top of the stack
-bool push(stack *s, item i)
+void valBits(item element)
 {
+	for (uint32_t i = 0; i < ITEM_NBITS; i += 1)
+	{
+		bool val = (element & (0x1 << (i % ITEM_NBITS))) >> (i % ITEM_NBITS);
+		printf("val, %u: %u\n", i, val);
+	}
+}
+
+// Adds an entry to the top of the stack
+bool push(stack *s, uint16_t element)
+{
+	printf("%u\n", element);
+	for (uint32_t i = 0; i < sizeof(uint16_t) * 8; i += 1)
+	{
+		bool val = (element & (0x1 << (element % 16))) >> (element % 16);
+		printf("val, %u: %u\n", i, val);
+	}
+}
+
+bool pushBit(stack *s, bool k)
+{
+	if (s->top > 256) { return false; }
+	else if (!k)
+	{
+		s->entries[s->top / 8] &= ~(0x1 << (s->top % 8));
+	}
+	else
+	{
+		s->entries[s->top / 8] |= (0x1 << (s->top % 8));
+	}
+	s->top += 1;
+	return true;
 }
 
 /*

@@ -22,8 +22,11 @@ stack *newStack(uint32_t nbits, bool fixed);
 
 void delStack(stack *s);
 
+void valBits(item element);
+
 // Adds an entry to the top of the stack
 bool push(stack *s, item i);
+bool pushBit(stack *s, bool k);
 
 // Removes an entry from the top of the stack
 bool pop(stack *s, item *i);
