@@ -17,8 +17,7 @@ int main(void)
 	printf("k: %p %d\n", (void *) &k, k);
 
 	printf("\n-------- popping --------\n");
-	int *ptr;
-	pop(s, (void *) &ptr);
+	int *ptr = pop(s);
 	printStack(s);
 	printf("ptr: %p %d\n", ptr, *ptr);
 	

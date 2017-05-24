@@ -7,7 +7,7 @@
 # endif
 
 /*
- * Allocates a new stack of void pointers
+ * Allocates a new stack of items
  */
 stack *newStack()
 {
@@ -16,7 +16,7 @@ stack *newStack()
 	{
 		s->size = MIN_STACK;
 		s->top = 0;
-		s->entries = (void **) calloc(s->size, sizeof(void *));
+		s->entries = (item *) calloc(s->size, sizeof(item));
 		if (s->entries)
 		{
 			return s;
@@ -34,18 +34,19 @@ void delStack(stack *s)
 }
 
 /*
- * Removes the top entry and stores it
+ * Removes the top entry
  *
  * @param s Stack to pop from
- * @param e The void pointer to store the popped entry
+ * @return Popped entry
  */
-void pop(stack *s, void **e)
+item pop(stack *s)
 {
 	if (!empty(s))
 	{
 		s->top -= 1;
-		*e = s->entries[s->top];
+		item i = s->entries[s->top];
 		s->entries[s->top] = NIL;
+		return i;
 	}
 }
 
@@ -53,34 +54,37 @@ void pop(stack *s, void **e)
  * Adds an entry to the top
  *
  * @param s Stack to add to
- * @param e The address to add
+ * @param i Entry to add
  */
-void push(stack *s, void *e)
+void push(stack *s, item i)
 {
 	if (full(s))
 	{
-		void **tmp = s->entries;
-		tmp = (void **) realloc(s->entries, sizeof(void *) * s->size * 2);
+		item *tmp = s->entries;
+		tmp = (item *) realloc(s->entries, sizeof(item) * s->size * 2);
 		if (tmp)
 		{
-			s->size *= 2;
+			s->size *= 2; // double size to reduce number of realloc calls
+			
+			// set all unused realloc entries to NIL
 			for (uint32_t i = s->top; i < s->size; i += 1)
 			{
 				tmp[i] = NIL;
 			}
+				
 			s->entries = tmp;
 		}
 	}
-	s->entries[s->top] = e;
+	s->entries[s->top] = i;
 	s->top += 1;
 }
 
-bool empty(stack *s)
+bool empty(const stack *s)
 {
 	return s->top == 0;
 }
 
-bool full(stack *s)
+bool full(const stack *s)
 {
 	return s->top == s->size;
 }
@@ -89,7 +93,7 @@ bool full(stack *s)
  * Debugging function to print each entry (address) in the stack,
  * the top of the stack, and the size.
  */
-void printStack(stack *s)
+void printStack(const stack *s)
 {
 	printf("top: %u\n", s->top);
 	printf("size: %u\n", s->size);
