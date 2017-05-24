@@ -1,103 +1,43 @@
-# include <stdlib.h>
-# include <stdio.h>
 # include "stack.h"
 
-/*
- * Allocates a new stack of items
- */
-stack *newStack(uint32_t size)
+stack *newStack(uint32_t nbits, bool fixed)
 {
-	stack *s = (stack *) malloc(sizeof(stack));
+	stack *s = (stack *s) malloc(sizeof(stack));
 	if (s)
 	{
-		s->size = size;
-		s->top = 0;
-		s->entries = (item *) calloc(s->size, sizeof(item));
+		s->entries = (item *) calloc((nbits / sizeof(item)) + 1, sizeof(item));
 		if (s->entries)
 		{
+			s->fixed = fixed;
+			s->size = nbits;
+			s->top = 0;
 			return s;
 		}
 	}
 	return (stack *) 0;
 }
 
-void delStack(stack *s)
+/*
+void delStack(stack *s);
+*/
+
+// Adds an entry to the top of the stack
+bool push(stack *s, item i)
 {
-	free(s->entries);
-	s->entries = NIL;
-	free(s);
-	s = NIL;
+	
 }
 
 /*
- * Removes the top entry
- *
- * @param s Stack to pop from
- * @return Popped entry
- */
-item pop(stack *s)
-{
-	if (!empty(s))
-	{
-		s->top -= 1;
-		item i = s->entries[s->top];
-		s->entries[s->top] = NIL;
-		return i;
-	}
-}
+// Removes an entry from the top of the stack
+bool pop(stack *s, item *i);
 
-/*
- * Adds an entry to the top
- *
- * @param s Stack to add to
- * @param i Entry to add
- */
-void push(stack *s, item i)
-{
-	if (full(s))
-	{
-		item *tmp = s->entries;
-		tmp = (item *) realloc(s->entries, sizeof(item) * s->size * 2);
-		if (tmp)
-		{
-			s->size *= 2; // double size to reduce number of realloc calls
-			
-			// set all unused realloc entries to NIL
-			for (uint32_t i = s->top; i < s->size; i += 1)
-			{
-				tmp[i] = NIL;
-			}
-				
-			s->entries = tmp;
-		}
-	}
-	s->entries[s->top] = i;
-	s->top += 1;
-}
+// Checks if the stack is empty
+bool empty(const stack *s);
+*/
 
-bool empty(const stack *s)
-{
-	return s->top == 0;
-}
-
+// Checks if the stack is full
 bool full(const stack *s)
 {
 	return s->top == s->size;
-}
-
-/*
- * Debugging function to print each entry (address) in the stack,
- * the top of the stack, and the size.
- */
-void printStack(const stack *s)
-{
-	printf("top: %u\n", s->top);
-	printf("size: %u\n", s->size);
-	uint32_t i = 0;
-	while (i < s->size)
-	{
-		printf("%p\n", s->entries[i]);
-		i += 1;
-	}
 }
 
