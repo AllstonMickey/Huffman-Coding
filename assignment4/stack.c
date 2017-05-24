@@ -39,32 +39,6 @@ stack *newStack(uint32_t nbits, bool fixed)
 // Adds an entry to the top of the stack
 bool push(stack *s, item i)
 {
-	if (s->fixed && full(s))
-	{
-		return false;
-	}
-	else if (full(s))
-	{
-		item *tmp = s->entries;
-		uint32_t nmemb = ((s->size / ITEM_NBITS) * 2) + 1;
-		tmp = (item *) realloc(s->entries, nmemb * sizeof(item));
-		if (tmp)
-		{
-			s->size *= 2;
-			s->entries = tmp;
-		}
-	}
-
-	if (i)
-	{
-		s->entries[s->top / ITEM_NBITS] |= (0x1 << (s->top % ITEM_NBITS));
-	}
-	else
-	{
-		s->entries[s->top / ITEM_NBITS] &= ~(0x1 << (s->top % ITEM_NBITS));
-	}
-	s->top += ITEM_NBITS;
-	return s;
 }
 
 /*
