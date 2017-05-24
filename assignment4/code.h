@@ -36,13 +36,12 @@ static inline bool pushCode(code *c, uint32_t k)
 	else if (k == 0) // clear bit
 	{
 		c->bits[c->l / 8] &= ~(0x1 << (c->l % 8));
-		c->l += 1;
 	}
 	else // set bit
 	{
 		c->bits[c->l / 8] |= (0x1 << (c->l % 8));
-		c->l += 1;
 	}
+	c->l += 1;
 	return true;
 }
 
