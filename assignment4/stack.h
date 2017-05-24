@@ -30,7 +30,7 @@ bool pushBit(stack *s, bool k);
 
 // Removes an entry from the top of the stack
 bool pop(stack *s, item *i);
-bool popBit(stack *s, bool k);
+bool popBit(stack *s, bool *k);
 
 // Checks if the stack is empty
 bool empty(const stack *s);

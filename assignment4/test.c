@@ -7,8 +7,12 @@ int main(void)
 	item num = 32;
 	push(s, num);
 	push(s, 17);
-	printItems(s);
 	printBits(s);
+	printf("popping...\n");
+	item res;
+	pop(s, &res);
+	printBits(s);
+	printf("res: %u\n", res);
 	/*
 	// for each bit (16 bits -> 2 bytes * 8 bits -> 16 bits)
 	for (uint32_t i = 0; i < sizeof(uint16_t) * 8; i += 1)
