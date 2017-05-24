@@ -3,7 +3,7 @@
 # include "stack.h"
 
 # ifndef MIN_STACK
-# define MIN_STACK 1
+# define MIN_STACK 4
 # endif
 
 /* typedef struct stack
@@ -38,12 +38,12 @@ void delStack(stack *s)
 }
 
 // Removes the top element and stores it in e
-void pop(stack *s, void *e)
+void pop(stack *s, void **e)
 {
 	if (!empty(s))
 	{
 		s->top -= 1;
-		e = s->entries[s->top];
+		*e = s->entries[s->top];
 		s->entries[s->top] = NIL;
 	}
 }

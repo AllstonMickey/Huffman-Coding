@@ -19,7 +19,7 @@ stack *newStack();
 void delStack(stack *s);
 
 // Removes the top element and stores it in e
-void pop(stack *s, void *e);
+void pop(stack *s, void **e);
 
 // Adds an element to the top of the stack
 void push(stack *s, void *e);
