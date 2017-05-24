@@ -3,7 +3,7 @@
 
 int main(void)
 {
-	stack *s = newStack(20, true);
+	stack *s = newStack(4, false);
 	item num = 32;
 	push(s, num);
 	push(s, 17);

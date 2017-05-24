@@ -2,12 +2,8 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-# ifndef VALBIT_VEC
-# define VALBIT_VEC(v, k) (v[k >> 3] & (0x1 << (k % 8))) >> (k % 8)
-# endif
-
-# ifndef VALBIT_ITEM
-# define VALBIT_ITEM(i, k) (i & (0x1 << (k % ITEM_NBITS))) >> (k % ITEM_NBITS)
+# ifndef VALBIT
+# define VALBIT(a, k) (a & (0x1 << (k % ITEM_NBITS))) >> (k % ITEM_NBITS)
 # endif
 
 # ifndef BITS
@@ -23,7 +19,7 @@ stack *newStack(uint32_t nbits, bool fixed)
 	stack *s = (stack *) malloc(sizeof(stack));
 	if (s)
 	{
-		s->entries = (item *) calloc(nbits / ITEM_NBITS, sizeof(item));
+		s->entries = (item *) calloc((nbits / ITEM_NBITS) + 1, sizeof(item));
 		if (s->entries)
 		{
 			s->fixed = fixed;
@@ -37,15 +33,15 @@ stack *newStack(uint32_t nbits, bool fixed)
 
 /*
    void delStack(stack *s);
- */
+   */
 
 // Adds an entry to the top of the stack
 bool push(stack *s, item i)
 {
-	for (uint32_t j = 0; j < ITEM_NBITS; j += 1)
+	for (int32_t bit_i = ITEM_NBITS - 1; bit_i > -1; bit_i -= 1)
 	{
-		printf("val, %u: %u\n", j, VALBIT_ITEM(i, j));
-		pushBit(s, VALBIT_ITEM(i, j));
+		printf("bit_i, %u: %u\n", bit_i, VALBIT(i, bit_i));
+		pushBit(s, VALBIT(i, bit_i));
 	}
 }
 
@@ -56,14 +52,32 @@ bool push(stack *s, item i)
  */
 bool pushBit(stack *s, bool k)
 {
-	if (s->top > 256) { return false; }
-	else if (!k)
+	if (full(s) && s->fixed)
 	{
-		s->entries[s->top / ITEM_NBITS] &= ~(0x1 << (s->top % ITEM_NBITS));
+		return false;
+	}
+	else if (full(s))
+	{
+		item *tmp = s->entries;
+		tmp = (item *) realloc(s->entries, ((2 * s->size / ITEM_NBITS) + 1) * sizeof(item));
+		if (tmp)
+		{
+			s->entries = tmp;
+			s->size *= 2;
+		}
+		else
+		{
+			tmp = NIL;
+		}
+	}
+	
+	if (k)
+	{
+		s->entries[s->top / ITEM_NBITS] |= (0x1 << (s->top % ITEM_NBITS));
 	}
 	else
 	{
-		s->entries[s->top / ITEM_NBITS] |= (0x1 << (s->top % ITEM_NBITS));
+		s->entries[s->top / ITEM_NBITS] &= ~(0x1 << (s->top % ITEM_NBITS));
 	}
 	s->top += 1;
 	return true;
@@ -81,7 +95,7 @@ bool pop(stack *s, item *e)
 	 */
 	for (uint32_t j = 0; j < ITEM_NBITS; j += 1)
 	{
-		
+
 	}
 }
 
@@ -100,7 +114,7 @@ bool empty(const stack *s)
 // Checks if the stack is full
 bool full(const stack *s)
 {
-	return s->top == s->size;
+	return s->top >= s->size;
 }
 
 void printItems(const stack *s)
@@ -120,7 +134,7 @@ void printBits(const stack *s)
 	printf("top: %u\n", s->top);
 	for (uint32_t i = 0; i < s->size; i += 1)
 	{
-		printf("%u", VALBIT_VEC(s->entries, i));
+		printf("%u", VALBIT(s->entries[i >> 3], i));
 		if ((i + 1) % 4 == 0) { printf(" ");  }
 		if ((i + 1) % 8 == 0) { printf("\n"); }
 	}
