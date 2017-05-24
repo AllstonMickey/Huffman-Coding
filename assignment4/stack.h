@@ -1,5 +1,5 @@
-# ifndef _GENERIC_STACK_H
-# define _GENERIC_STACK_H
+# ifndef _STACK_H
+# define _STACK_H
 # include <stdint.h>
 # include <stdbool.h>
 
@@ -7,9 +7,9 @@
 # define NIL (void *) 0
 # endif
 
-typedef uint8_t item; // define an item as 1 byte
+typedef uint16_t item; // define an item as 1 byte
 
-typedef stack
+typedef struct stack
 {
 	bool fixed;    // Dynamic or Fixed size?
 	uint32_t top;  // Number of used bits
@@ -33,5 +33,9 @@ bool empty(const stack *s);
 
 // Checks if the stack is full
 bool full(const stack *s);
+
+void printItems(const stack *s);
+
+void printBits(const stack *s);
 
 # endif
