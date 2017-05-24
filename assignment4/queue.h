@@ -13,7 +13,7 @@ typedef struct queue
 {
 	uint32_t size;       // How big is it?
 	uint32_t head, tail; // Front and rear locations
-	item *Q;             // Array to hold the entries
+	item *entries;       // Array to hold the entries
 } queue;
 
 queue *newQueue(uint32_t size);
