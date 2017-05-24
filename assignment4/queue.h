@@ -7,11 +7,14 @@
 # define NIL (void *) 0
 # endif
 
-typedef treeNode item; // treeNode defined in huffman.h
+# ifndef ITEM
+# define ITEM
+typedef uint32_t item; // treeNode defined in huffman.h
+# endif
 
 typedef struct queue
 {
-	uint32_t size;       // How big is it?
+	uint32_t size;       // How big is it? (number of entries)
 	uint32_t head, tail; // Front and rear locations
 	item *entries;       // Array to hold the entries
 } queue;

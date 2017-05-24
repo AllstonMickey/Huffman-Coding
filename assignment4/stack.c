@@ -35,7 +35,13 @@ stack *newStack(uint32_t nbits, bool fixed)
    void delStack(stack *s);
    */
 
-// Adds an entry to the top of the stack
+/*
+ * Pushes an item onto a stack by using its composition of bits.
+ *
+ * Since each item is represented in binary at its most pure form,
+ * we can push each bit of the item (in reverse order to make popping easier)
+ * to represent the item itself.
+ */
 bool push(stack *s, item i)
 {
 	for (int32_t bit_i = ITEM_NBITS - 1; bit_i > -1; bit_i -= 1)
@@ -45,17 +51,15 @@ bool push(stack *s, item i)
 }
 
 /*
- * TODO: check if stack is fixed
- * 	 realloc if not fixed and full
- * 	 push if space is available
+ * Pushes a bit k onto a stack.
  */
 bool pushBit(stack *s, bool k)
 {
-	if (full(s) && s->fixed)
+	if (fullStack(s) && s->fixed)
 	{
 		return false;
 	}
-	else if (full(s))
+	else if (fullStack(s))
 	{
 		item *tmp = s->entries;
 		tmp = (item *) realloc(s->entries, ((2 * s->size / ITEM_NBITS) + 1) * sizeof(item));
@@ -82,19 +86,28 @@ bool pushBit(stack *s, bool k)
 	return true;
 }
 
+/*
+ * Uses bit shifting to pop bits and recreate the item.
+ *
+ * Using the facts that each stack we created has bits pushed onto it,
+ * and a single partition/group width of bits is equal to the size
+ * of the item in bits, we can pop c bits off the stack, where c is
+ * the size of the item in bits.
+ *
+ * We can then store this result in a variable of value 0, popped, using
+ * bit shifting.  Since popped is type item, the computer knows what this
+ * bit representation is as that item, and therefore, does not confuse
+ * chars vs uint8_t, uint32_t vs. treeNode, etc.
+ */
 bool pop(stack *s, item *i)
 {
-	/*
-	 * For each bit in item e, pop it off the stack
-	 * (remember, this will pop the bits off in reverse order of binary representation)
-	 *
-	 * Concatenate the bits together and set it equal to the item.
-	 */
-	if (empty(s))
+	if (emptyStack(s))
 	{
 		return false;
 	}
 
+	// for each bit in the item, pop the bit
+	// store the result in an item using bit shifting
 	item popped = 0x0;
 	for (uint32_t j = 0; j < ITEM_NBITS; j += 1)
 	{
@@ -112,7 +125,7 @@ bool pop(stack *s, item *i)
 bool popBit(stack *s, bool *k)
 {
 	// for each bit in the item
-	if (empty(s))
+	if (emptyStack(s))
 	{
 		return false;
 	}
@@ -124,18 +137,18 @@ bool popBit(stack *s, bool *k)
 
 
 // Checks if the stack is empty
-bool empty(const stack *s)
+bool emptyStack(const stack *s)
 {
 	return s->top == 0;
 }
 
 // Checks if the stack is full
-bool full(const stack *s)
+bool fullStack(const stack *s)
 {
 	return s->top >= s->size;
 }
 
-void printItems(const stack *s)
+void printStackItems(const stack *s)
 {
 	printf("top:  %u\n", s->top);
 	printf("size: %u\n", s->size);
@@ -147,14 +160,21 @@ void printItems(const stack *s)
 	}
 }
 
-void printBits(const stack *s)
+void printStackBits(const stack *s)
 {
 	printf("top: %u\n", s->top);
 	for (uint32_t i = 0; i < s->top; i += 1)
 	{
 		printf("%u", VALBIT(s->entries[i >> 3], i));
-		if ((i + 1) % 4 == 0) { printf(" ");  }
-		if ((i + 1) % 8 == 0) { printf("\n"); }
+		if ((i + 1) % 4 == 0)
+		{
+			printf(" ");
+		}
+		if ((i + 1) % 8 == 0)
+		{
+			printf("\n");
+		}
 	}
 	printf("\n");
 }
+

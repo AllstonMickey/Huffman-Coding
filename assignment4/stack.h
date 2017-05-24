@@ -3,11 +3,11 @@
 # include <stdint.h>
 # include <stdbool.h>
 
+# define item char
+
 # ifndef NIL
 # define NIL (void *) 0
 # endif
-
-typedef char item; // define an item as 1 byte
 
 typedef struct stack
 {
@@ -22,8 +22,6 @@ stack *newStack(uint32_t nbits, bool fixed);
 
 void delStack(stack *s);
 
-void valBits(item element);
-
 // Adds an entry to the top of the stack
 bool push(stack *s, item i);
 bool pushBit(stack *s, bool k);
@@ -33,13 +31,13 @@ bool pop(stack *s, item *i);
 bool popBit(stack *s, bool *k);
 
 // Checks if the stack is empty
-bool empty(const stack *s);
+bool emptyStack(const stack *s);
 
 // Checks if the stack is full
-bool full(const stack *s);
+bool fullStack(const stack *s);
 
-void printItems(const stack *s);
+void printStackItems(const stack *s);
 
-void printBits(const stack *s);
+void printStackBits(const stack *s);
 
 # endif
