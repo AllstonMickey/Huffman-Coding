@@ -82,9 +82,6 @@ bool pushBit(stack *s, bool k)
 	return true;
 }
 
-// TODO
-// Removes an entry from the top of the stack
-// sets e to the popped item
 bool pop(stack *s, item *i)
 {
 	/*
@@ -93,21 +90,25 @@ bool pop(stack *s, item *i)
 	 *
 	 * Concatenate the bits together and set it equal to the item.
 	 */
+	if (empty(s))
+	{
+		return false;
+	}
+
 	item popped = 0x0;
 	for (uint32_t j = 0; j < ITEM_NBITS; j += 1)
 	{
 		bool val;
 		popBit(s, &val);
-		printf("val, %u: %u\n", j, val);
 		if (val)
 		{
 			popped |= 0x1 << j;
 		}
 	}
 	*i = popped;
+	return true;
 }
 
-// TODO
 bool popBit(stack *s, bool *k)
 {
 	// for each bit in the item
@@ -149,7 +150,7 @@ void printItems(const stack *s)
 void printBits(const stack *s)
 {
 	printf("top: %u\n", s->top);
-	for (uint32_t i = 0; i < s->size; i += 1)
+	for (uint32_t i = 0; i < s->top; i += 1)
 	{
 		printf("%u", VALBIT(s->entries[i >> 3], i));
 		if ((i + 1) % 4 == 0) { printf(" ");  }
