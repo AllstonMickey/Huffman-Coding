@@ -16,7 +16,7 @@ typedef struct stack
 	item *entries; // Array to hold the stack's entries
 } stack;
 
-stack *newStack();
+stack *newStack(uint32_t size);
 
 void delStack(stack *s);
 

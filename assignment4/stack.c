@@ -2,19 +2,15 @@
 # include <stdio.h>
 # include "stack.h"
 
-# ifndef MIN_STACK
-# define MIN_STACK 16
-# endif
-
 /*
  * Allocates a new stack of items
  */
-stack *newStack()
+stack *newStack(uint32_t size)
 {
 	stack *s = (stack *) malloc(sizeof(stack));
 	if (s)
 	{
-		s->size = MIN_STACK;
+		s->size = size;
 		s->top = 0;
 		s->entries = (item *) calloc(s->size, sizeof(item));
 		if (s->entries)

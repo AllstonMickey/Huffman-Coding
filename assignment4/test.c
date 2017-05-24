@@ -7,7 +7,7 @@ int main(void)
 	int j = 2190;
 	int k = 96;
 
-	stack *s = newStack();
+	stack *s = newStack(1);
 	push(s, &i);
 	push(s, &j);
 	push(s, &k);
