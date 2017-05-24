@@ -3,16 +3,12 @@
 # include "stack.h"
 
 # ifndef MIN_STACK
-# define MIN_STACK 4
+# define MIN_STACK 16
 # endif
 
-/* typedef struct stack
-{
-	uint32_t sie; // How big?
-	uint32_t top;  // Where is the top?
-	void **entries; // Array of any object
-} stack; */
-
+/*
+ * Allocates a new stack of void pointers
+ */
 stack *newStack()
 {
 	stack *s = (stack *) malloc(sizeof(stack));
@@ -37,7 +33,12 @@ void delStack(stack *s)
 	s = NIL;
 }
 
-// Removes the top element and stores it in e
+/*
+ * Removes the top entry and stores it
+ *
+ * @param s Stack to pop from
+ * @param e The void pointer to store the popped entry
+ */
 void pop(stack *s, void **e)
 {
 	if (!empty(s))
@@ -48,8 +49,12 @@ void pop(stack *s, void **e)
 	}
 }
 
-
-// Adds an element to the top of the stack
+/*
+ * Adds an entry to the top
+ *
+ * @param s Stack to add to
+ * @param e The address to add
+ */
 void push(stack *s, void *e)
 {
 	if (full(s))
@@ -80,6 +85,10 @@ bool full(stack *s)
 	return s->top == s->size;
 }
 
+/*
+ * Debugging function to print each entry (address) in the stack,
+ * the top of the stack, and the size.
+ */
 void printStack(stack *s)
 {
 	printf("top: %u\n", s->top);
@@ -91,3 +100,4 @@ void printStack(stack *s)
 		i += 1;
 	}
 }
+

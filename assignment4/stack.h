@@ -11,17 +11,17 @@ typedef struct stack
 {
 	uint32_t size; // How big?
 	uint32_t top;  // Where is the top?
-	void **entries; // Array of pointers to any objects
+	void **entries; // Array of void pointers
 } stack;
 
 stack *newStack();
 
 void delStack(stack *s);
 
-// Removes the top element and stores it in e
+// Removes the top void pointer and stores it in e
 void pop(stack *s, void **e);
 
-// Adds an element to the top of the stack
+// Adds an entry to the top of the stack
 void push(stack *s, void *e);
 
 // Is it empty?
