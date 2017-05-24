@@ -8,7 +8,7 @@
 
 /* typedef struct stack
 {
-	uint32_t size; // How big?
+	uint32_t sie; // How big?
 	uint32_t top;  // Where is the top?
 	void **entries; // Array of any object
 } stack; */
@@ -36,27 +36,34 @@ void delStack(stack *s)
 	free(s);
 	s = NIL;
 }
-/*
+
 // Removes the top element and stores it in e
 void pop(stack *s, void *e)
 {
 	if (!empty(s))
 	{
-	
+		s->top -= 1;
+		e = s->entries[s->top];
+		s->entries[s->top] = NIL;
 	}
 }
-*/
+
+
 // Adds an element to the top of the stack
 void push(stack *s, void *e)
 {
 	if (full(s))
 	{
-		void *tmp = s->entries;
+		void **tmp = s->entries;
 		tmp = (void **) realloc(s->entries, sizeof(void *) * s->size * 2);
 		if (tmp)
 		{
-			s->entries = tmp;
 			s->size *= 2;
+			for (uint32_t i = s->top; i < s->size; i += 1)
+			{
+				tmp[i] = NIL;
+			}
+			s->entries = tmp;
 		}
 	}
 	s->entries[s->top] = e;

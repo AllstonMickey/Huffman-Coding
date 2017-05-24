@@ -16,4 +16,4 @@ stack.o : stack.c stack.h
 
 .PHONY: clean
 clean :
-	$(RM) test.o test
+	$(RM) test.o test stack.o
