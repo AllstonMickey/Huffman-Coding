@@ -9,8 +9,8 @@
 
 typedef struct stack
 {
-	uint32_t size; // How big?
-	uint32_t top;  // Where is the top?
+	uint32_t size;  // How big? (max # of entries)
+	uint32_t top;   // Where is the top?
 	void **entries; // Array of void pointers
 } stack;
 
