@@ -75,6 +75,8 @@ bool full(stack *s)
 
 void printStack(stack *s)
 {
+	printf("top: %u\n", s->top);
+	printf("size: %u\n", s->size);
 	uint32_t i = 0;
 	while (i < s->size)
 	{
