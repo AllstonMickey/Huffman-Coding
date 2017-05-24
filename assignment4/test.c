@@ -3,8 +3,9 @@
 
 int main(void)
 {
+	int num = 42;
 	stack *s = newStack();
-	printf("%u\n", empty(s));
+	
 	delStack(s);
 	return 0;
 }

@@ -9,7 +9,7 @@
 {
 	uint32_t size; // How big?
 	uint32_t top;  // Where is the top?
-	void *entries; // Array of any object
+	void **entries; // Array of any object
 } stack; */
 
 stack *newStack()
@@ -19,7 +19,7 @@ stack *newStack()
 	{
 		s->size = MIN_STACK;
 		s->top = 0;
-		s->entries = (void *) calloc(s->size, sizeof(void));
+		s->entries = (void **) calloc(s->size, sizeof(void *));
 		if (s->entries)
 		{
 			return s;
@@ -35,14 +35,40 @@ void delStack(stack *s)
 	free(s);
 	s = NIL;
 }
-
+/*
 // Removes the top element and stores it in e
 void pop(stack *s, void *e)
 {
+	if (!empty(s))
+	{
 	
+	}
+}
+
+// Adds an element to the top of the stack
+void push(stack *s, void *e)
+{
+	if (full(s))
+	{
+		void *tmp = s->entries;
+		tmp = (void *) realloc(s->entries, sizeof(void) * s->size * 2);
+		if (tmp)
+		{
+			s->entries = tmp;
+			s->size *= 2;
+		}
+	}
+	s->entries[top] = 
+	top += 1;
 }
 
 bool empty(stack *s)
 {
 	return s->top == 0;
 }
+
+bool full(stack *s)
+{
+	return s->top == s->size;
+}
+*/

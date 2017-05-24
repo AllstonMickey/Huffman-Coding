@@ -11,7 +11,7 @@ typedef struct stack
 {
 	uint32_t size; // How big?
 	uint32_t top;  // Where is the top?
-	void *entries; // Array of any object
+	void **entries; // Array of pointers to any objects
 } stack;
 
 stack *newStack();
