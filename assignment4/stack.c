@@ -45,13 +45,12 @@ void valBits(item element)
 }
 
 // Adds an entry to the top of the stack
-bool push(stack *s, uint16_t element)
+bool push(stack *s, item i)
 {
-	printf("%u\n", element);
-	for (uint32_t i = 0; i < sizeof(uint16_t) * 8; i += 1)
+	for (uint32_t j = 0; j < ITEM_NBITS; j += 1)
 	{
-		bool val = (element & (0x1 << (element % 16))) >> (element % 16);
-		printf("val, %u: %u\n", i, val);
+		bool val = (i & (0x1 << (j % ITEM_NBITS))) >> (j % ITEM_NBITS);
+		printf("val, %u: %u\n", j, val);
 	}
 }
 
