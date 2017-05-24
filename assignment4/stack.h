@@ -30,4 +30,6 @@ bool empty(stack *s);
 // Is it full?
 bool full(stack *s);
 
+void printStack(stack *s);
+
 # endif

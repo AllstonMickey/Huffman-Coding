@@ -1,4 +1,5 @@
 # include <stdlib.h>
+# include <stdio.h>
 # include "stack.h"
 
 # ifndef MIN_STACK
@@ -44,22 +45,22 @@ void pop(stack *s, void *e)
 	
 	}
 }
-
+*/
 // Adds an element to the top of the stack
 void push(stack *s, void *e)
 {
 	if (full(s))
 	{
 		void *tmp = s->entries;
-		tmp = (void *) realloc(s->entries, sizeof(void) * s->size * 2);
+		tmp = (void **) realloc(s->entries, sizeof(void *) * s->size * 2);
 		if (tmp)
 		{
 			s->entries = tmp;
 			s->size *= 2;
 		}
 	}
-	s->entries[top] = 
-	top += 1;
+	s->entries[s->top] = e;
+	s->top += 1;
 }
 
 bool empty(stack *s)
@@ -71,4 +72,13 @@ bool full(stack *s)
 {
 	return s->top == s->size;
 }
-*/
+
+void printStack(stack *s)
+{
+	uint32_t i = 0;
+	while (i < s->size)
+	{
+		printf("%p\n", s->entries[i]);
+		i += 1;
+	}
+}
