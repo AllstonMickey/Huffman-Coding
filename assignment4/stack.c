@@ -35,15 +35,6 @@ stack *newStack(uint32_t nbits, bool fixed)
    void delStack(stack *s);
  */
 
-void valBits(item element)
-{
-	for (uint32_t i = 0; i < ITEM_NBITS; i += 1)
-	{
-		bool val = (element & (0x1 << (i % ITEM_NBITS))) >> (i % ITEM_NBITS);
-		printf("val, %u: %u\n", i, val);
-	}
-}
-
 // Adds an entry to the top of the stack
 bool push(stack *s, item i)
 {
@@ -51,6 +42,7 @@ bool push(stack *s, item i)
 	{
 		bool val = (i & (0x1 << (j % ITEM_NBITS))) >> (j % ITEM_NBITS);
 		printf("val, %u: %u\n", j, val);
+		pushBit(s, val);
 	}
 }
 
@@ -59,11 +51,11 @@ bool pushBit(stack *s, bool k)
 	if (s->top > 256) { return false; }
 	else if (!k)
 	{
-		s->entries[s->top / 8] &= ~(0x1 << (s->top % 8));
+		s->entries[s->top / ITEM_NBITS] &= ~(0x1 << (s->top % ITEM_NBITS));
 	}
 	else
 	{
-		s->entries[s->top / 8] |= (0x1 << (s->top % 8));
+		s->entries[s->top / ITEM_NBITS] |= (0x1 << (s->top % ITEM_NBITS));
 	}
 	s->top += 1;
 	return true;

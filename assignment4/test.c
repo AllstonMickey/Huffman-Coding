@@ -4,8 +4,10 @@
 int main(void)
 {
 	stack *s = newStack(20, true);
-	uint16_t num = 32;
+	item num = 32;
 	push(s, num);
+	printItems(s);
+	printBits(s);
 	/*
 	// for each bit (16 bits -> 2 bytes * 8 bits -> 16 bits)
 	for (uint32_t i = 0; i < sizeof(uint16_t) * 8; i += 1)

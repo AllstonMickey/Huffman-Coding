@@ -7,7 +7,7 @@
 # define NIL (void *) 0
 # endif
 
-typedef uint16_t item; // define an item as 1 byte
+typedef uint8_t item; // define an item as 1 byte
 
 typedef struct stack
 {
