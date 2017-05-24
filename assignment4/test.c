@@ -6,6 +6,7 @@ int main(void)
 	stack *s = newStack(20, true);
 	item num = 32;
 	push(s, num);
+	push(s, 17);
 	printItems(s);
 	printBits(s);
 	/*

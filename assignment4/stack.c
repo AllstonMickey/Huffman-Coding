@@ -2,8 +2,12 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-# ifndef VALBIT
-# define VALBIT(v, k) (v[k >> 3] & (0x1 << (k % 8))) >> (k % 8)
+# ifndef VALBIT_VEC
+# define VALBIT_VEC(v, k) (v[k >> 3] & (0x1 << (k % 8))) >> (k % 8)
+# endif
+
+# ifndef VALBIT_ITEM
+# define VALBIT_ITEM(i, k) (i & (0x1 << (k % ITEM_NBITS))) >> (k % ITEM_NBITS)
 # endif
 
 # ifndef BITS
@@ -40,12 +44,16 @@ bool push(stack *s, item i)
 {
 	for (uint32_t j = 0; j < ITEM_NBITS; j += 1)
 	{
-		bool val = (i & (0x1 << (j % ITEM_NBITS))) >> (j % ITEM_NBITS);
-		printf("val, %u: %u\n", j, val);
-		pushBit(s, val);
+		printf("val, %u: %u\n", j, VALBIT_ITEM(i, j));
+		pushBit(s, VALBIT_ITEM(i, j));
 	}
 }
 
+/*
+ * TODO: check if stack is fixed
+ * 	 realloc if not fixed and full
+ * 	 push if space is available
+ */
 bool pushBit(stack *s, bool k)
 {
 	if (s->top > 256) { return false; }
@@ -61,13 +69,33 @@ bool pushBit(stack *s, bool k)
 	return true;
 }
 
-/*
+// TODO
 // Removes an entry from the top of the stack
-bool pop(stack *s, item *i);
+bool pop(stack *s, item *e)
+{
+	/*
+	 * For each bit in item e, pop it off the stack
+	 * (remember, this will pop the bits off in reverse order of binary representation)
+	 *
+	 * Concatenate the bits together and set it equal to the item.
+	 */
+	for (uint32_t j = 0; j < ITEM_NBITS; j += 1)
+	{
+		
+	}
+}
+
+// TODO
+bool popBit(stack *s, bool k)
+{
+}
+
 
 // Checks if the stack is empty
-bool empty(const stack *s);
-*/
+bool empty(const stack *s)
+{
+	return s->top == 0;
+}
 
 // Checks if the stack is full
 bool full(const stack *s)
@@ -92,8 +120,9 @@ void printBits(const stack *s)
 	printf("top: %u\n", s->top);
 	for (uint32_t i = 0; i < s->size; i += 1)
 	{
-		printf("%u", VALBIT(s->entries, i));
+		printf("%u", VALBIT_VEC(s->entries, i));
 		if ((i + 1) % 4 == 0) { printf(" ");  }
 		if ((i + 1) % 8 == 0) { printf("\n"); }
 	}
+	printf("\n");
 }
