@@ -25,9 +25,6 @@ struct DAH
 // Create a single node with symbols, count, and leaf or not
 treeNode *newNode(uint8_t s, uint64_t c, bool l);
 
-// Delete a single node
-treeNode *delNode(treeNode *t);
-
 // Delete a tree of nodes
 treeNode *delTree(treeNode *t);
 
@@ -35,7 +32,7 @@ treeNode *delTree(treeNode *t);
 void dumpTree(treeNode *t, int file);
 
 // Build a tree from the saved tree
-treeNode *loadTree(uint8_t savedTree[]);
+treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 
 // Step through a tree following the code
 int32_t *stepTree(treeNode *root, treeNode *t, uint32_t code);
@@ -50,7 +47,7 @@ static inline void delNode(treeNode *h)
 }
 
 // Compares the size of two trees
-static inline bool compare(treeNode *l, treeNode *r)
+static inline int8_t compare(treeNode *l, treeNode *r)
 {
 	return l->count - r->count;
 }
