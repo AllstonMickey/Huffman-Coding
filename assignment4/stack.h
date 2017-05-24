@@ -7,35 +7,29 @@
 # define NIL (void *) 0
 # endif
 
-typedef uint16_t item; // define an item as 1 byte
+typedef void* item; // treeNode defined in huffman.h
 
 typedef struct stack
 {
-	bool fixed;    // Dynamic or Fixed size?
-	uint32_t top;  // Number of used bits
-	uint32_t size; // Number of max bits (may realloc later if fixed is true)
-	item *entries; // Array of whatever type is being held in the stack
+	uint32_t size; // How big? (max # of entries)
+	uint32_t top;  // Where is the top?
+	item *entries; // Array to hold the stack's entries
 } stack;
 
-// Creates a stack occupying 'bytes' size
-stack *newStack(uint32_t nbits, bool fixed);
+stack *newStack(uint32_t size);
 
 void delStack(stack *s);
 
-// Adds an entry to the top of the stack
-bool push(stack *s, item i);
+item pop(stack *s);
 
-// Removes an entry from the top of the stack
-bool pop(stack *s, item *i);
+void push(stack *s, item i);
 
-// Checks if the stack is empty
+// Is it empty?
 bool empty(const stack *s);
 
-// Checks if the stack is full
+// Is it full?
 bool full(const stack *s);
 
-void printItems(const stack *s);
-
-void printBits(const stack *s);
+void printStack(const stack *s);
 
 # endif
