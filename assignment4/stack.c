@@ -1,6 +1,10 @@
 # include <stdlib.h>
 # include "stack.h"
 
+# ifndef MIN_STACK
+# define MIN_STACK 16
+# endif
+
 /* typedef struct stack
 {
 	uint32_t size; // How big?
@@ -13,7 +17,7 @@ stack *newStack()
 	stack *s = (stack *) malloc(sizeof(stack));
 	if (s)
 	{
-		s->size = 256;
+		s->size = MIN_STACK;
 		s->top = 0;
 		s->entries = (void *) calloc(s->size, sizeof(void));
 		if (s->entries)
@@ -32,3 +36,13 @@ void delStack(stack *s)
 	s = NIL;
 }
 
+// Removes the top element and stores it in e
+void pop(stack *s, void *e)
+{
+	
+}
+
+bool empty(stack *s)
+{
+	return s->top == 0;
+}
