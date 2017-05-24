@@ -1,0 +1,12 @@
+Idea for generic stacks:
+	Each data structure should be represented as sections of bits within the stack.
+	
+For each bit in the data structure (using sizeof*8), we can push each individual bit, either
+a zero or a one.  We have these cases implemented in bv.h, bf.h, and now code.h.  They are nearly
+identical concepts.  To do so, two push functions must be made.  One which takes any item as its second
+parameter, and the other which pushes single bits, taken as a bool parameter.  The first push function
+repeatedly calls the second.  This allows pushing of 8 bit integers and single bits, including every
+possible data structure, since computers will represent them ultimately as ones and zeros.
+
+To pop the items off, all you need to know is the data type being popped off, and then pop the bits off,
+in partitions of width equal to the number of bits of the data type.
