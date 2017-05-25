@@ -11,15 +11,16 @@
 # endif
 
 # ifndef ITEM_NBITS
-# define ITEM_NBITS (sizeof(item) * BITS)
+# define ITEM_NBITS (sizeof(stackItem) * BITS)
 # endif
 
 stack *newStack(uint32_t nbits, bool fixed)
 {
+	printf("stack.c: %lu %lu\n", sizeof(stackItem), sizeof(STACK_ITEM));
 	stack *s = (stack *) malloc(sizeof(stack));
 	if (s)
 	{
-		s->entries = (item *) calloc((nbits / ITEM_NBITS) + 1, sizeof(item));
+		s->entries = (stackItem *) calloc((nbits / ITEM_NBITS) + 1, sizeof(stackItem));
 		if (s->entries)
 		{
 			s->fixed = fixed;
@@ -42,7 +43,7 @@ stack *newStack(uint32_t nbits, bool fixed)
  * we can push each bit of the item (in reverse order to make popping easier)
  * to represent the item itself.
  */
-bool push(stack *s, item i)
+bool push(stack *s, stackItem i)
 {
 	for (int32_t bit_i = ITEM_NBITS - 1; bit_i > -1; bit_i -= 1)
 	{
@@ -61,8 +62,8 @@ bool pushBit(stack *s, bool k)
 	}
 	else if (fullStack(s))
 	{
-		item *tmp = s->entries;
-		tmp = (item *) realloc(s->entries, ((2 * s->size / ITEM_NBITS) + 1) * sizeof(item));
+		stackItem *tmp = s->entries;
+		tmp = (stackItem *) realloc(s->entries, ((2 * s->size / ITEM_NBITS) + 1) * sizeof(stackItem));
 		if (tmp)
 		{
 			s->entries = tmp;
@@ -99,7 +100,7 @@ bool pushBit(stack *s, bool k)
  * bit representation is as that item, and therefore, does not confuse
  * chars vs uint8_t, uint32_t vs. treeNode, etc.
  */
-bool pop(stack *s, item *i)
+bool pop(stack *s, stackItem *i)
 {
 	if (emptyStack(s))
 	{
@@ -108,7 +109,7 @@ bool pop(stack *s, item *i)
 
 	// for each bit in the item, pop the bit
 	// store the result in an item using bit shifting
-	item popped = 0x0;
+	stackItem popped = 0x0;
 	for (uint32_t j = 0; j < ITEM_NBITS; j += 1)
 	{
 		bool val;

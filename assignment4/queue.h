@@ -7,16 +7,13 @@
 # define NIL (void *) 0
 # endif
 
-# ifndef ITEM
-# define ITEM
-typedef uint32_t item; // treeNode defined in huffman.h
-# endif
+typedef QUEUE_ITEM queueItem;
 
 typedef struct queue
 {
 	uint32_t size;       // How big is it? (number of entries)
 	uint32_t head, tail; // Front and rear locations
-	item *entries;       // Array to hold the entries
+	queueItem *entries;       // Array to hold the entries
 } queue;
 
 queue *newQueue(uint32_t size);
@@ -24,10 +21,10 @@ queue *newQueue(uint32_t size);
 void delQueue(queue *q);
 
 // Adds an entry to the front
-bool enqueue(queue *q, item i);
+bool enqueue(queue *q, queueItem i);
 
 // Removes the rear entry (smallest value) and sets i to it
-bool dequeue(queue *q, item *i);
+bool dequeue(queue *q, queueItem *i);
 
 // Is it empty?
 bool empty(queue *q);

@@ -1,6 +1,10 @@
 # include <stdlib.h>
 # include "queue.h"
 
+# ifndef NIL
+# define NIL (void *) 0
+# endif
+
 /* typedef struct queue
  * {
  * 	uint32_t size;       // How big is it?
@@ -14,7 +18,7 @@ queue *newQueue(uint32_t size)
 	queue *q = (queue *) malloc(sizeof(queue));
 	if (q)
 	{
-		q->entries = (item *) calloc(size, sizeof(item));
+		q->entries = (queueItem *) calloc(size, sizeof(queueItem));
 		if (q->entries)
 		{
 			q->size = size;
@@ -41,7 +45,7 @@ void delQueue(queue *q)
  * @return true  Success
  * 	   false Failure
  */
-bool enqueue(queue *q, item i)
+bool enqueue(queue *q, queueItem i)
 {
 
 }
@@ -54,7 +58,7 @@ bool enqueue(queue *q, item i)
  * @return true  Success
  * 	   false Failure
  */
-bool dequeue(queue *q, item *i)
+bool dequeue(queue *q, queueItem *i)
 {
 
 }
