@@ -1,5 +1,5 @@
 # include "stack.h"
-//# include "queue.h"
+# include "queue.h"
 # include <stdio.h>
 
 int main(void)
@@ -23,8 +23,8 @@ int main(void)
 	printStackBits(s);
 	printf("res2: %u\n", res2);
 
-	//queue *q = newQueue(5);
-	//delQueue(q);
+	queue *q = newQueue(5);
+	delQueue(q);
 	
 	return 0;
 }
