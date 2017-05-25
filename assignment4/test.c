@@ -4,7 +4,7 @@
 
 int main(void)
 {
-	printf("test.c : %lu %lu\n", sizeof(stackItem), sizeof(STACK_ITEM));
+	printf("test.c : %lu\n", sizeof(stackItem));
 	stack *s = newStack(4, false);
 	stackItem num = 42;
 	push(s, num);

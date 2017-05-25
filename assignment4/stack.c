@@ -16,7 +16,7 @@
 
 stack *newStack(uint32_t nbits, bool fixed)
 {
-	printf("stack.c: %lu %lu\n", sizeof(stackItem), sizeof(STACK_ITEM));
+	printf("stack.c: %lu\n", sizeof(stackItem));
 	stack *s = (stack *) malloc(sizeof(stack));
 	if (s)
 	{

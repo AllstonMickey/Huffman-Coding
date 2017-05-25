@@ -7,7 +7,7 @@
 # define NIL (void *) 0
 # endif
 
-typedef QUEUE_ITEM queueItem;
+typedef uint8_t queueItem;
 
 typedef struct queue
 {
