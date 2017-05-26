@@ -10,7 +10,7 @@ DEFQUEUE  = -DQUEUE_ITEM=$(QUEUETYPE)
 all : test
 
 test : test.o stack.o queue.o
-	$(CC) -std=c99 test.o stack.o stackType.o queue.o -o test
+	$(CC) -std=c99 test.o stack.o queue.o -o test
 
 test.o : test.c stack.h queue.h
 	$(eval STACKTYPE=uint16_t)
