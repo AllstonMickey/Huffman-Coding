@@ -18,6 +18,8 @@ queue *newQueue(uint32_t size)
 		if (q->nodes)
 		{
 			q->size = size;
+			q->len = 1; // furthest element away from 0th index
+			q->nodes[0] = NIL; // 0 element is empty to maintain arithmetic properties
 			return q;
 		}
 	}
