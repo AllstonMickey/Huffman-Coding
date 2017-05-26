@@ -7,6 +7,10 @@
 # define NIL (void *) 0
 # endif
 
+# ifndef ROOT
+# define ROOT 1
+# endif
+
 typedef QUEUE_ITEM queueItem;
 
 typedef struct queue

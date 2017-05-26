@@ -7,10 +7,6 @@
 # include "queue.h"
 # include "heap.h"
 
-# ifndef NIL
-# define NIL (void *) 0
-# endif
-
 queue *newQueue(uint32_t size)
 {
 	queue *q = (queue *) malloc(sizeof(queue));
@@ -21,7 +17,7 @@ queue *newQueue(uint32_t size)
 		{
 			q->size = size;
 			q->nodes[0] = (queueItem) 0x0; // 0th index is empty to maintain heap properties
-			q->head = 1;
+			q->head = ROOT;
 			return q;
 		}
 	}
@@ -45,16 +41,14 @@ bool enqueue(queue *q, queueItem i)
 	{
 		return false;
 	}
-	else if (emptyQueue(q))
+	
+	q->nodes[q->head] = i;
+	if (!emptyQueue(q))
 	{
-		q->nodes[q->head] = i;
-	}
-	else
-	{
-		q->nodes[q->head] = i;
 		percolate(&q);
 	}
 	q->head += 1;
+	
 	return true;
 }
 
@@ -65,15 +59,14 @@ bool fullQueue(queue *q)
 
 bool emptyQueue(queue *q)
 {
-	return q->head == 1;
+	return q->head == ROOT;
 }
 
 void printQueue(queue *q)
 {
 	for (uint32_t i = 0; i < q->size; i += 1)
 	{
-		printf("%u\n", q->nodes[i]);
+		printf("%u, %u\n", i, q->nodes[i]);
 	}
-	printf("\n");
 }
 

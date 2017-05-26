@@ -1,6 +1,7 @@
 # include "stack.h"
 # include "queue.h"
 # include <stdio.h>
+# include <stdlib.h>
 
 int main(void)
 {
@@ -26,7 +27,7 @@ int main(void)
 	printf("\n");
 	*/
 
-	//  Stack Testing with numbers (working as of 05/27/17, 18:38)
+	//  Stack Testing with numbers (working as of 05/25/17, 18:38)
 	/*
 	printf("pushing...\n");
 
@@ -50,13 +51,18 @@ int main(void)
 	*/
 	delStack(s);
 
-	queue *q = newQueue(5);
+	queue *q = newQueue(10);
 
-	uint8_t nums[4] = { 42, 69, 77, 28 };
-	for (int i = 0; i < 4; i += 1)
+	srand(256);
+	uint8_t nums[10] = { 0x0 };
+	
+	// Enqueue Testing (working as of 05/25/17, 19:54)
+	for (int i = 0; i < 10; i += 1)
 	{
+		nums[i] = rand() % 255;
 		enqueue(q, nums[i]);
 	}
+
 	printQueue(q);
 	delQueue(q);
 	
