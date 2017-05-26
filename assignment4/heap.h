@@ -1,3 +1,6 @@
+// TODO: stop accessing children out of the array bounds,
+// 	 check if they are within the size first.
+
 # ifndef _HEAP_H
 # define _HEAP_H
 
