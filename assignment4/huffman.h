@@ -26,7 +26,7 @@ struct DAH
 treeNode *newNode(uint8_t s, uint64_t c, bool l);
 
 // Delete a tree of nodes
-treeNode *delTree(treeNode *t);
+void delTree(treeNode *t);
 
 // Dump a Huffman tree onto a file
 void dumpTree(treeNode *t, int file);
