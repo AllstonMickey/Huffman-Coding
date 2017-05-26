@@ -19,7 +19,7 @@ queue *newQueue(uint32_t size)
 		{
 			q->size = size;
 			q->len = 1; // furthest element away from 0th index
-			q->nodes[0] = NIL; // 0 element is empty to maintain arithmetic properties
+			q->nodes[0] = (queueItem) 0; // 0 element is empty to maintain arithmetic properties
 			return q;
 		}
 	}
@@ -40,5 +40,15 @@ void delQueue(queue *q)
 bool enqueue(queue *q, queueItem i)
 {
 	
+}
+
+bool fullQueue(queue *q)
+{
+	return q->len == q->size;
+}
+
+bool emptyQueue(queue *q)
+{
+	return q->len == 1;
 }
 

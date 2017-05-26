@@ -20,4 +20,10 @@ queue *newQueue(uint32_t size);
 
 void delQueue(queue *q);
 
+bool enqueue(queue *q, queueItem i);
+
+bool fullQueue(queue *q);
+
+bool emptyQueue(queue *q);
+
 # endif

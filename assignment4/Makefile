@@ -1,10 +1,14 @@
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -Wpedantic -std=c99
 RM = rm -f
-STACKTYPE = uint8_t
-QUEUETYPE = uint8_t
-DEFSTACK  = -DSTACK_ITEM=$(STACKTYPE)
-DEFQUEUE  = -DQUEUE_ITEM=$(QUEUETYPE)
+
+ENCODE_STACKTYPE = uint8_t
+DECODE_STACKTYPE = uint16_t
+STACKTYPE        = uint32_t
+DEFINE_STACK     = -DSTACK_ITEM=$(STACKTYPE)
+
+QUEUETYPE    = uint8_t
+DEFINE_QUEUE = -DQUEUE_ITEM=$(QUEUETYPE)
 
 .PHONY: all
 all : test
@@ -13,15 +17,14 @@ test : test.o stack.o queue.o
 	$(CC) -std=c99 test.o stack.o queue.o -o test
 
 test.o : test.c stack.h queue.h
-	$(eval STACKTYPE=uint16_t)
-	$(eval QUEUETYPE=uint16_t)
-	$(CC) $(DEFSTACK) $(DEFQUEUE) -std=c99 test.c -c
+	$(eval STACKTYPE=$(ENCODE_STACKTYPE))
+	$(CC) $(DEFINE_STACK) $(DEFINE_QUEUE) -std=c99 test.c -c
 
 stack.o : stack.c stack.h
-	$(CC) $(DEFSTACK) -std=c99 stack.c -c
+	$(CC) $(DEFINE_STACK) -std=c99 stack.c -c
 
 queue.o : queue.c queue.h
-	$(CC) $(DEFQUEUE) -std=c99 queue.c -c
+	$(CC) $(DEFINE_QUEUE) -std=c99 queue.c -c
 
 .PHONY: clean
 clean :

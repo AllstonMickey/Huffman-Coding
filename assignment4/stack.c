@@ -16,7 +16,6 @@
 
 stack *newStack(uint32_t nbits, bool fixed)
 {
-	printf("stack.c: %lu\n", sizeof(stackItem));
 	stack *s = (stack *) malloc(sizeof(stack));
 	if (s)
 	{
@@ -32,9 +31,15 @@ stack *newStack(uint32_t nbits, bool fixed)
 	return (stack *) 0;
 }
 
-/*
-   void delStack(stack *s);
-   */
+void delStack(stack *s)
+{
+	free(s->entries);
+	s->entries = NIL;
+
+	free(s);
+	s = NIL;
+}
+
 
 /*
  * Pushes an item onto a stack by using its composition of bits.
