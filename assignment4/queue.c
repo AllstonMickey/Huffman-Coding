@@ -4,6 +4,7 @@
 
 # include <stdlib.h>
 # include "queue.h"
+# include "heap.h"
 
 # ifndef NIL
 # define NIL (void *) 0

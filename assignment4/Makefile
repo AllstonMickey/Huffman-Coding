@@ -16,14 +16,14 @@ all : test
 test : test.o stack.o queue.o
 	$(CC) -std=c99 test.o stack.o queue.o -o test
 
-test.o : test.c stack.h queue.h
+test.o : test.c stack.h queue.h heap.h
 	$(eval STACKTYPE=$(ENCODE_STACKTYPE))
 	$(CC) $(DEFINE_STACK) $(DEFINE_QUEUE) -std=c99 test.c -c
 
 stack.o : stack.c stack.h
 	$(CC) $(DEFINE_STACK) -std=c99 stack.c -c
 
-queue.o : queue.c queue.h
+queue.o : queue.c queue.h heap.h
 	$(CC) $(DEFINE_QUEUE) -std=c99 queue.c -c
 
 .PHONY: clean
