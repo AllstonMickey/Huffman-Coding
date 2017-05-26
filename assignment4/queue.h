@@ -24,10 +24,16 @@ queue *newQueue(uint32_t size);
 
 void delQueue(queue *q);
 
+// Adds an item to the queue
 bool enqueue(queue *q, queueItem i);
 
+// Removes the smallest item from the queue
+bool dequeue(queue *q, queueItem *i);
+
+// Is it full?
 bool fullQueue(queue *q);
 
+// Is it empty?
 bool emptyQueue(queue *q);
 
 void printQueue(queue *q);

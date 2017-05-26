@@ -54,16 +54,29 @@ int main(void)
 	queue *q = newQueue(10);
 
 	srand(256);
-	uint8_t nums[10] = { 0x0 };
+	queueItem nums[7] = { 0x0 };
 	
 	// Enqueue Testing (working as of 05/25/17, 19:54)
-	for (int i = 0; i < 10; i += 1)
+	printf("enqueueing...\n");
+	for (int i = 0; i < 7; i += 1)
 	{
 		nums[i] = rand() % 255;
 		enqueue(q, nums[i]);
 	}
-
 	printQueue(q);
+	
+	printf("dequeueing 1...\n");
+	queueItem res1;
+	dequeue(q, &res1);
+	printQueue(q);
+	printf("res1: %u\n", res1);
+
+	printf("dequeueing 2...\n");
+	queueItem res2;
+	dequeue(q, &res2);
+	printQueue(q);
+	printf("res2: %u\n", res2);
+
 	delQueue(q);
 	
 	return 0;

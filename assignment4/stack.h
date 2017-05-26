@@ -17,7 +17,6 @@ typedef struct stack
 	stackItem *entries; // Array of whatever type is being held in the stack
 } stack;
 
-// Creates a stack occupying 'bytes' size
 stack *newStack(uint32_t nbits, bool fixed);
 
 void delStack(stack *s);

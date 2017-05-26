@@ -33,7 +33,12 @@ void delQueue(queue *q)
 }
 
 /*
- * Adds an item to the queue
+ * Adds an item to the queue and puts it in its
+ * correct position in the queue, dependent on its priority.
+ *
+ * Smaller numbers percolate up to the top of the tree.
+ *
+ * !: The item being enqueued MUST be positive
  */
 bool enqueue(queue *q, queueItem i)
 {
@@ -52,11 +57,36 @@ bool enqueue(queue *q, queueItem i)
 	return true;
 }
 
+/*
+ * Since the queue is a binary heap, the smallest element
+ * (and thus, greatest priority), is at the root.
+ *
+ * Dequeue the root and fix the heap with recede()
+ * in order to maintain the binary heap properties.
+ *
+ */
+bool dequeue(queue *q, queueItem *i)
+{
+	if (emptyQueue(q))
+	{
+		return false;
+	}
+
+	*i = q->nodes[ROOT];
+	q->head -= 1;
+	q->nodes[ROOT] = q->nodes[q->head];
+	q->nodes[q->head] = (queueItem) 0x0;
+	recede(&q);
+	return true;
+}
+
+// Is it full?
 bool fullQueue(queue *q)
 {
 	return q->head == q->size;
 }
 
+// Is it empty?
 bool emptyQueue(queue *q)
 {
 	return q->head == ROOT;

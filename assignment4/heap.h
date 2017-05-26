@@ -5,27 +5,77 @@
 # define SWAP(x, y) { queueItem t = x; x = y; y = t; ; }
 # endif
 
+# ifndef parent
+# define parent(n) (n / 2)
+# endif
+
 # ifndef leftChild
-# define leftChild(p) (2 * p)
+# define leftChild(n) (2 * n)
 # endif
 
 # ifndef rightChild
-# define rightChild(p) ((2 * p) + 1)
+# define rightChild(n) ((2 * n) + 1)
 # endif
 
-# ifndef parent
-# define parent(c) (c / 2)
-# endif
-
-
+/* 
+ * Sends the item at the end of the queue up the tree
+ * until the heap properties are met.
+ */
 static inline void percolate(queue **q)
 {
-	uint32_t i = (*q)->head;
+	uint32_t c = (*q)->head;
+	while ((*q)->nodes[c] < (*q)->nodes[parent(c)])
 	{
-		while ((*q)->nodes[i] < (*q)->nodes[parent(i)])
+		SWAP((*q)->nodes[c], (*q)->nodes[parent(c)]);
+		c = parent(c);
+	}
+}
+
+/*
+ * Checks which child has priority
+ */
+static inline int32_t comparison(queue *q, uint32_t p)
+{
+	return q->nodes[leftChild(p)] - q->nodes[rightChild(p)];
+}
+
+/*
+ * Fixes the heap by checking which of its children has higher priority (if any).
+ *
+ * diff <  0: left child has priority (unless left child is 0 because it is not born)
+ * diff >= 0: right child has priority (unless right child is 0)
+ */
+static inline void recede(queue **q)
+{
+	uint32_t c = ROOT;
+	int32_t diff;
+	while ((diff = comparison(*q, c)))
+	{
+		if (diff < 0) // right child has a larger value
 		{
-			SWAP((*q)->nodes[i], (*q)->nodes[parent(i)]);
-			i = parent(i);
+			if ((*q)->nodes[leftChild(c)])
+			{
+				SWAP((*q)->nodes[c], (*q)->nodes[leftChild(c)]);
+				c = leftChild(c);
+			}
+			else
+			{
+				SWAP((*q)->nodes[c], (*q)->nodes[rightChild(c)]);
+				c = rightChild(c);
+			}
+		}
+		else
+		{
+			if ((*q)->nodes[rightChild(c)])
+			{
+				SWAP((*q)->nodes[c], (*q)->nodes[rightChild(c)]);
+				c = rightChild(c);
+			}
+			else
+			{
+				SWAP((*q)->nodes[c], (*q)->nodes[leftChild(c)]);
+				c = leftChild(c);
+			}
 		}
 	}
 }
