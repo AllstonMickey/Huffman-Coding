@@ -26,4 +26,6 @@ bool fullQueue(queue *q);
 
 bool emptyQueue(queue *q);
 
+void printQueue(queue *q);
+
 # endif

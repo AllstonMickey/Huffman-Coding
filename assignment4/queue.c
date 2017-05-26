@@ -2,6 +2,7 @@
  * Implementation of a priority queue as a binary min-heap
  */
 
+# include <stdio.h>
 # include <stdlib.h>
 # include "queue.h"
 # include "heap.h"
@@ -19,7 +20,7 @@ queue *newQueue(uint32_t size)
 		if (q->nodes)
 		{
 			q->size = size;
-			q->nodes[0] = (queueItem) 0; // 0 element is empty to maintain arithmetic properties
+			q->nodes[0] = (queueItem) 0x0; // 0th index is empty to maintain heap properties
 			q->head = 1;
 			return q;
 		}
@@ -40,7 +41,21 @@ void delQueue(queue *q)
  */
 bool enqueue(queue *q, queueItem i)
 {
-	
+	if (fullQueue(q))
+	{
+		return false;
+	}
+	else if (emptyQueue(q))
+	{
+		q->nodes[q->head] = i;
+	}
+	else
+	{
+		q->nodes[q->head] = i;
+		percolate(&q);
+	}
+	q->head += 1;
+	return true;
 }
 
 bool fullQueue(queue *q)
@@ -51,5 +66,14 @@ bool fullQueue(queue *q)
 bool emptyQueue(queue *q)
 {
 	return q->head == 1;
+}
+
+void printQueue(queue *q)
+{
+	for (uint32_t i = 0; i < q->size; i += 1)
+	{
+		printf("%u\n", q->nodes[i]);
+	}
+	printf("\n");
 }
 

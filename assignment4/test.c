@@ -51,6 +51,13 @@ int main(void)
 	delStack(s);
 
 	queue *q = newQueue(5);
+
+	uint8_t nums[4] = { 42, 69, 77, 28 };
+	for (int i = 0; i < 4; i += 1)
+	{
+		enqueue(q, nums[i]);
+	}
+	printQueue(q);
 	delQueue(q);
 	
 	return 0;
