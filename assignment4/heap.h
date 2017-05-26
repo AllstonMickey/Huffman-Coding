@@ -34,51 +34,58 @@ static inline void percolate(queue **q)
 	}
 }
 
-/*
- * Checks which child has priority
- */
-static inline int32_t comparison(queue *q, uint32_t p)
+uint32_t favorite(queue *q, uint32_t p)
 {
-	return q->nodes[leftChild(p)] - q->nodes[rightChild(p)];
+	uint32_t l = leftChild(p);
+	uint32_t r = rightChild(p);
+
+	/*
+	 * Makes sure the node exists before checking the value inside
+	 * Returns the node with highest priority
+	 */
+	if (l < q->head && r < q->head) // both nodes exist
+	{
+		if (q->nodes[l] < q->nodes[r]) // left gets priority
+		{
+			return l;
+		}
+		else if (q->nodes[l] > q->nodes[r]) // right gets priority
+		{
+			return r;
+		}
+		else // no priority, return parent's index
+		{
+			return p;
+		}
+	}
+	else if (l < q->head) // only left child exists, return left
+	{
+		return l;
+	}
+	else // no child exists, return parent
+	{
+		return p;
+	}
 }
 
 /*
- * Fixes the heap by checking which of its children has higher priority (if any).
+ * Fixes the heap by checking which of the parent's children has higher priority (if any).
  *
- * diff <  0: left child has priority (unless left child is 0 because it is not born)
- * diff >= 0: right child has priority (unless right child is 0)
+ * Sends the root element down the tree until heap properties are met.
  */
 static inline void recede(queue **q)
 {
-	uint32_t c = ROOT;
-	int32_t diff;
-	while ((diff = comparison(*q, c)))
+	uint32_t p = ROOT;
+	while (favorite(*q, p) != p)
 	{
-		if (diff < 0) // right child has a larger value
+		if ((*q)->nodes[p] > (*q)->nodes[favorite(*q, p)])
 		{
-			if ((*q)->nodes[leftChild(c)])
-			{
-				SWAP((*q)->nodes[c], (*q)->nodes[leftChild(c)]);
-				c = leftChild(c);
-			}
-			else
-			{
-				SWAP((*q)->nodes[c], (*q)->nodes[rightChild(c)]);
-				c = rightChild(c);
-			}
+			SWAP((*q)->nodes[p], (*q)->nodes[favorite(*q, p)]);
+			p = favorite(*q, p);
 		}
 		else
 		{
-			if ((*q)->nodes[rightChild(c)])
-			{
-				SWAP((*q)->nodes[c], (*q)->nodes[rightChild(c)]);
-				c = rightChild(c);
-			}
-			else
-			{
-				SWAP((*q)->nodes[c], (*q)->nodes[leftChild(c)]);
-				c = leftChild(c);
-			}
+			break;
 		}
 	}
 }
