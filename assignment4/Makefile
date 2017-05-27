@@ -18,6 +18,7 @@ test : test.o stack.o queue.o
 
 test.o : test.c stack.h queue.h heap.h bv.h
 	$(eval STACKTYPE=$(ENCODE_STACKTYPE))
+	$(eval QUEUETYPE=uint32_t)
 	$(CC) $(DEFINE_STACK) $(DEFINE_QUEUE) -std=c99 test.c -c
 
 stack.o : stack.c stack.h

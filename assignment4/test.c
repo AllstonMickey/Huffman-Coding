@@ -102,6 +102,9 @@ int main(void)
 		printf("%u: %u\n", i, histogram[i]);
 	}
 
+	// TODO: Implement huffman.h
+	// 	 Change QUEUETYPE to treeNode in Makefile when done with huffman.c
+
 	delVec(v);
 	return 0;
 }
