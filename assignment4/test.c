@@ -77,8 +77,8 @@ int main(void)
 		dequeue(q, &res[i]);
 		printQueue(q);
 	}
-	delQueue(q);
 	*/
+	delQueue(q);
 
 	uint32_t histogram[256];
 
@@ -90,5 +90,7 @@ int main(void)
 	bitV *v = newVec(buffer.st_size * 8);
 	int64_t n = read(fd, v->v, buffer.st_size);
 	printf("bytes read in: %d\n", n);
+	
+	delVec(v);
 	return 0;
 }
