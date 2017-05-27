@@ -16,7 +16,7 @@ all : test
 test : test.o stack.o queue.o
 	$(CC) -std=c99 test.o stack.o queue.o -o test
 
-test.o : test.c stack.h queue.h heap.h
+test.o : test.c stack.h queue.h heap.h bv.h
 	$(eval STACKTYPE=$(ENCODE_STACKTYPE))
 	$(CC) $(DEFINE_STACK) $(DEFINE_QUEUE) -std=c99 test.c -c
 

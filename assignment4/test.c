@@ -1,7 +1,11 @@
 # include "stack.h"
 # include "queue.h"
+# include "bv.h"
 # include <stdio.h>
 # include <stdlib.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <fcntl.h>
 
 int main(void)
 {
@@ -51,14 +55,14 @@ int main(void)
 	*/
 	delStack(s);
 
-	queue *q = newQueue(10);
+	queue *q = newQueue(5);
 
-	srand(32);
-	queueItem nums[7] = { 0x0 };
-	
+	srand(3190231);
+	queueItem nums[4] = { 0x0 };
+	/*
 	// Enqueue Testing (working as of 05/25/17, 19:54)
 	printf("enqueueing...\n");
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		nums[i] = rand() % 255;
 		enqueue(q, nums[i]);
@@ -66,13 +70,24 @@ int main(void)
 	printQueue(q);
 
 	printf("dequeueing...\n");
-	queueItem res[7] = { 0x0 };
-	for (int i = 0; i < 6; i++)
+	queueItem res[4] = { 0x0 };
+	for (int i = 0; i < 1; i++)
 	{
 		dequeue(q, &res[i]);
 		printQueue(q);
 	}
 	delQueue(q);
+	*/
+
+	uint32_t histogram[256];
+
+	int fd = open("/afs/cats.ucsc.edu/users/g/darrell/encode", O_RDONLY);
+	struct stat buffer;
+	fstat(fd, &buffer);
+	printf("%u\n", buffer.st_size);
+
+	//bitV *vec = newVec(len);
+	
 	
 	return 0;
 }
