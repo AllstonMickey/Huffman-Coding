@@ -15,10 +15,10 @@
 
 typedef struct bitV {
 	uint8_t *v;
-	uint32_t l;
+	uint64_t l;
 } bitV;
 
-static inline bitV *newVec(uint32_t len)
+static inline bitV *newVec(uint64_t len)
 {
 	bitV *vec = (bitV *) malloc(sizeof(bitV));
 	if (vec)
@@ -49,17 +49,17 @@ static inline void oneVec(bitV *vec)
 	}
 }
 
-static inline void setBit(bitV *vec, uint32_t b)
+static inline void setBit(bitV *vec, uint64_t b)
 {
 	(vec->v)[b >> 3] |= (0x1 << (b % 8));
 }
 
-static inline void clrBit(bitV *vec, uint32_t b)
+static inline void clrBit(bitV *vec, uint64_t b)
 {
 	(vec->v)[b >> 3] &= ~(0x1 << (b % 8));
 }
 
-static inline uint8_t valBit(bitV *vec, uint32_t b)
+static inline uint8_t valBit(bitV *vec, uint64_t b)
 {
 	return ((vec->v)[b >> 3] & (0x1 << (b % 8))) >> (b % 8);
 }
