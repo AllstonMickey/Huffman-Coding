@@ -3,9 +3,10 @@
 # include "bv.h"
 # include <stdio.h>
 # include <stdlib.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <fcntl.h>
+# include <sys/types.h> // fstat
+# include <sys/stat.h> // fstat
+# include <fcntl.h>   // fstat
+# include <unistd.h> // read
 
 int main(void)
 {
@@ -84,10 +85,10 @@ int main(void)
 	int fd = open("/afs/cats.ucsc.edu/users/g/darrell/encode", O_RDONLY);
 	struct stat buffer;
 	fstat(fd, &buffer);
-	printf("%u\n", buffer.st_size);
-
-	//bitV *vec = newVec(len);
+	printf("bytes in file: %u\n", buffer.st_size);
 	
-	
+	bitV *v = newVec(buffer.st_size * 8);
+	int64_t n = read(fd, v->v, buffer.st_size);
+	printf("bytes read in: %d\n", n);
 	return 0;
 }
