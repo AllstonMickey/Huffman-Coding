@@ -80,7 +80,9 @@ int main(void)
 	*/
 	delQueue(q);
 
-	uint32_t histogram[256];
+	uint32_t histogram[256] = { 0 };
+	histogram[0] = 1;
+	 histogram[255] = 1;
 
 	int fd = open("/afs/cats.ucsc.edu/users/g/darrell/encode", O_RDONLY);
 	struct stat buffer;
@@ -90,7 +92,16 @@ int main(void)
 	bitV *v = newVec(buffer.st_size * 8);
 	int64_t n = read(fd, v->v, buffer.st_size);
 	printf("bytes read in: %d\n", n);
-	
+	for (uint64_t i = 0; i < buffer.st_size; i += 1)
+	{
+		histogram[v->v[i]] += 1;
+	}
+
+	for (uint8_t i = 0; i < 255; i += 1)
+	{
+		printf("%u: %u\n", i, histogram[i]);
+	}
+
 	delVec(v);
 	return 0;
 }
