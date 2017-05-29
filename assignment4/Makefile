@@ -13,13 +13,16 @@ DEFINE_QUEUE = -DQUEUE_ITEM=$(QUEUETYPE)
 .PHONY: all
 all : test
 
-test : test.o stack.o queue.o
-	$(CC) -std=c99 test.o stack.o queue.o -o test
+test : test.o stack.o queue.o huffman.o
+	$(CC) -std=c99 test.o stack.o queue.o huffman.o -o test
 
-test.o : test.c stack.h queue.h heap.h bv.h
+test.o : test.c stack.h queue.h heap.h bv.h huffman.h
 	$(eval STACKTYPE=$(ENCODE_STACKTYPE))
 	$(eval QUEUETYPE=uint32_t)
 	$(CC) $(DEFINE_STACK) $(DEFINE_QUEUE) -std=c99 test.c -c
+
+huffman.o : huffman.c huffman.h
+	$(CC) $(DEFINE_STACK) -std=c99 huffman.c -c
 
 stack.o : stack.c stack.h
 	$(CC) $(DEFINE_STACK) -std=c99 stack.c -c
@@ -29,4 +32,4 @@ queue.o : queue.c queue.h heap.h
 
 .PHONY: clean
 clean :
-	$(RM) test.o stack.o queue.o test
+	$(RM) test.o stack.o queue.o huffman.o test

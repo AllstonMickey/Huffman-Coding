@@ -1,6 +1,6 @@
-# include "stack.h"
 # include "queue.h"
 # include "bv.h"
+# include "huffman.h"
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/types.h> // fstat
@@ -104,6 +104,24 @@ int main(void)
 
 	// TODO: Implement huffman.h
 	// 	 Change QUEUETYPE to treeNode in Makefile when done with huffman.c
+
+	treeNode *root = newNode((char) 83, 1, true);
+	treeNode *l = newNode((char) 82, 1, true);
+	treeNode *r = newNode((char) 84, 1, true);
+	root->left = l;
+	root->right = r;
+	
+	treeNode *foo = newNode((char) 75, 1, true);
+	l->left = foo;
+
+	treeNode *bar = newNode((char) 76, 1, true);
+	r->left = bar;
+
+	treeNode *baz = newNode((char) 74, 1, true);
+	l->right = baz;
+
+	//delNode(root);
+	delTree(root);
 
 	delVec(v);
 	return 0;
