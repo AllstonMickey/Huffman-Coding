@@ -6,9 +6,7 @@ ENCODE_STACKTYPE = uint8_t
 DECODE_STACKTYPE = uint16_t
 STACKTYPE        = uint32_t
 DEFINE_STACK     = -DSTACK_ITEM=$(STACKTYPE)
-
-QUEUETYPE    = treeNode
-DEFINE_QUEUE = -DQUEUE_ITEM=$(QUEUETYPE)
+DEFINE_QUEUE     = -DQUEUE_ITEM=treeNode
 
 .PHONY: all
 all : encode
@@ -31,4 +29,4 @@ queue.o : queue.c queue.h huffman.h
 
 .PHONY: clean
 clean :
-	$(RM) test.o stack.o queue.o huffman.o test encode.o encode
+	$(RM) stack.o queue.o huffman.o encode.o encode

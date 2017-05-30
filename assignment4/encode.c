@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 		}
 	}
 	
+	/* QUEUE TESTING with treeNode as the item
 	treeNode *nodes = calloc(3, sizeof(treeNode));
 	
 	treeNode *t = newNode(0, 15, false);
@@ -61,5 +62,5 @@ int main(int argc, char **argv)
 	printQueue(q);
 	dequeue(q, &res[2]);
 	printQueue(q);
-
+	*/
 }
