@@ -3,6 +3,7 @@
 # include <fcntl.h>     // fstat
 # include <unistd.h>    // read
 # include <getopt.h>
+# include <string.h>
 # include "bv.h"        // bit vectors, stdint, stdio, stdlib
 # include "huffman.h"   // huffman trees, stacks, stdint, stdbool
 # include "queue.h"     // queues, heaps, stdint, stdbool
@@ -11,8 +12,8 @@ void populateHistogram(char *file, uint32_t hist[]);
 
 int main(int argc, char **argv)
 {
-	char *in = NIL;
-	char *out = NIL;
+	char in[256] = {0};
+	char out[256] = {0};
 	bool verbose = false;
 
 	int opt;
@@ -22,12 +23,22 @@ int main(int argc, char **argv)
 		{
 			case 'i':
 			{
-				in = optarg;
+				strncpy(in, optarg, sizeof(char) * 256);
+				// strncpy does not null-term strings if the buf is maxed in size
+				if (in[255] != '\0')
+				{
+					in[255] = '\0';
+				}	
 				break;
 			}
 			case 'o':
 			{
-				out = optarg;
+				strncpy(out, optarg, sizeof(char) * 256);
+				// strncpy does not null-term strings if the buf is maxed in size
+				if (out[255] != '\0')
+				{
+					out[255] = '\0';
+				}
 				break;
 			}
 			case 'v':
@@ -66,11 +77,23 @@ int main(int argc, char **argv)
 	printQueue(q);
 	*/
 
-	in = "/afs/cats.ucsc.edu/users/g/darrell/encode";
-	uint32_t histogram[256] = { 0 };
+	while (in[0] == '\0')
+	{
+		printf("Enter an input file path: ");
+		scanf("%s", in);
+	}
+
+	uint32_t histogram[256] = {0};
 	histogram[0] = 1;
 	histogram[255] = 1;
 	populateHistogram(in, histogram);
+	
+	for (int i = 0; i < 256; i += 1)
+	{
+		printf("%u: %u\n", i, histogram[i]);
+	}
+	
+	return 0;
 }
 
 /*
@@ -85,9 +108,12 @@ void populateHistogram(char *file, uint32_t hist[])
 	int fd = open(file, O_RDONLY);
 	struct stat buffer;
 	fstat(fd, &buffer);
+	printf("bytes in file: %u\n", buffer.st_size);
 
 	bitV *v = newVec(buffer.st_size * 8);
 	int64_t n = read(fd, v->v, buffer.st_size);
+	printf("bytes read in: %d\n", n);
+	
 	for (uint64_t i = 0; i < buffer.st_size; i += 1)
 	{
 		hist[v->v[i]] += 1;
