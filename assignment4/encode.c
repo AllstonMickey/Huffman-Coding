@@ -112,9 +112,6 @@ int main(int argc, char **argv)
 /*
  * Counts the number of occurrences of each byte in a file,
  * storing them in a histogram.
- *
- * @param file Path to the file to read from
- * @param hist Array to store the occurrences
  */
 void populateHistogram(char *file, uint32_t hist[])
 {
@@ -133,6 +130,10 @@ void populateHistogram(char *file, uint32_t hist[])
 	}
 }
 
+/*
+ * Enqueues all 'active' entries of the histogram as treeNodes.
+ * Priority is determined by the count of each node (the freq. in hist.)
+ */
 void enqueueHist(queue **q, uint32_t hist[])
 {
 	for (int i = 0; i < HIST_LEN; i += 1)
