@@ -106,6 +106,7 @@ int main(int argc, char **argv)
 	enqueueHist(&histQueue, histogram);
 	printQueue(histQueue);	
 	delQueue(histQueue);
+	
 	return 0;
 }
 

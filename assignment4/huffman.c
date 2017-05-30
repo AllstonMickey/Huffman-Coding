@@ -52,10 +52,16 @@ int32_t stepTree(treeNode *root, treeNode **t, uint32_t code);
 
 // Parse a Huffman tree to build codes
 void buildCode(treeNode *t, stack bits, stack hist[256]);
+*/
 
 // Join two subtrees
-treeNode *join(treeNode *l, treeNode *r);
-*/
+treeNode *join(treeNode *l, treeNode *r)
+{
+	treeNode *j = newNode('$', l->count + r->count, false);
+	j->left = l;
+	j->right = r;
+	return j;
+}
 
 void printTree(treeNode *t, int depth)
 {
