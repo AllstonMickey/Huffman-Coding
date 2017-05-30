@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 	queue *histQueue = newQueue(HIST_LEN);
 	enqueueHist(&histQueue, histogram);
 	printQueue(histQueue);	
-
+	delQueue(histQueue);
 	return 0;
 }
 
@@ -128,6 +128,7 @@ void populateHistogram(char *file, uint32_t hist[])
 	{
 		hist[v->v[i]] += 1;
 	}
+	delVec(v);
 }
 
 /*
@@ -142,6 +143,7 @@ void enqueueHist(queue **q, uint32_t hist[])
 		{
 			treeNode *n = newNode(i, hist[i], true);
 			enqueue(*q, *n);
+			delNode(n);
 		}
 	}
 }
