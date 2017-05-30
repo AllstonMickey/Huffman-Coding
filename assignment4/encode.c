@@ -71,26 +71,6 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* QUEUE TESTING with treeNode as the item
-	   treeNode *nodes = calloc(3, sizeof(treeNode));
-
-	   treeNode *t = newNode(0, 15, false);
-	   treeNode *l = newNode(0, 7, false);
-	   treeNode *r = newNode(0, 2, false);
-
-	   queue *q = newQueue(5);
-	   enqueue(q, *t); enqueue(q, *l); enqueue(q, *r);
-	   printQueue(q);
-
-	   treeNode res[3];
-	   dequeue(q, &res[0]);
-	   printQueue(q);
-	   dequeue(q, &res[1]);
-	   printQueue(q);
-	   dequeue(q, &res[2]);
-	   printQueue(q);
-	   */
-
 	while (in[0] == '\0')
 	{
 		printf("Enter an input file path: ");
@@ -105,11 +85,6 @@ int main(int argc, char **argv)
 	histogram[0] = 1;
 	histogram[HIST_LEN - 1] = 1;
 	loadHist(in, histogram);
-
-	for (int i = 0; i < HIST_LEN; i += 1)
-	{
-		printf("%u: %u\n", i, histogram[i]);
-	}
 
 	/*
 	 * Enqueue the histogram into a priority queue.
