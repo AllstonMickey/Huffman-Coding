@@ -8,12 +8,20 @@
 # include "huffman.h"   // huffman trees, stacks, stdint, stdbool
 # include "queue.h"     // queues, heaps, stdint, stdbool
 
+# ifndef HIST_LEN
+# define HIST_LEN 256
+# endif
+
+# ifndef MAX_BUF
+# define MAX_BUF 127
+# endif
+
 void populateHistogram(char *file, uint32_t hist[]);
 
 int main(int argc, char **argv)
 {
-	char in[256] = {0};
-	char out[256] = {0};
+	char in[MAX_BUF] = {0};
+	char out[MAX_BUF] = {0};
 	bool verbose = false;
 
 	int opt;
@@ -23,21 +31,21 @@ int main(int argc, char **argv)
 		{
 			case 'i':
 			{
-				strncpy(in, optarg, sizeof(char) * 256);
+				strncpy(in, optarg, sizeof(char) * MAX_BUF);
 				// strncpy does not null-term strings if the buf is maxed in size
-				if (in[255] != '\0')
+				if (in[MAX_BUF - 1] != '\0')
 				{
-					in[255] = '\0';
+					in[MAX_BUF - 1] = '\0';
 				}	
 				break;
 			}
 			case 'o':
 			{
-				strncpy(out, optarg, sizeof(char) * 256);
+				strncpy(out, optarg, sizeof(char) * MAX_BUF);
 				// strncpy does not null-term strings if the buf is maxed in size
-				if (out[255] != '\0')
+				if (out[MAX_BUF - 1] != '\0')
 				{
-					out[255] = '\0';
+					out[MAX_BUF - 1] = '\0';
 				}
 				break;
 			}
@@ -83,12 +91,12 @@ int main(int argc, char **argv)
 		scanf("%s", in);
 	}
 
-	uint32_t histogram[256] = {0};
+	uint32_t histogram[HIST_LEN] = {0};
 	histogram[0] = 1;
-	histogram[255] = 1;
+	histogram[HIST_LEN - 1] = 1;
 	populateHistogram(in, histogram);
 	
-	for (int i = 0; i < 256; i += 1)
+	for (int i = 0; i < HIST_LEN; i += 1)
 	{
 		printf("%u: %u\n", i, histogram[i]);
 	}
