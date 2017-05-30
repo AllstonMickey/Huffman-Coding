@@ -96,11 +96,19 @@ int main(int argc, char **argv)
 	histogram[HIST_LEN - 1] = 1;
 	populateHistogram(in, histogram);
 	
-	for (int i = 0; i < HIST_LEN; i += 1)
+	queue *q = newQueue(HIST_LEN);
+	for (uint16_t i = 0; i < HIST_LEN; i += 1)
 	{
 		printf("%u: %u\n", i, histogram[i]);
+		if (histogram[i])
+		{
+			treeNode *n = newNode(i, histogram[i], true);
+			enqueue(q, *n);
+		}
 	}
+	printQueue(q);
 	
+
 	return 0;
 }
 
