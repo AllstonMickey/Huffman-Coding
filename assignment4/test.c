@@ -59,11 +59,11 @@ int main(void)
 	queue *q = newQueue(5);
 
 	srand(3190231);
-	queueItem nums[4] = { 0x0 };
-	/*
+	queueItem nums[5] = { 0x0 };
+	///*
 	// Enqueue Testing (working as of 05/25/17, 19:54)
 	printf("enqueueing...\n");
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		nums[i] = rand() % 255;
 		enqueue(q, nums[i]);
@@ -71,13 +71,13 @@ int main(void)
 	printQueue(q);
 
 	printf("dequeueing...\n");
-	queueItem res[4] = { 0x0 };
-	for (int i = 0; i < 1; i++)
+	queueItem res[5] = { 0x0 };
+	for (int i = 0; i < 5; i++)
 	{
 		dequeue(q, &res[i]);
 		printQueue(q);
 	}
-	*/
+	//*/
 	delQueue(q);
 
 	uint32_t histogram[256] = { 0 };
@@ -99,7 +99,7 @@ int main(void)
 
 	for (uint8_t i = 0; i < 255; i += 1)
 	{
-		printf("%u: %u\n", i, histogram[i]);
+		//printf("%u: %u\n", i, histogram[i]);
 	}
 
 	// TODO: Implement huffman.h
@@ -120,7 +120,6 @@ int main(void)
 	treeNode *baz = newNode((char) 74, 1, true);
 	l->right = baz;
 
-	//delNode(root);
 	delTree(root);
 
 	delVec(v);

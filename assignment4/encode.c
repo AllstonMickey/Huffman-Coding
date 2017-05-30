@@ -4,7 +4,7 @@
 # include <unistd.h>    // read
 # include <getopt.h>
 # include "bv.h"        // bit vectors, stdint, stdio, stdlib
-# include "huffman.h"   // huffman trees, stacks (of bits), stdint, stdbool
+# include "huffman.h"   // huffman trees, stacks, stdint, stdbool
 # include "queue.h"     // queues, heaps, stdint, stdbool
 
 int main(int argc, char **argv)
@@ -43,4 +43,23 @@ int main(int argc, char **argv)
 			}
 		}
 	}
+	
+	treeNode *nodes = calloc(3, sizeof(treeNode));
+	
+	treeNode *t = newNode(0, 15, false);
+	treeNode *l = newNode(0, 7, false);
+	treeNode *r = newNode(0, 2, false);
+	
+	queue *q = newQueue(5);
+	enqueue(q, *t); enqueue(q, *l); enqueue(q, *r);
+	printQueue(q);
+
+	treeNode res[3];
+	dequeue(q, &res[0]);
+	printQueue(q);
+	dequeue(q, &res[1]);
+	printQueue(q);
+	dequeue(q, &res[2]);
+	printQueue(q);
+
 }

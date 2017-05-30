@@ -4,6 +4,10 @@
 # ifndef _HEAP_H
 # define _HEAP_H
 
+// treeNode t;
+// t->count; // returns count of the node
+// queueItem *nodes; // array of treeNodes
+
 # ifndef SWAP
 # define SWAP(x, y) { queueItem t = x; x = y; y = t; ; }
 # endif
@@ -27,7 +31,7 @@
 static inline void percolate(queue **q)
 {
 	uint32_t c = (*q)->head;
-	while ((*q)->nodes[c] < (*q)->nodes[parent(c)])
+	while (VALNODE(*q, c) < VALNODE(*q, parent(c)))
 	{
 		SWAP((*q)->nodes[c], (*q)->nodes[parent(c)]);
 		c = parent(c);
@@ -45,11 +49,11 @@ uint32_t favorite(queue *q, uint32_t p)
 	 */
 	if (l < q->head && r < q->head) // both nodes exist
 	{
-		if (q->nodes[l] < q->nodes[r]) // left gets priority
+		if (VALNODE(q, l) < VALNODE(q, r)) // left gets priority
 		{
 			return l;
 		}
-		else if (q->nodes[l] > q->nodes[r]) // right gets priority
+		else if (VALNODE(q, l) > VALNODE(q, r)) // right gets priority
 		{
 			return r;
 		}
@@ -78,7 +82,7 @@ static inline void recede(queue **q)
 	uint32_t p = ROOT;
 	while (favorite(*q, p) != p)
 	{
-		if ((*q)->nodes[p] > (*q)->nodes[favorite(*q, p)])
+		if (VALNODE(*q, p) > VALNODE(*q, favorite(*q, p)))
 		{
 			SWAP((*q)->nodes[p], (*q)->nodes[favorite(*q, p)]);
 			p = favorite(*q, p);

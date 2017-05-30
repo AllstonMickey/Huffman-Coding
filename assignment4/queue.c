@@ -16,7 +16,7 @@ queue *newQueue(uint32_t size)
 		if (q->nodes)
 		{
 			q->size = size;
-			q->nodes[0] = (queueItem) 0x0; // 0th index is empty to maintain heap properties
+			VALNODE(q, 0) = 0; // 0th index is empty to maintain heap properties
 			q->head = ROOT;
 			return q;
 		}
@@ -48,6 +48,7 @@ bool enqueue(queue *q, queueItem i)
 	}
 	
 	q->nodes[q->head] = i;
+	//q->nodes[q->head] = i;
 	if (!emptyQueue(q))
 	{
 		percolate(&q);
@@ -75,7 +76,8 @@ bool dequeue(queue *q, queueItem *i)
 	*i = q->nodes[ROOT];
 	q->head -= 1;
 	q->nodes[ROOT] = q->nodes[q->head];
-	q->nodes[q->head] = (queueItem) 0x0;
+	VALNODE(q, q->head) = 0;
+	//q->nodes[q->head] = (queueItem) 0x0;
 	recede(&q);
 	return true;
 }
@@ -96,7 +98,7 @@ void printQueue(queue *q)
 {
 	for (uint32_t i = 0; i < q->size; i += 1)
 	{
-		printf("%u, %u\n", i, q->nodes[i]);
+		printf("%u, %u\n", i, VALNODE(q, i));
 	}
 }
 

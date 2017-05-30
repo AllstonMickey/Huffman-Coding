@@ -7,28 +7,27 @@ DECODE_STACKTYPE = uint16_t
 STACKTYPE        = uint32_t
 DEFINE_STACK     = -DSTACK_ITEM=$(STACKTYPE)
 
-QUEUETYPE    = uint32_t
+QUEUETYPE    = treeNode
 DEFINE_QUEUE = -DQUEUE_ITEM=$(QUEUETYPE)
 
 .PHONY: all
-all : test
+all : encode
 
-test : test.o stack.o queue.o huffman.o
-	$(CC) -std=c99 test.o stack.o queue.o huffman.o -o test
+encode : encode.o stack.o huffman.o queue.o
+	$(CC) -std=c99 encode.o stack.o huffman.o queue.o -o encode
 
-test.o : test.c stack.h queue.h heap.h bv.h huffman.h
+encode.o : encode.c stack.h huffman.h queue.h
 	$(eval STACKTYPE=$(ENCODE_STACKTYPE))
-	$(eval QUEUETYPE=uint32_t)
-	$(CC) $(DEFINE_STACK) $(DEFINE_QUEUE) -std=c99 test.c -c
-
-huffman.o : huffman.c huffman.h
-	$(CC) $(DEFINE_STACK) -std=c99 huffman.c -c
+	$(CC) $(DEFINE_STACK) $(DEFINE_QUEUE) -std=c99 encode.c -c
 
 stack.o : stack.c stack.h
 	$(CC) $(DEFINE_STACK) -std=c99 stack.c -c
 
-queue.o : queue.c queue.h heap.h
-	$(CC) $(DEFINE_QUEUE) -std=c99 queue.c -c
+huffman.o : huffman.c huffman.h stack.h
+	$(CC) $(DEFINE_STACK) -std=c99 huffman.c -c
+
+queue.o : queue.c queue.h huffman.h
+	$(CC) $(DEFINE_STACK) $(DEFINE_QUEUE) -include huffman.h -std=c99 queue.c -c
 
 .PHONY: clean
 clean :
