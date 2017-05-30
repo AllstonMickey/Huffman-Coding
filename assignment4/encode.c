@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 	histogram[HIST_LEN - 1] = 1;
 	populateHistogram(in, histogram);
 	
-	for (uint16_t i = 0; i < HIST_LEN; i += 1)
+	for (int i = 0; i < HIST_LEN; i += 1)
 	{
 		printf("%u: %u\n", i, histogram[i]);
 	}

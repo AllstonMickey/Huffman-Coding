@@ -1,5 +1,6 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include <ctype.h> // isalnum
 # include "huffman.h"
 
 /*struct treeNode
@@ -55,3 +56,28 @@ void buildCode(treeNode *t, stack bits, stack hist[256]);
 // Join two subtrees
 treeNode *join(treeNode *l, treeNode *r);
 */
+
+void printTree(treeNode *t, int depth)
+{
+	if (t && t->leaf)
+	{
+		if (isalnum(t->symbol))
+		{
+			spaces(4 * depth);
+			printf("%c (%llu)\n", t->symbol, t->count);
+		}
+		else
+		{
+			spaces(4 * depth);
+			printf("%X (%llu)\n", t->symbol, t->count);
+		}
+	}
+	else if (t)
+	{
+		spaces(4 * depth);
+		printf("% (%llu)\n", t->count);
+		printTree(t->left, depth + 1);
+		printTree(t->right, depth + 1);
+	}
+	return;
+}

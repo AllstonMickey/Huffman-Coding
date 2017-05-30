@@ -6,6 +6,7 @@
 # ifndef _HUFFMAN_H
 # define _HUFFMAN_H
 # include <stdlib.h>
+# include <stdio.h>
 # include <stdint.h>
 # include <stdbool.h>
 # include "stack.h"
@@ -56,5 +57,16 @@ static inline int8_t compare(treeNode *l, treeNode *r)
 
 // Join two subtrees
 treeNode *join(treeNode *l, treeNode *r);
+
+static inline void spaces(int c)
+{
+	for (int i = 0; i < c; i += 1)
+	{
+		putchar(' ');
+	}
+	return;
+}
+
+void printTree(treeNode *t, int depth);
 
 # endif
