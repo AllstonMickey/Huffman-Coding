@@ -16,8 +16,13 @@
 # define MAX_BUF 127
 # endif
 
+# ifndef ISLEAF
+# define ISLEAF true
+# endif
+
 void populateHistogram(char *file, uint32_t hist[]);
 void enqueueHist(queue **q, uint32_t hist[]);
+void buildTree(queue **q);
 
 int main(int argc, char **argv)
 {
@@ -85,7 +90,7 @@ int main(int argc, char **argv)
 	dequeue(q, &res[2]);
 	printQueue(q);
 	*/
-
+	
 	while (in[0] == '\0')
 	{
 		printf("Enter an input file path: ");
@@ -102,10 +107,24 @@ int main(int argc, char **argv)
 		printf("%u: %u\n", i, histogram[i]);
 	}
 
-	queue *histQueue = newQueue(HIST_LEN);
-	enqueueHist(&histQueue, histogram);
-	printQueue(histQueue);	
-	delQueue(histQueue);
+	queue *q = newQueue(HIST_LEN);
+	enqueueHist(&q, histogram);
+	printQueue(q);	
+	
+	// construct tree
+	//buildTree(&t);
+
+	while (q->head - 1 != ROOT)
+	{
+		treeNode l, r, *j;
+		dequeue(q, &l);
+		dequeue(q, &r);
+		j = join(&l, &r);
+		enqueue(q, *j);
+	}
+
+	printQueue(q);
+	delQueue(q);
 	
 	return 0;
 }
@@ -142,10 +161,20 @@ void enqueueHist(queue **q, uint32_t hist[])
 	{
 		if (hist[i])
 		{
-			treeNode *n = newNode(i, hist[i], true);
+			treeNode *n = newNode(i, hist[i], ISLEAF);
 			enqueue(*q, *n);
 			delNode(n);
 		}
 	}
 }
 
+void buildTree(queue **q)
+{
+	treeNode l, r;
+	while (dequeue(*q, &l) && dequeue(*q, &r))
+	{
+		treeNode *j = newNode('$', l.count + r.count, !ISLEAF);
+		enqueue(*q, *j);
+		delNode(j);
+	}
+}
