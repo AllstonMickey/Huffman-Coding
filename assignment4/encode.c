@@ -17,6 +17,7 @@
 # endif
 
 void populateHistogram(char *file, uint32_t hist[]);
+void enqueueHist(queue **q, uint32_t hist[]);
 
 int main(int argc, char **argv)
 {
@@ -96,18 +97,14 @@ int main(int argc, char **argv)
 	histogram[HIST_LEN - 1] = 1;
 	populateHistogram(in, histogram);
 	
-	queue *q = newQueue(HIST_LEN);
 	for (uint16_t i = 0; i < HIST_LEN; i += 1)
 	{
 		printf("%u: %u\n", i, histogram[i]);
-		if (histogram[i])
-		{
-			treeNode *n = newNode(i, histogram[i], true);
-			enqueue(q, *n);
-		}
 	}
-	printQueue(q);
-	
+
+	queue *histQueue = newQueue(HIST_LEN);
+	enqueueHist(&histQueue, histogram);
+	printQueue(histQueue);	
 
 	return 0;
 }
@@ -135,3 +132,16 @@ void populateHistogram(char *file, uint32_t hist[])
 		hist[v->v[i]] += 1;
 	}
 }
+
+void enqueueHist(queue **q, uint32_t hist[])
+{
+	for (int i = 0; i < HIST_LEN; i += 1)
+	{
+		if (hist[i])
+		{
+			treeNode *n = newNode(i, hist[i], true);
+			enqueue(*q, *n);
+		}
+	}
+}
+
