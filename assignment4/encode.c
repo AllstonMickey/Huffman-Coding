@@ -20,7 +20,7 @@
 # define ISLEAF true
 # endif
 
-void populateHistogram(char *file, uint32_t hist[]);
+void loadHist(char *file, uint32_t hist[]);
 void enqueueHist(queue **q, uint32_t hist[]);
 void buildTree(queue **q);
 
@@ -36,104 +36,109 @@ int main(int argc, char **argv)
 		switch (opt)
 		{
 			case 'i':
-			{
-				strncpy(in, optarg, sizeof(char) * MAX_BUF);
-				// strncpy does not null-term strings if the buf is maxed in size
-				if (in[MAX_BUF - 1] != '\0')
 				{
-					in[MAX_BUF - 1] = '\0';
-				}	
-				break;
-			}
-			case 'o':
-			{
-				strncpy(out, optarg, sizeof(char) * MAX_BUF);
-				// strncpy does not null-term strings if the buf is maxed in size
-				if (out[MAX_BUF - 1] != '\0')
-				{
-					out[MAX_BUF - 1] = '\0';
+					strncpy(in, optarg, sizeof(char) * MAX_BUF);
+					// strncpy does not null-term strings if the buf is maxed in size
+					if (in[MAX_BUF - 1] != '\0')
+					{
+						in[MAX_BUF - 1] = '\0';
+					}	
+					break;
 				}
-				break;
-			}
+			case 'o':
+				{
+					strncpy(out, optarg, sizeof(char) * MAX_BUF);
+					// strncpy does not null-term strings if the buf is maxed in size
+					if (out[MAX_BUF - 1] != '\0')
+					{
+						out[MAX_BUF - 1] = '\0';
+					}
+					break;
+				}
 			case 'v':
-			{
-				verbose = true;
-				break;
-			}
+				{
+					verbose = true;
+					break;
+				}
 			case '?':
-			{
-				break;
-			}
+				{
+					break;
+				}
 			default:
-			{
-				break;
-			}
+				{
+					break;
+				}
 		}
 	}
-	
-	/* QUEUE TESTING with treeNode as the item
-	treeNode *nodes = calloc(3, sizeof(treeNode));
-	
-	treeNode *t = newNode(0, 15, false);
-	treeNode *l = newNode(0, 7, false);
-	treeNode *r = newNode(0, 2, false);
-	
-	queue *q = newQueue(5);
-	enqueue(q, *t); enqueue(q, *l); enqueue(q, *r);
-	printQueue(q);
 
-	treeNode res[3];
-	dequeue(q, &res[0]);
-	printQueue(q);
-	dequeue(q, &res[1]);
-	printQueue(q);
-	dequeue(q, &res[2]);
-	printQueue(q);
-	*/
-	
+	/* QUEUE TESTING with treeNode as the item
+	   treeNode *nodes = calloc(3, sizeof(treeNode));
+
+	   treeNode *t = newNode(0, 15, false);
+	   treeNode *l = newNode(0, 7, false);
+	   treeNode *r = newNode(0, 2, false);
+
+	   queue *q = newQueue(5);
+	   enqueue(q, *t); enqueue(q, *l); enqueue(q, *r);
+	   printQueue(q);
+
+	   treeNode res[3];
+	   dequeue(q, &res[0]);
+	   printQueue(q);
+	   dequeue(q, &res[1]);
+	   printQueue(q);
+	   dequeue(q, &res[2]);
+	   printQueue(q);
+	   */
+
 	while (in[0] == '\0')
 	{
 		printf("Enter an input file path: ");
 		scanf("%s", in);
 	}
 
+	/*
+	 * Make a histogram of byte frequency from the input file.
+	 */
+
 	uint32_t histogram[HIST_LEN] = {0};
 	histogram[0] = 1;
 	histogram[HIST_LEN - 1] = 1;
-	populateHistogram(in, histogram);
-	
+	loadHist(in, histogram);
+
 	for (int i = 0; i < HIST_LEN; i += 1)
 	{
 		printf("%u: %u\n", i, histogram[i]);
 	}
 
+	/*
+	 * Enqueue the histogram into a priority queue.
+	 */
+
 	queue *q = newQueue(HIST_LEN);
 	enqueueHist(&q, histogram);
 	printQueue(q);	
 	
-	// construct tree
-	//buildTree(&t);
+	/*
+	 * Create a treeNode as the root of the Huffman Tree.
+	 * Build the tree by repeatedly dequeuing and joining nodes from the queue.
+	 */
 
-	while (q->head - 1 != ROOT)
-	{
-		treeNode l, r, *j;
-		dequeue(q, &l);
-		dequeue(q, &r);
-		j = join(&l, &r);
-		enqueue(q, *j);
-	}
+	buildTree(&q);
+	treeNode huf;
+	dequeue(q, &huf);
+	printf("%u\n", huf.count);
 
-	printQueue(q);
 	delQueue(q);
-	
 	return 0;
 }
 
-/*
+/* loadHist:
+ *
  * Counts the number of occurrences of each byte in a file,
  * storing them in a histogram.
  */
-void populateHistogram(char *file, uint32_t hist[])
+void loadHist(char *file, uint32_t hist[])
 {
 	int fd = open(file, O_RDONLY);
 	struct stat buffer;
@@ -143,7 +148,7 @@ void populateHistogram(char *file, uint32_t hist[])
 	bitV *v = newVec(buffer.st_size * 8);
 	int64_t n = read(fd, v->v, buffer.st_size);
 	printf("bytes read in: %d\n", n);
-	
+
 	for (uint64_t i = 0; i < buffer.st_size; i += 1)
 	{
 		hist[v->v[i]] += 1;
@@ -151,7 +156,8 @@ void populateHistogram(char *file, uint32_t hist[])
 	delVec(v);
 }
 
-/*
+/* enqueueHist:
+ * 
  * Enqueues all 'active' entries of the histogram as treeNodes.
  * Priority is determined by the count of each node (the freq. in hist.)
  */
@@ -168,12 +174,19 @@ void enqueueHist(queue **q, uint32_t hist[])
 	}
 }
 
+/* buildTree:
+ *
+ * Dequeues two nodes with the smallest counts and joins them under
+ * a parent node.  Repeat until one node left in the queue (the root).
+ */
 void buildTree(queue **q)
 {
-	treeNode l, r;
-	while (dequeue(*q, &l) && dequeue(*q, &r))
+	while ((*q)->head - 1 != ROOT)
 	{
-		treeNode *j = newNode('$', l.count + r.count, !ISLEAF);
+		treeNode l, r, *j;
+		dequeue(*q, &l);
+		dequeue(*q, &r);
+		j = join(&l, &r);
 		enqueue(*q, *j);
 		delNode(j);
 	}
