@@ -5,6 +5,7 @@
 
 # ifndef _HUFFMAN_H
 # define _HUFFMAN_H
+# include <stdlib.h>
 # include <stdint.h>
 # include <stdbool.h>
 # include "stack.h"

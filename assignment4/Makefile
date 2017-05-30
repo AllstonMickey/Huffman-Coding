@@ -7,7 +7,7 @@ DECODE_STACKTYPE = uint16_t
 STACKTYPE        = uint32_t
 DEFINE_STACK     = -DSTACK_ITEM=$(STACKTYPE)
 
-QUEUETYPE    = uint8_t
+QUEUETYPE    = uint32_t
 DEFINE_QUEUE = -DQUEUE_ITEM=$(QUEUETYPE)
 
 .PHONY: all
@@ -32,4 +32,4 @@ queue.o : queue.c queue.h heap.h
 
 .PHONY: clean
 clean :
-	$(RM) test.o stack.o queue.o huffman.o test
+	$(RM) test.o stack.o queue.o huffman.o test encode.o encode

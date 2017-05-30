@@ -8,7 +8,6 @@
 # include <stdint.h>
 # include <stdlib.h> // malloc, calloc, free
 # include <stdio.h>  // printf
-# include "stack.h"
 
 # ifndef NIL
 # define NIL (void *) 0
