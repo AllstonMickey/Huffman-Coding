@@ -98,10 +98,7 @@ int main(int argc, char **argv)
 
 	stack *bits = newStack(HIST_LEN, false); // code for the current path to the leaf
 	stack table[HIST_LEN]; // array of stacks of variable length
-	
 	buildCode(huf, *bits, table);
-	
-	
 
 	/*
 	printStackBits(&table['h']);

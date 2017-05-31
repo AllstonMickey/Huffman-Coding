@@ -54,23 +54,16 @@ int32_t stepTree(treeNode *root, treeNode **t, uint32_t code);
 // Parse a Huffman tree to build codes
 void buildCode(treeNode *t, stack s, stack hist[256])
 {
-	// if leaf
-	// 	save code in hist
-	// else
-	// 	go left
-	// 	go right
-
-	bool bit;
 	if (t->leaf)
 	{
 		/* stack s represents the path to the node and so is the code for it
 		 * save this stack into a table of variable length codes (hist).
 		 *
-		 * Since hist['h'] is s, it does not save the current state of s.
+		 * ex: Since hist['h'] is s, it does not save the current state of s.
 		 * Therefore, when s is later modified by traversing the tree for other leaves,
 		 * hist['h'] is also modified.
 		 */
-
+		
 		hist[t->symbol] = s;
 	
 		// Printing debug info
@@ -84,10 +77,13 @@ void buildCode(treeNode *t, stack s, stack hist[256])
 	}
 	else
 	{
+		bool bit;
+		// go left
 		pushBit(&s, false); // push 0
 		buildCode(t->left, s, hist);
 		popBit(&s, &bit);
-
+	
+		// go right
 		pushBit(&s, true); // push 1
 		buildCode(t->right, s, hist);
 		popBit(&s, &bit);
