@@ -168,7 +168,7 @@ void printStackItems(const stack *s)
 
 void printStackBits(const stack *s)
 {
-	printf("top: %u\n", s->top);
+	//printf("top: %u\n", s->top);
 	for (uint32_t i = 0; i < s->top; i += 1)
 	{
 		printf("%u", VALBIT(s->entries[i >> 3], i));

@@ -49,10 +49,50 @@ treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 
 // Step through a tree following the code
 int32_t stepTree(treeNode *root, treeNode **t, uint32_t code);
+*/
 
 // Parse a Huffman tree to build codes
-void buildCode(treeNode *t, stack bits, stack hist[256]);
-*/
+void buildCode(treeNode *t, stack s, stack hist[256])
+{
+	// if leaf
+	// 	save code in hist
+	// else
+	// 	go left
+	// 	go right
+
+	bool bit;
+	if (t->leaf)
+	{
+		/* stack s represents the path to the node and so is the code for it
+		 * save this stack into a table of variable length codes (hist).
+		 *
+		 * Since hist['h'] is s, it does not save the current state of s.
+		 * Therefore, when s is later modified by traversing the tree for other leaves,
+		 * hist['h'] is also modified.
+		 */
+
+		hist[t->symbol] = s;
+	
+		// Printing debug info
+		printf("### Saving stack hist[%u] (%llu). . .\n", t->symbol, t->count);
+		printStackBits(&hist[t->symbol]);
+		printf("### Saved stack  hist[%u] (%llu). . .\n", t->symbol, t->count);
+		printf("\t--- state of hist['h']\n");
+		printf("\t");printStackBits(&hist['h']);
+		printf("\t--- ended hist['h']\n");
+		return;
+	}
+	else
+	{
+		pushBit(&s, false); // push 0
+		buildCode(t->left, s, hist);
+		popBit(&s, &bit);
+
+		pushBit(&s, true); // push 1
+		buildCode(t->right, s, hist);
+		popBit(&s, &bit);
+	}
+}
 
 // Join two subtrees
 treeNode *join(treeNode *l, treeNode *r)
