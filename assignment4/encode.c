@@ -98,11 +98,26 @@ int main(int argc, char **argv)
 	 * Create a treeNode as the root of the Huffman Tree.
 	 * Build the tree by repeatedly dequeuing and joining nodes from the queue.
 	 */
-
+	/*
 	buildTree(&q);
-	treeNode huf;
-	dequeue(q, &huf);
-	printf("%u\n", huf.count);
+	treeNode *huf;
+	dequeue(q, huf);
+	printf("%u\n", huf->count);
+
+	printTree(huf, 0);
+	*/
+	
+	// join two trees
+	// the new node being returned has '$' symbol
+	// the sum of the two counts
+	// and not a leaf (false)
+	treeNode l; dequeue(q, &l);
+	treeNode r; dequeue(q, &r);
+	//treeNode *j = newNode('$', l.count + r.count, false);
+	treeNode *j = join(&l, &r);
+	printf("left "); printNode(&l);
+	printf("right "); printNode(&r);
+	printf("joined "); printNode(j);
 
 	delQueue(q);
 	return 0;

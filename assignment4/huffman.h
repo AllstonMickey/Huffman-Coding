@@ -69,4 +69,6 @@ static inline void spaces(int c)
 
 void printTree(treeNode *t, int depth);
 
+void printNode(treeNode *t);
+
 # endif

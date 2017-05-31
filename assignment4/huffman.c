@@ -82,8 +82,24 @@ void printTree(treeNode *t, int depth)
 	{
 		spaces(4 * depth);
 		printf("% (%llu)\n", t->count);
-		printTree(t->left, depth + 1);
-		printTree(t->right, depth + 1);
+		if (t->left != NIL)
+		{
+			printTree(t->left, depth + 1);
+		}
+		if (t->right != NIL)
+		{
+			printTree(t->right, depth + 1);
+		}
 	}
 	return;
 }
+
+void printNode(treeNode *t)
+{
+	printf("node %p:\n", (void *) t);
+	printf("\tsymbol: %c %u\n", (char) t->symbol, t->symbol);
+	printf("\tcount : %u\n", t->count);
+	printf("\t*left : %p\n", (void *) t->left);
+	printf("\t*right: %p\n", (void *) t->right);
+}
+
