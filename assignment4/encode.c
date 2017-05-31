@@ -16,10 +16,6 @@
 # define MAX_BUF 128
 # endif
 
-# ifndef ISLEAF
-# define ISLEAF true
-# endif
-
 void loadHist(char *file, uint32_t hist[]);
 void enqueueHist(queue **q, uint32_t hist[]);
 treeNode *buildTree(queue **q);
@@ -93,10 +89,14 @@ int main(int argc, char **argv)
 	queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
 	enqueueHist(&q, histogram);
 	
+	/*
+	 * Constructs a Huffman Tree from the entries in the Queue.
+	 */
+
 	treeNode *huf = buildTree(&q);
 	printTree(huf, 0);
+	
 	delTree(huf);
-
 	delQueue(q);
 	return 0;
 }
@@ -135,7 +135,7 @@ void enqueueHist(queue **q, uint32_t hist[])
 	{
 		if (hist[i])
 		{
-			treeNode *n = newNode(i, hist[i], ISLEAF);
+			treeNode *n = newNode(i, hist[i], true);
 			enqueue(*q, *n);
 			delNode(n);
 		}
@@ -146,6 +146,7 @@ void enqueueHist(queue **q, uint32_t hist[])
  *
  * Dequeues two nodes with the smallest counts and joins them under
  * a parent node.  Repeats until one node left in the queue (the root).
+ * Returns the root node of the Huffman Tree as a pointer.
  */
 treeNode *buildTree(queue **q)
 {
@@ -165,3 +166,4 @@ treeNode *buildTree(queue **q)
 	dequeue(*q, &tree);
 	return convert(tree);
 }
+
