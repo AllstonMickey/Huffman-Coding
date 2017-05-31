@@ -51,23 +51,28 @@ uint32_t favorite(queue *q, uint32_t p)
 	{
 		if (VALNODE(q, l) < VALNODE(q, r)) // left gets priority
 		{
+			//printf("here! (l)\n");
 			return l;
 		}
 		else if (VALNODE(q, l) > VALNODE(q, r)) // right gets priority
 		{
+			//printf("here! (r)\n");
 			return r;
 		}
 		else // no priority, return parent's index
 		{
-			return p;
+			//printf("here! (p)\n");
+			return l;
 		}
 	}
 	else if (l < q->head) // only left child exists, return left
 	{
+		//printf("here! (l2)\n");
 		return l;
 	}
 	else // no child exists, return parent
 	{
+		//printf("here! (p2)\n");
 		return p;
 	}
 }
@@ -76,6 +81,11 @@ uint32_t favorite(queue *q, uint32_t p)
  * Fixes the heap by checking which of the parent's children has higher priority (if any).
  *
  * Sends the root element down the tree until heap properties are met.
+ *
+ * Checks which child has priority over the other.
+ * Checks if the that child has priority over the parent.
+ * 	If it does, swap them.
+ * 	If it does not, done.
  */
 static inline void recede(queue **q)
 {

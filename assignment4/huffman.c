@@ -37,7 +37,7 @@ void delTree(treeNode *t)
 
 	delTree(t->left);
 	delTree(t->right);
-	delNode(t);
+	free(t);
 }
 
 /*
@@ -65,31 +65,28 @@ treeNode *join(treeNode *l, treeNode *r)
 
 void printTree(treeNode *t, int depth)
 {
-	if (t && t->leaf)
+	if (t)
 	{
-		if (isalnum(t->symbol))
+		printTree(t->left, depth + 1);
+		if (t->leaf)
 		{
-			spaces(4 * depth);
-			printf("%c (%llu)\n", t->symbol, t->count);
+			if (isalnum(t->symbol))
+			{
+				spaces(4 * depth);
+				printf("'%c' (%llu)\n", t->symbol, t->count);
+			}
+			else
+			{
+				spaces(4 * depth);
+				printf("0x%X (%llu)\n", t->symbol, t->count);
+			}
 		}
 		else
 		{
 			spaces(4 * depth);
-			printf("%X (%llu)\n", t->symbol, t->count);
+			printf("$ (%llu)\n", t->count);
 		}
-	}
-	else if (t)
-	{
-		spaces(4 * depth);
-		printf("% (%llu)\n", t->count);
-		if (t->left != NIL)
-		{
-			printTree(t->left, depth + 1);
-		}
-		if (t->right != NIL)
-		{
-			printTree(t->right, depth + 1);
-		}
+		printTree(t->right, depth + 1);
 	}
 	return;
 }

@@ -64,7 +64,6 @@ bool enqueue(queue *q, queueItem i)
  *
  * Dequeue the root and fix the heap with recede()
  * in order to maintain the binary heap properties.
- *
  */
 bool dequeue(queue *q, queueItem *i)
 {
@@ -96,7 +95,8 @@ bool emptyQueue(queue *q)
 
 void printQueue(queue *q)
 {
-	for (uint32_t i = 0; i < q->size; i += 1)
+	printf("Printing queue...\n");
+	for (uint32_t i = 0; i < 7; i += 1)
 	{
 		printf("%u, %u\n", i, VALNODE(q, i));
 	}

@@ -12,7 +12,7 @@
 # endif
 
 # ifndef VALNODE
-# define VALNODE(q, n) ((q)->nodes[n].count)
+# define VALNODE(q, n) ((q)->nodes[(n)].count)
 # endif
 
 typedef QUEUE_ITEM queueItem;

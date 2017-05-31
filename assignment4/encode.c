@@ -13,7 +13,7 @@
 # endif
 
 # ifndef MAX_BUF
-# define MAX_BUF 127
+# define MAX_BUF 128
 # endif
 
 # ifndef ISLEAF
@@ -22,7 +22,7 @@
 
 void loadHist(char *file, uint32_t hist[]);
 void enqueueHist(queue **q, uint32_t hist[]);
-void buildTree(queue **q);
+treeNode buildTree(queue **q);
 
 int main(int argc, char **argv)
 {
@@ -90,34 +90,71 @@ int main(int argc, char **argv)
 	 * Enqueue the histogram into a priority queue.
 	 */
 
-	queue *q = newQueue(HIST_LEN);
+	queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
 	enqueueHist(&q, histogram);
-	printQueue(q);	
 	
 	/*
-	 * Create a treeNode as the root of the Huffman Tree.
-	 * Build the tree by repeatedly dequeuing and joining nodes from the queue.
+	 * Build the Huffman Tree from the priority queue's entries.
 	 */
-	/*
-	buildTree(&q);
-	treeNode *huf;
-	dequeue(q, huf);
-	printf("%u\n", huf->count);
 
-	printTree(huf, 0);
-	*/
+	treeNode huf = buildTree(&q);
+	printTree(&huf, 0);
+
+	/* TESTING printTree with MANUAL ENTRIES
+	 * 
+	treeNode l0, r0;
+	dequeue(q, &l0);
+	dequeue(q, &r0);
+	printQueue(q);
+	printNode(&l0); printNode(&r0);
+	treeNode *j0 = newNode('$', l0.count + r0.count, false);
+	j0->left = &l0;
+	j0->right = &r0;
+	printNode(j0);
+	enqueue(q, *j0);
+	printQueue(q);
+
+	treeNode l1, r1;
+	dequeue(q, &l1);
+	dequeue(q, &r1);
+	printQueue(q);
+	printNode(&l1); printNode(&r1);
+	treeNode *j1 = newNode('$', l1.count + r1.count, false);
+	j1->left = &l1;
+	j1->right = &r1;
+	printNode(j1);
+	enqueue(q, *j1);
+	printQueue(q);
 	
-	// join two trees
-	// the new node being returned has '$' symbol
-	// the sum of the two counts
-	// and not a leaf (false)
-	treeNode l; dequeue(q, &l);
-	treeNode r; dequeue(q, &r);
-	//treeNode *j = newNode('$', l.count + r.count, false);
-	treeNode *j = join(&l, &r);
-	printf("left "); printNode(&l);
-	printf("right "); printNode(&r);
-	printf("joined "); printNode(j);
+	treeNode l2, r2;
+	dequeue(q, &l2);
+	dequeue(q, &r2);
+	printQueue(q);
+	printNode(&l2); printNode(&r2);
+	treeNode *j2 = newNode('$', l2.count + r2.count, false);
+	j2->left = &l2;
+	j2->right = &r2;
+	printNode(j2);
+	enqueue(q, *j2);
+	printQueue(q);
+
+	treeNode l3, r3;
+	dequeue(q, &l3);
+	dequeue(q, &r3);
+	printQueue(q);
+	printNode(&l3); printNode(&r3);
+	treeNode *j3 = newNode('$', l3.count + r3.count, false);
+	j3->left = &l3;
+	j3->right = &r3;
+	printNode(j3);
+	enqueue(q, *j3);
+	printQueue(q);
+
+	treeNode huf;
+	dequeue(q, &huf);
+	printQueue(q);
+	printTree(&huf, 0);
+	*/
 
 	delQueue(q);
 	return 0;
@@ -159,7 +196,6 @@ void enqueueHist(queue **q, uint32_t hist[])
 		{
 			treeNode *n = newNode(i, hist[i], ISLEAF);
 			enqueue(*q, *n);
-			delNode(n);
 		}
 	}
 }
@@ -167,17 +203,30 @@ void enqueueHist(queue **q, uint32_t hist[])
 /* buildTree:
  *
  * Dequeues two nodes with the smallest counts and joins them under
- * a parent node.  Repeat until one node left in the queue (the root).
+ * a parent node.  Repeats until one node left in the queue (the root).
  */
-void buildTree(queue **q)
+treeNode buildTree(queue **q)
 {
-	while ((*q)->head - 1 != ROOT)
+	/* store the previous nodes and their 'j' parents to prevent
+	 * overwriting subtree data when going through iterations.
+	 *
+	 * Must be allocated on the heap to prevent seg. faults. with large files.
+	 */
+
+	uint32_t s = HIST_LEN;
+	treeNode *l = calloc(s, sizeof(treeNode));
+	treeNode *r = calloc(s, sizeof(treeNode));
+	treeNode **j = calloc(s, sizeof(treeNode *));
+
+	for (int i = 0; (*q)->head - 1 != ROOT; i += 1)
 	{
-		treeNode l, r, *j;
-		dequeue(*q, &l);
-		dequeue(*q, &r);
-		j = join(&l, &r);
-		enqueue(*q, *j);
-		delNode(j);
+		dequeue(*q, &l[i]);
+		dequeue(*q, &r[i]);
+		j[i] = join(&l[i], &r[i]);
+		enqueue(*q, *j[i]);
 	}
+
+	treeNode tree;
+	dequeue(*q, &tree);
+	return tree;
 }
