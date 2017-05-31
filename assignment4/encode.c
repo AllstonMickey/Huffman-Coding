@@ -90,40 +90,14 @@ int main(int argc, char **argv)
 	 * Enqueue the histogram into a priority queue.
 	 */
 
-	//queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
-	queue *q = newQueue(1000);
-	treeNode *a = newNode('#', 3, true);
-	enqueue(q, a);
-	printQueue(q);
+	queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
+	enqueueHist(&q, histogram);
 	
-	treeNode *b = newNode('#', 5, true);
-	enqueue(q, b);
-	printQueue(q);
+	treeNode *huf = buildTree(&q);
+	printTree(huf, 0);
+	delTree(huf);
 
-	treeNode *c = newNode('#', 2, true);
-	enqueue(q, c);
-	printQueue(q);
-
-	treeNode *d = newNode('#', 1, true);
-	enqueue(q, d);
-	printQueue(q);
-
-	//enqueueHist(&q, histogram);
-	//printQueue(q);
-	
-	/*
-	 * Build the Huffman Tree from the priority queue's entries.
-	 *
-	 * store the previous nodes and their 'j' parents to prevent
-	 * overwriting subtree data when going through iterations.
-	 *
-	 * Must be allocated on the heap to prevent seg. faults. with large files.
-	 */
-
-	//treeNode *huf = buildTree(&q);
-	//printTree(huf, 0);
-
-	//delQueue(q);
+	delQueue(q);
 	return 0;
 }
 
@@ -162,7 +136,8 @@ void enqueueHist(queue **q, uint32_t hist[])
 		if (hist[i])
 		{
 			treeNode *n = newNode(i, hist[i], ISLEAF);
-			enqueue(*q, n);
+			enqueue(*q, *n);
+			delNode(n);
 		}
 	}
 }
@@ -174,12 +149,19 @@ void enqueueHist(queue **q, uint32_t hist[])
  */
 treeNode *buildTree(queue **q)
 {
-	treeNode *j;
-	for (int i = 0; (*q)->head - 1 != ROOT; i += 1)
+	while ((*q)->head - 1 != ROOT)
 	{
-		j = join(dequeue(*q), dequeue(*q));
-		enqueue(*q, j);
+		treeNode l;
+		treeNode r;
+		dequeue(*q, &l);
+		dequeue(*q, &r);
+
+		treeNode *j = join(convert(l), convert(r));
+		enqueue(*q, *j);
+		delNode(j);
 	}
 
-	return dequeue(*q);
+	treeNode tree;
+	dequeue(*q, &tree);
+	return convert(tree);
 }

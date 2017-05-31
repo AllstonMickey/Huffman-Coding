@@ -58,6 +58,8 @@ static inline int8_t compare(treeNode *l, treeNode *r)
 // Join two subtrees
 treeNode *join(treeNode *l, treeNode *r);
 
+treeNode *convert(treeNode t);
+
 static inline void spaces(int c)
 {
 	for (int i = 0; i < c; i += 1)

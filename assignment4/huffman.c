@@ -63,6 +63,14 @@ treeNode *join(treeNode *l, treeNode *r)
 	return j;
 }
 
+treeNode *convert(treeNode t)
+{
+	treeNode *p = newNode(t.symbol, t.count, t.leaf);
+	p->left = t.left;
+	p->right = t.right;
+	return p;
+}
+
 void printTree(treeNode *t, int depth)
 {
 	if (t)
