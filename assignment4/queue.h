@@ -12,16 +12,16 @@
 # endif
 
 # ifndef VALNODE
-# define VALNODE(q, n) ((q)->nodes[(n)].count)
+# define VALNODE(q, n) ((q)->nodes[n]->count)
 # endif
 
 typedef QUEUE_ITEM queueItem;
 
 typedef struct queue
 {
-	uint32_t size;    // How big is it? (number of entries)
-	uint32_t head;    // Where is the next element?
-	queueItem *nodes; // Array of nodes for the heap
+	uint32_t size;     // How big is it? (number of entries)
+	uint32_t head;     // Where is the next element?
+	queueItem **nodes; // Array of nodes for the heap
 } queue;
 
 queue *newQueue(uint32_t size);
@@ -29,10 +29,10 @@ queue *newQueue(uint32_t size);
 void delQueue(queue *q);
 
 // Adds an item to the queue
-bool enqueue(queue *q, queueItem i);
+bool enqueue(queue *q, queueItem *i);
 
 // Removes the smallest item from the queue
-bool dequeue(queue *q, queueItem *i);
+queueItem *dequeue(queue *q);
 
 // Is it full?
 bool fullQueue(queue *q);

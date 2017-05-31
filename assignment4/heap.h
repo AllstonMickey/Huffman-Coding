@@ -9,19 +9,19 @@
 // queueItem *nodes; // array of treeNodes
 
 # ifndef SWAP
-# define SWAP(x, y) { queueItem t = x; x = y; y = t; ; }
+# define SWAP(x, y) { queueItem *t = x; x = y; y = t; ; }
 # endif
 
 # ifndef parent
-# define parent(n) (n / 2)
+# define parent(n) ((n) / 2)
 # endif
 
 # ifndef leftChild
-# define leftChild(n) (2 * n)
+# define leftChild(n) (2 * (n))
 # endif
 
 # ifndef rightChild
-# define rightChild(n) ((2 * n) + 1)
+# define rightChild(n) ((2 * (n)) + 1)
 # endif
 
 /* 

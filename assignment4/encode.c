@@ -22,7 +22,7 @@
 
 void loadHist(char *file, uint32_t hist[]);
 void enqueueHist(queue **q, uint32_t hist[]);
-treeNode buildTree(queue **q, treeNode *l, treeNode *r, treeNode **j);
+treeNode *buildTree(queue **q);
 
 int main(int argc, char **argv)
 {
@@ -90,8 +90,26 @@ int main(int argc, char **argv)
 	 * Enqueue the histogram into a priority queue.
 	 */
 
-	queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
-	enqueueHist(&q, histogram);
+	//queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
+	queue *q = newQueue(1000);
+	treeNode *a = newNode('#', 3, true);
+	enqueue(q, a);
+	printQueue(q);
+	
+	treeNode *b = newNode('#', 5, true);
+	enqueue(q, b);
+	printQueue(q);
+
+	treeNode *c = newNode('#', 2, true);
+	enqueue(q, c);
+	printQueue(q);
+
+	treeNode *d = newNode('#', 1, true);
+	enqueue(q, d);
+	printQueue(q);
+
+	//enqueueHist(&q, histogram);
+	//printQueue(q);
 	
 	/*
 	 * Build the Huffman Tree from the priority queue's entries.
@@ -102,22 +120,10 @@ int main(int argc, char **argv)
 	 * Must be allocated on the heap to prevent seg. faults. with large files.
 	 */
 
-	uint32_t s = HIST_LEN;
-	treeNode *l = calloc(s, sizeof(treeNode));
-	treeNode *r = calloc(s, sizeof(treeNode));
-	treeNode **j = calloc(s, sizeof(treeNode *));
+	//treeNode *huf = buildTree(&q);
+	//printTree(huf, 0);
 
-	treeNode huf = buildTree(&q, l, r, j);
-	printTree(&huf, 0)
-
-	for (int i = 0; i < s; i += 1)
-	{
-		free(j[i]);
-	}
-	free(j);
-	free(r);
-	free(l);
-	delQueue(q);
+	//delQueue(q);
 	return 0;
 }
 
@@ -156,8 +162,7 @@ void enqueueHist(queue **q, uint32_t hist[])
 		if (hist[i])
 		{
 			treeNode *n = newNode(i, hist[i], ISLEAF);
-			enqueue(*q, *n);
-			delNode(n);
+			enqueue(*q, n);
 		}
 	}
 }
@@ -167,17 +172,14 @@ void enqueueHist(queue **q, uint32_t hist[])
  * Dequeues two nodes with the smallest counts and joins them under
  * a parent node.  Repeats until one node left in the queue (the root).
  */
-treeNode buildTree(queue **q, treeNode *l, treeNode *r, treeNode **j)
+treeNode *buildTree(queue **q)
 {
+	treeNode *j;
 	for (int i = 0; (*q)->head - 1 != ROOT; i += 1)
 	{
-		dequeue(*q, &l[i]);
-		dequeue(*q, &r[i]);
-		j[i] = join(&l[i], &r[i]);
-		enqueue(*q, *j[i]);
+		j = join(dequeue(*q), dequeue(*q));
+		enqueue(*q, j);
 	}
 
-	treeNode tree;
-	dequeue(*q, &tree);
-	return tree;
+	return dequeue(*q);
 }

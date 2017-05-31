@@ -9,11 +9,12 @@
 
 queue *newQueue(uint32_t size)
 {
+	/*
 	queue *q = (queue *) malloc(sizeof(queue));
 	if (q)
 	{
 		q->nodes = (queueItem *) calloc(size, sizeof(queueItem));
-		if (q->nodes)
+		if (q->nodes != NIL)
 		{
 			q->size = size;
 			VALNODE(q, 0) = 0; // 0th index is empty to maintain heap properties
@@ -22,10 +23,36 @@ queue *newQueue(uint32_t size)
 		}
 	}
 	return (queue *) 0;
+	*/
+	queue *q = (queue *) malloc(sizeof(queue));
+	if (q)
+	{
+		q->nodes = (queueItem **) calloc(size, sizeof(queueItem *));
+		if (q->nodes)
+		{
+			for (int i = 0; i < size; i += 1)
+			{
+				q->nodes[i] = (queueItem *) malloc(sizeof(queueItem));
+			}
+			if (q->nodes[0])
+			{
+				q->nodes[0]->count = 0;
+				q->size = size;
+				q->head = ROOT;
+				return q;
+			}
+		}
+	}
+	return (queue *) 0;
 }
 
 void delQueue(queue *q)
 {
+	for (int i = 0; i < q->size; i += 1)
+	{
+		free(q->nodes[i]);
+		q->nodes[i] = NIL;
+	}
 	free(q->nodes);
 	q->nodes = NIL;
 	free(q);
@@ -40,7 +67,7 @@ void delQueue(queue *q)
  *
  * !: The item being enqueued MUST be positive
  */
-bool enqueue(queue *q, queueItem i)
+bool enqueue(queue *q, queueItem *i)
 {
 	if (fullQueue(q))
 	{
@@ -65,20 +92,26 @@ bool enqueue(queue *q, queueItem i)
  * Dequeue the root and fix the heap with recede()
  * in order to maintain the binary heap properties.
  */
-bool dequeue(queue *q, queueItem *i)
+queueItem *dequeue(queue *q)
 {
 	if (emptyQueue(q))
 	{
-		return false;
+		return (queueItem *) 0; // nothing dequeued
 	}
+	queueItem *item = q->nodes[ROOT];
+	q->head -= 1;
+	q->nodes[ROOT] = q->nodes[q->head];
+	VALNODE(q, q->head) = 0;
+	recede(&q);
 
+	/*
 	*i = q->nodes[ROOT];
 	q->head -= 1;
 	q->nodes[ROOT] = q->nodes[q->head];
 	VALNODE(q, q->head) = 0;
 	//q->nodes[q->head] = (queueItem) 0x0;
 	recede(&q);
-	return true;
+	*/
 }
 
 // Is it full?
