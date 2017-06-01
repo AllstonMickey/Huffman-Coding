@@ -19,7 +19,8 @@
 ssize_t loadHist(char *file, uint32_t hist[]);
 uint32_t enqueueHist(queue **q, uint32_t hist[]);
 treeNode *buildTree(queue **q);
-void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves, treeNode *t);
+void writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileLen,
+		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], stack *codes[HIST_LEN]);
 
 int main(int argc, char **argv)
 {
@@ -120,7 +121,18 @@ int main(int argc, char **argv)
 	/*
 	 * Write to Output File
 	 */
-	writeOFile(out, sFileSize, leafCount, huf);
+
+	writeOFile(out, in, sFileSize, leafCount, huf, histogram, path);
+	
+	
+	bitV *v = newVec(14);
+	printf("before:\n"); printVec(v);
+	//setBit(v, 3);
+	appendStack(v, path[10]);
+	appendStack(v, path[104]);
+	appendStack(v, path[101]);
+	printf("\nafter:\n"); printVec(v);
+	printf("\n");
 	
 	delTree(huf);
 	delQueue(q);
@@ -198,19 +210,20 @@ treeNode *buildTree(queue **q)
 	return convert(tree);
 }
 
-void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves, treeNode *t)
+void writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileLen,
+		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], stack *codes[HIST_LEN])
 {
-	int fd;
+	int fdOut;
 	if (oFile[0] == '\0')
 	{
-		fd = STDIN_FILENO;
+		fdOut = STDIN_FILENO;
 	}
 	else
 	{
-		fd = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+		fdOut = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
 	}
 
-	if (fd == -1)
+	if (fdOut == -1)
 	{
 		perror("Cannot open output file");
 		return;
@@ -219,8 +232,38 @@ void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves, treeNod
 	uint32_t magicNumber = 0xdeadd00d;
 	uint16_t treeSize = (3 * leaves) - 1;
 	
-	write(fd, &magicNumber, sizeof(magicNumber));
-	write(fd, &sFileLen, sizeof(sFileLen));
-	write(fd, &treeSize, sizeof(treeSize));
-	dumpTree(t, fd);
+	write(fdOut, &magicNumber, sizeof(magicNumber));
+	write(fdOut, &sFileLen, sizeof(sFileLen));
+	write(fdOut, &treeSize, sizeof(treeSize));
+	dumpTree(t, fdOut);
+	
+	/*
+	 * Writes paths to the leaves for the bytes in the file
+	 */
+
+	int fdIn;
+	if (sFile[0] == '\0')
+	{
+		fdIn = STDIN_FILENO;
+	}
+	else
+	{
+		fdIn = open(sFile, O_RDONLY);
+	}
+
+	if (fdIn == -1)
+	{
+		perror("Cannot open input file");
+		return;
+	}
+
+	// read the bytes of sFile into bitV
+	struct stat buffer;
+	fstat(fdIn, &buffer);
+	bitV *v = newVec(buffer.st_size * 8);
+	ssize_t n = read(fdIn, v->v, buffer.st_size);
+
+	for (int i = 0; i < n; i += 1)
+	{
+	}
 }
