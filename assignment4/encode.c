@@ -21,6 +21,7 @@ uint32_t enqueueHist(queue **q, uint32_t hist[]);
 treeNode *buildTree(queue **q);
 void writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileLen,
 		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], stack *codes[HIST_LEN]);
+void dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN]);
 
 int main(int argc, char **argv)
 {
@@ -83,7 +84,7 @@ int main(int argc, char **argv)
 	histogram[0] = 1;
 	histogram[HIST_LEN - 1] = 1;
 	uint64_t sFileSize = (uint64_t) loadHist(in, histogram);
-	printf("sFileSize: %u\n", sFileSize);
+	printf("sFileSize (in bits): %u\n", sFileSize * 8);
 
 	/*
 	 * Enqueue the histogram into a priority queue.
@@ -105,9 +106,9 @@ int main(int argc, char **argv)
 
 	stack *path[HIST_LEN];
 	stack *s = newStack(HIST_LEN, false);
-	printf("Building leaf paths. . .\n");
 	buildCode(huf, s, path);
 	
+	/*
 	printf("\nPrinting resulting leaf paths. . .\n");
 	for (uint16_t i = 0; i < HIST_LEN; i += 1)
 	{
@@ -116,23 +117,13 @@ int main(int argc, char **argv)
 			printf("path[%u]: ", i);
 			printStackBits(path[i]);
 		}
-	}
+	}*/
 
 	/*
 	 * Write to Output File
 	 */
 
 	writeOFile(out, in, sFileSize, leafCount, huf, histogram, path);
-	
-	
-	bitV *v = newVec(14);
-	printf("before:\n"); printVec(v);
-	//setBit(v, 3);
-	appendStack(v, path[10]);
-	appendStack(v, path[104]);
-	appendStack(v, path[101]);
-	printf("\nafter:\n"); printVec(v);
-	printf("\n");
 	
 	delTree(huf);
 	delQueue(q);
@@ -149,11 +140,9 @@ ssize_t loadHist(char *file, uint32_t hist[])
 	int fd = open(file, O_RDONLY);
 	struct stat buffer;
 	fstat(fd, &buffer);
-	printf("bytes in file: %u\n", buffer.st_size);
 
 	bitV *v = newVec(buffer.st_size * 8);
 	ssize_t n = read(fd, v->v, buffer.st_size);
-	printf("bytes read in: %d\n", n);
 
 	for (ssize_t i = 0; i < buffer.st_size; i += 1)
 	{
@@ -214,13 +203,13 @@ void writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileLen,
 		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], stack *codes[HIST_LEN])
 {
 	int fdOut;
-	if (oFile[0] == '\0')
+	if (oFile[0])
 	{
-		fdOut = STDIN_FILENO;
+		fdOut = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
 	}
 	else
 	{
-		fdOut = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+		fdOut = STDIN_FILENO;
 	}
 
 	if (fdOut == -1)
@@ -236,19 +225,19 @@ void writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileLen,
 	write(fdOut, &sFileLen, sizeof(sFileLen));
 	write(fdOut, &treeSize, sizeof(treeSize));
 	dumpTree(t, fdOut);
-	
-	/*
-	 * Writes paths to the leaves for the bytes in the file
-	 */
+	dumpCodes(fdOut, sFile, codes);
+}
 
+void dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN])
+{
 	int fdIn;
-	if (sFile[0] == '\0')
+	if (sFile[0])
 	{
-		fdIn = STDIN_FILENO;
+		fdIn = open(sFile, O_RDONLY);
 	}
 	else
 	{
-		fdIn = open(sFile, O_RDONLY);
+		fdIn = STDIN_FILENO;
 	}
 
 	if (fdIn == -1)
@@ -257,13 +246,23 @@ void writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileLen,
 		return;
 	}
 
-	// read the bytes of sFile into bitV
 	struct stat buffer;
 	fstat(fdIn, &buffer);
-	bitV *v = newVec(buffer.st_size * 8);
-	ssize_t n = read(fdIn, v->v, buffer.st_size);
+	bitV *readBytes = newVec(buffer.st_size * 8);
+	ssize_t n = read(fdIn, readBytes->v, buffer.st_size);
 
+	bitV *readCodes = newVec(KB);
 	for (int i = 0; i < n; i += 1)
 	{
+		appendStack(readCodes, codes[readBytes->v[i]]);
 	}
+
+	int i;
+	for (i = 0; i < (readCodes->f / 8) + 1; i += 1)
+	{
+		
+		write(outputFildes, &(readCodes->v[i]), sizeof(readCodes->v[i]));
+	}
+	printf("i: %d\n", i);
+	printf("oFileSize (in bits): %u\n", readCodes->f + 1);
 }

@@ -76,8 +76,6 @@ void buildCode(treeNode *t, stack *s, stack *table[256])
 	if (t->leaf)
 	{
 		table[t->symbol] = deepCopyStack(s, true, false);
-		printf("[sym %u]: ", t->symbol); // DEBUGGING PRINT
-		printStackBits(s); // DEBUGGING PRINT
 		return;
 	}
 

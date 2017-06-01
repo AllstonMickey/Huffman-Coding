@@ -36,9 +36,8 @@ void delQueue(queue *q)
  * Adds an item to the queue and puts it in its
  * correct position in the queue, dependent on its priority.
  *
- * Smaller numbers percolate up to the top of the tree.
+ * Smaller VALNODEs percolate up to the top of the tree.
  *
- * !: The item being enqueued MUST be positive
  */
 bool enqueue(queue *q, queueItem i)
 {
@@ -48,7 +47,6 @@ bool enqueue(queue *q, queueItem i)
 	}
 	
 	q->nodes[q->head] = i;
-	//q->nodes[q->head] = i;
 	if (!emptyQueue(q))
 	{
 		percolate(&q);
@@ -76,7 +74,6 @@ bool dequeue(queue *q, queueItem *i)
 	q->head -= 1;
 	q->nodes[ROOT] = q->nodes[q->head];
 	VALNODE(q, q->head) = 0;
-	//q->nodes[q->head] = (queueItem) 0x0;
 	recede(&q);
 	return true;
 }

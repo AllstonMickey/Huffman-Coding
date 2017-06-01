@@ -1,12 +1,5 @@
-// TODO: stop accessing children out of the array bounds,
-// 	 check if they are within the size first.
-
 # ifndef _HEAP_H
 # define _HEAP_H
-
-// treeNode t;
-// t->count; // returns count of the node
-// queueItem *nodes; // array of treeNodes
 
 # ifndef SWAP
 # define SWAP(x, y) { queueItem t = x; x = y; y = t; ; }
@@ -47,32 +40,28 @@ uint32_t favorite(queue *q, uint32_t p)
 	 * Makes sure the node exists before checking the value inside
 	 * Returns the node with highest priority
 	 */
+
 	if (l < q->head && r < q->head) // both nodes exist
 	{
 		if (VALNODE(q, l) < VALNODE(q, r)) // left gets priority
 		{
-			//printf("here! (l)\n");
 			return l;
 		}
 		else if (VALNODE(q, l) > VALNODE(q, r)) // right gets priority
 		{
-			//printf("here! (r)\n");
 			return r;
 		}
-		else // no priority, return parent's index
+		else // no priority, return the left because it doesn't matter
 		{
-			//printf("here! (p)\n");
 			return l;
 		}
 	}
 	else if (l < q->head) // only left child exists, return left
 	{
-		//printf("here! (l2)\n");
 		return l;
 	}
 	else // no child exists, return parent
 	{
-		//printf("here! (p2)\n");
 		return p;
 	}
 }

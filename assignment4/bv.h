@@ -15,7 +15,7 @@
 # endif
 
 # ifndef KB
-# define KB 8192
+# define KB 4096
 # endif
 
 typedef struct bitV {
@@ -76,6 +76,21 @@ static inline uint8_t valBit(bitV *vec, uint64_t b)
 
 static inline bool appendStack(bitV *vec, stack *s)
 {
+	while ((vec->f + s->size) > vec->l)
+	{
+		uint8_t *tmp = (uint8_t *) realloc(vec->v, vec->l + KB);
+		if (tmp)
+		{
+			vec->v = tmp;
+			vec->l += KB;
+		}
+		else
+		{
+			tmp = NIL;
+			return false;
+		}
+	}
+
 	for (int i = 0; i < s->size; i += 1) // for each bit in stack
 	{
 		// get the value of the bit
