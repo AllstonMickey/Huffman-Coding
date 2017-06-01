@@ -4,12 +4,12 @@
 # include "huffman.h"
 
 /*struct treeNode
-{
-	uint8_t symbol;
-	uint64_t count;
-	bool leaf;
-	treeNode *left, *right;
-};*/
+  {
+  uint8_t symbol;
+  uint64_t count;
+  bool leaf;
+  treeNode *left, *right;
+  };*/
 
 // Create a single node with symbols, count, and leaf or not
 treeNode *newNode(uint8_t s, uint64_t c, bool l)
@@ -52,42 +52,24 @@ int32_t stepTree(treeNode *root, treeNode **t, uint32_t code);
 */
 
 // Parse a Huffman tree to build codes
-void buildCode(treeNode *t, stack s, stack hist[256])
+void buildCode(treeNode *t, stack *s, stack *table[256])
 {
 	if (t->leaf)
 	{
-		/* stack s represents the path to the node and so is the code for it
-		 * save this stack into a table of variable length codes (hist).
-		 *
-		 * ex: Since hist['h'] is s, it does not save the current state of s.
-		 * Therefore, when s is later modified by traversing the tree for other leaves,
-		 * hist['h'] is also modified.
-		 */
-		
-		hist[t->symbol] = s;
-	
-		// Printing debug info
-		printf("### Saving stack hist[%u] (%llu). . .\n", t->symbol, t->count);
-		printStackBits(&hist[t->symbol]);
-		printf("### Saved stack  hist[%u] (%llu). . .\n", t->symbol, t->count);
-		printf("\t--- state of hist['h']\n");
-		printf("\t");printStackBits(&hist['h']);
-		printf("\t--- ended hist['h']\n");
+		table[t->symbol] = deepCopyStack(s, true, false);
+		printf("[sym %u]: ", t->symbol); // DEBUGGING PRINT
+		printStackBits(s); // DEBUGGING PRINT
 		return;
 	}
-	else
-	{
-		bool bit;
-		// go left
-		pushBit(&s, false); // push 0
-		buildCode(t->left, s, hist);
-		popBit(&s, &bit);
-	
-		// go right
-		pushBit(&s, true); // push 1
-		buildCode(t->right, s, hist);
-		popBit(&s, &bit);
-	}
+
+	bool tmp;
+	pushBit(s, 0);
+	buildCode(t->left, s, table);
+	popBit(s, &tmp);
+
+	pushBit(s, 1);
+	buildCode(t->right, s, table);
+	popBit(s, &tmp);
 }
 
 // Join two subtrees

@@ -96,17 +96,25 @@ int main(int argc, char **argv)
 	treeNode *huf = buildTree(&q);
 	printTree(huf, 0);
 
-	stack *bits = newStack(HIST_LEN, false); // code for the current path to the leaf
-	stack table[HIST_LEN]; // array of stacks of variable length
-	buildCode(huf, *bits, table);
-
 	/*
-	printStackBits(&table['h']);
-	printStackBits(&table[0]);
-	printStackBits(&table[255]);
-	printStackBits(&table[10]);
-	printStackBits(&table['e']);
-	*/
+	 * Build bit paths (as a stack) to the leaves from the root
+	 */
+
+	stack *path[HIST_LEN];
+	stack *s = newStack(HIST_LEN, false);
+	printf("Building leaf paths. . .\n");
+	buildCode(huf, s, path);
+	
+	printf("\nPrinting resulting leaf paths. . .\n");
+	for (uint16_t i = 0; i < HIST_LEN; i += 1)
+	{
+		if (histogram[i])
+		{
+			printf("path[%u]: ", i);
+			printStackBits(path[i]);
+		}
+	}
+
 
 	delTree(huf);
 	delQueue(q);

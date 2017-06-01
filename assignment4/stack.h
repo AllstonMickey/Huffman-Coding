@@ -19,6 +19,8 @@ typedef struct stack
 
 stack *newStack(uint32_t nbits, bool fixed);
 
+stack *deepCopyStack(stack *s, bool fixed, bool extras);
+
 void delStack(stack *s);
 
 // Adds an entry to the top of the stack

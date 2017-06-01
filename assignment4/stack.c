@@ -1,6 +1,7 @@
 # include "stack.h"
 # include <stdlib.h>
 # include <stdio.h>
+# include <string.h>
 
 # ifndef VALBIT
 # define VALBIT(a, k) (a & (0x1 << (k % ITEM_NBITS))) >> (k % ITEM_NBITS)
@@ -29,6 +30,37 @@ stack *newStack(uint32_t nbits, bool fixed)
 		}
 	}
 	return (stack *) 0;
+}
+
+/* deepCopyStack:
+ *
+ * Deep copies a stack and its elements.
+ *
+ * @param fixed  Is this copy a fixed size stack?
+ * @param extras Contain the extra elements beyond the current top?
+ */
+stack *deepCopyStack(stack *s, bool fixed, bool extras)
+{
+	uint32_t size;
+	if (extras)
+	{
+		size = s->size;
+	}
+	else
+	{
+		size = s->top;
+	
+	}
+	
+	stack *cpy = newStack(size, fixed);
+	cpy->top = s->top;
+	
+	for (int i = 0; i < size; i += 1)
+	{
+		memcpy(cpy->entries, s->entries, sizeof(stackItem));
+	}
+	
+	return cpy;
 }
 
 void delStack(stack *s)
@@ -140,7 +172,6 @@ bool popBit(stack *s, bool *k)
 	*k = VALBIT(s->entries[s->top / ITEM_NBITS], s->top);
 	return true;
 }
-
 
 // Checks if the stack is empty
 bool emptyStack(const stack *s)
