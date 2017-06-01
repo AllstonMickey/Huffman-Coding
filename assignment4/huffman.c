@@ -1,6 +1,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <ctype.h> // isalnum
+# include <unistd.h> // write
 # include "huffman.h"
 
 /*struct treeNode
@@ -40,10 +41,28 @@ void delTree(treeNode *t)
 	free(t);
 }
 
-/*
-// Dump a Huffman tree onto a file
-void dumpTree(treeNode *t, int file);
 
+// Dump a Huffman tree onto a file
+void dumpTree(treeNode *t, int fildes)
+{
+	// traverse left
+	// traverse right
+	// write to file
+	if (t->leaf)
+	{
+		write(fildes, "L", sizeof(char));
+		write(fildes, &(t->symbol), sizeof(t->symbol));
+		return;
+	}
+	else
+	{
+		dumpTree(t->left, fildes);
+		dumpTree(t->right, fildes);
+		write(fildes, "I", sizeof(char));
+	}
+}
+
+/*
 // Build a tree from the saved tree
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 

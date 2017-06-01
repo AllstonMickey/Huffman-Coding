@@ -19,7 +19,7 @@
 ssize_t loadHist(char *file, uint32_t hist[]);
 uint32_t enqueueHist(queue **q, uint32_t hist[]);
 treeNode *buildTree(queue **q);
-void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves);
+void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves, treeNode *t);
 
 int main(int argc, char **argv)
 {
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 	/*
 	 * Write to Output File
 	 */
-	writeOFile(out, sFileSize, leafCount);
+	writeOFile(out, sFileSize, leafCount, huf);
 	
 	delTree(huf);
 	delQueue(q);
@@ -198,7 +198,7 @@ treeNode *buildTree(queue **q)
 	return convert(tree);
 }
 
-void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves)
+void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves, treeNode *t)
 {
 	int fd;
 	if (oFile[0] == '\0')
@@ -222,4 +222,5 @@ void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves)
 	write(fd, &magicNumber, sizeof(magicNumber));
 	write(fd, &sFileLen, sizeof(sFileLen));
 	write(fd, &treeSize, sizeof(treeSize));
+	dumpTree(t, fd);
 }
