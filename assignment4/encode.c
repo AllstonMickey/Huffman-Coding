@@ -16,14 +16,15 @@
 # define MAX_BUF 128
 # endif
 
-void loadHist(char *file, uint32_t hist[]);
-void enqueueHist(queue **q, uint32_t hist[]);
+ssize_t loadHist(char *file, uint32_t hist[]);
+uint32_t enqueueHist(queue **q, uint32_t hist[]);
 treeNode *buildTree(queue **q);
+void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves);
 
 int main(int argc, char **argv)
 {
-	char in[MAX_BUF] = {0};
-	char out[MAX_BUF] = {0};
+	char in[MAX_BUF] = {'\0'};
+	char out[MAX_BUF] = {'\0'};
 	bool verbose = false;
 
 	int opt;
@@ -80,14 +81,15 @@ int main(int argc, char **argv)
 	uint32_t histogram[HIST_LEN] = {0};
 	histogram[0] = 1;
 	histogram[HIST_LEN - 1] = 1;
-	loadHist(in, histogram);
+	uint64_t sFileSize = (uint64_t) loadHist(in, histogram);
+	printf("sFileSize: %u\n", sFileSize);
 
 	/*
 	 * Enqueue the histogram into a priority queue.
 	 */
 
 	queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
-	enqueueHist(&q, histogram);
+	uint16_t leafCount = enqueueHist(&q, histogram);
 	
 	/*
 	 * Constructs a Huffman Tree from the entries in the Queue.
@@ -115,7 +117,11 @@ int main(int argc, char **argv)
 		}
 	}
 
-
+	/*
+	 * Write to Output File
+	 */
+	writeOFile(out, sFileSize, leafCount);
+	
 	delTree(huf);
 	delQueue(q);
 	return 0;
@@ -126,7 +132,7 @@ int main(int argc, char **argv)
  * Counts the number of occurrences of each byte in a file,
  * storing them in a histogram.
  */
-void loadHist(char *file, uint32_t hist[])
+ssize_t loadHist(char *file, uint32_t hist[])
 {
 	int fd = open(file, O_RDONLY);
 	struct stat buffer;
@@ -134,14 +140,16 @@ void loadHist(char *file, uint32_t hist[])
 	printf("bytes in file: %u\n", buffer.st_size);
 
 	bitV *v = newVec(buffer.st_size * 8);
-	int64_t n = read(fd, v->v, buffer.st_size);
+	ssize_t n = read(fd, v->v, buffer.st_size);
 	printf("bytes read in: %d\n", n);
 
-	for (uint64_t i = 0; i < buffer.st_size; i += 1)
+	for (ssize_t i = 0; i < buffer.st_size; i += 1)
 	{
 		hist[v->v[i]] += 1;
 	}
 	delVec(v);
+	close(fd);
+	return n;
 }
 
 /* enqueueHist:
@@ -149,17 +157,20 @@ void loadHist(char *file, uint32_t hist[])
  * Enqueues all 'active' entries of the histogram as treeNodes.
  * Priority is determined by the count of each node (the freq. in hist.)
  */
-void enqueueHist(queue **q, uint32_t hist[])
+uint32_t enqueueHist(queue **q, uint32_t hist[])
 {
+	uint16_t leaves = 0;
 	for (int i = 0; i < HIST_LEN; i += 1)
 	{
 		if (hist[i])
 		{
+			leaves += 1;
 			treeNode *n = newNode(i, hist[i], true);
 			enqueue(*q, *n);
 			delNode(n);
 		}
 	}
+	return leaves;
 }
 
 /* buildTree:
@@ -187,3 +198,28 @@ treeNode *buildTree(queue **q)
 	return convert(tree);
 }
 
+void writeOFile(char oFile[MAX_BUF], uint64_t sFileLen, uint16_t leaves)
+{
+	int fd;
+	if (oFile[0] == '\0')
+	{
+		fd = STDIN_FILENO;
+	}
+	else
+	{
+		fd = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+	}
+
+	if (fd == -1)
+	{
+		perror("Cannot open output file");
+		return;
+	}
+
+	uint32_t magicNumber = 0xdeadd00d;
+	uint16_t treeSize = (3 * leaves) - 1;
+	
+	write(fd, &magicNumber, sizeof(magicNumber));
+	write(fd, &sFileLen, sizeof(sFileLen));
+	write(fd, &treeSize, sizeof(treeSize));
+}
