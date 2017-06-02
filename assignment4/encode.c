@@ -124,6 +124,17 @@ int main(int argc, char **argv)
 			}
 		}
 	}
+	
+	/*
+	bitV *n = newVec(5);
+	printf("\n(0): %u\n", n->f); printVec(n);
+	appendStack(n, path['e']);
+	printf("\n(1): %u\n", n->f); printVec(n);
+	appendStack(n, path[0xFF]);
+	printf("\n(2): %u\n", n->f);
+	appendStack(n, path[0x0]);
+	printf("\n(3): %u\n", n->f);
+	*/
 
 	delTree(huf);
 	delQueue(q);
@@ -188,7 +199,7 @@ treeNode *buildTree(queue **q)
 		treeNode r;
 		dequeue(*q, &l);
 		dequeue(*q, &r);
-
+		printf("dequeued: %u %u\n", l.count, r.count);
 		treeNode *j = join(convert(l), convert(r));
 		enqueue(*q, *j);
 		delNode(j);
