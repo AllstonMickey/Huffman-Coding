@@ -297,13 +297,11 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN]
 		appendStack(readCodes, codes[readBytes->v[i]]);
 	}
 
-	int i;
-	for (i = 0; i < (readCodes->f / 8) + 1; i += 1)
+	for (int i = 0; i < (readCodes->f / 8) + 1; i += 1)
 	{
-
 		write(outputFildes, &(readCodes->v[i]), sizeof(readCodes->v[i]));
 	}
-	return (uint64_t) readCodes->f + 1;
+	return (uint64_t) readCodes->f;
 }
 
 void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves)
