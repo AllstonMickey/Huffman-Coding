@@ -140,7 +140,16 @@ int main(int argc, char **argv)
 			}
 		}
 	}
+	
+	for (uint16_t i = 0; i < HIST_LEN; i += 1)
+	{
+		if (histogram[i])
+		{
+			delStack(path[i]);
+		}
+	}
 
+	delStack(s);
 	delTree(huf);
 	delQueue(q);
 	return 0;
@@ -292,8 +301,11 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN]
 		write(outputFildes, &(readCodes->v[i]), sizeof(readCodes->v[i]));
 	}
 
+	delVec(readBytes);
 	close(fdIn);
-	return readCodes->f;
+	uint64_t oFileBits = readCodes->f;
+	delVec(readCodes);
+	return oFileBits;
 }
 
 void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves)
