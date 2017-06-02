@@ -2,14 +2,6 @@
 # include <unistd.h> // write
 # include "huffman.h"
 
-/*struct treeNode
-  {
-  uint8_t symbol;
-  uint64_t count;
-  bool leaf;
-  treeNode *left, *right;
-  };*/
-
 // Create a single node with symbols, count, and leaf or not
 treeNode *newNode(uint8_t s, uint64_t c, bool l)
 {
@@ -43,9 +35,6 @@ void delTree(treeNode *t)
 // Dump a Huffman tree onto a file
 void dumpTree(treeNode *t, int fildes)
 {
-	// traverse left
-	// traverse right
-	// write to file
 	if (t->leaf)
 	{
 		write(fildes, "L", sizeof(char));

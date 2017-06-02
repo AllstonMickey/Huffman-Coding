@@ -6,15 +6,15 @@
 # endif
 
 # ifndef parent
-# define parent(n) (n / 2)
+# define parent(n) ((n) / 2)
 # endif
 
 # ifndef leftChild
-# define leftChild(n) (2 * n)
+# define leftChild(n) (2 * (n))
 # endif
 
 # ifndef rightChild
-# define rightChild(n) ((2 * n) + 1)
+# define rightChild(n) ((2 * (n)) + 1)
 # endif
 
 /* 
@@ -79,9 +79,7 @@ static inline void recede(queue *q)
 	{
 		if (VALNODE(q, p) > VALNODE(q, favorite(q, p)))
 		{
-			
 			uint32_t fav = favorite(q, p);
-			printf("swapping. . .\n");
 			SWAP(q->nodes[p], q->nodes[favorite(q, p)]);
 			p = fav;
 		}

@@ -10,7 +10,7 @@
 # include "stack.h"
 
 # ifndef NIL
-# define NIL (void*) 0
+# define NIL (void *) 0
 # endif
 
 typedef struct DAH treeNode;

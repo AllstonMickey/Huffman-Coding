@@ -74,8 +74,6 @@ bool dequeue(queue *q, queueItem *i)
 	q->head -= 1;
 	q->nodes[ROOT] = q->nodes[q->head];
 	VALNODE(q, q->head) = 0;
-	printf("BEFORE RECEDE:\n");
-	printQueue(q);
 	recede(q);
 	return true;
 }

@@ -4,7 +4,7 @@
 # include <string.h>
 
 # ifndef VALBIT
-# define VALBIT(a, k) (a & (0x1 << (k % ITEM_NBITS))) >> (k % ITEM_NBITS)
+# define VALBIT(a, k) ((a) & (0x1 << ((k) % ITEM_NBITS))) >> ((k) % ITEM_NBITS)
 # endif
 
 # ifndef BITS
@@ -162,7 +162,6 @@ bool pop(stack *s, stackItem *i)
 
 bool popBit(stack *s, bool *k)
 {
-	// for each bit in the item
 	if (emptyStack(s))
 	{
 		return false;
@@ -205,10 +204,6 @@ void printStackBits(const stack *s)
 		if ((i + 1) % 4 == 0)
 		{
 			printf(" ");
-		}
-		if ((i + 1) % 8 == 0)
-		{
-			printf("\n");
 		}
 	}
 	printf("\n");
