@@ -33,6 +33,7 @@ static inline void percolate(queue **q)
 
 uint32_t favorite(queue *q, uint32_t p)
 {
+	//printf("p: %u\n", p);
 	uint32_t l = leftChild(p);
 	uint32_t r = rightChild(p);
 
@@ -43,17 +44,13 @@ uint32_t favorite(queue *q, uint32_t p)
 
 	if (l < q->head && r < q->head) // both nodes exist
 	{
-		if (VALNODE(q, l) < VALNODE(q, r)) // left gets priority
+		if (VALNODE(q, l) <= VALNODE(q, r)) // left gets priority
 		{
 			return l;
 		}
-		else if (VALNODE(q, l) > VALNODE(q, r)) // right gets priority
+		else
 		{
 			return r;
-		}
-		else // no priority, return the left because it doesn't matter
-		{
-			return l;
 		}
 	}
 	else if (l < q->head) // only left child exists, return left
@@ -79,15 +76,21 @@ uint32_t favorite(queue *q, uint32_t p)
 static inline void recede(queue **q)
 {
 	uint32_t p = ROOT;
+	printf("initial favorite: %u\n", favorite(*q, p));
 	while (favorite(*q, p) != p)
 	{
+		printf("favorite: %u\n", favorite(*q, p));
 		if (VALNODE(*q, p) > VALNODE(*q, favorite(*q, p)))
 		{
+			
+			uint32_t fav = favorite(*q, p);
+			printf("swapping. . .\n");
 			SWAP((*q)->nodes[p], (*q)->nodes[favorite(*q, p)]);
-			p = favorite(*q, p);
+			p = fav;
 		}
 		else
 		{
+			printf("done. . .\n");
 			break;
 		}
 	}

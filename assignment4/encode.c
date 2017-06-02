@@ -31,9 +31,10 @@ int main(int argc, char **argv)
 	bool verbose = false; // print statistics?
 	bool pFlag = false;   // print the Huffman tree?
 	bool sFlag = false;   // print the stacks for each leaf?
+	bool hFlag = false;   // print the histogram?
 
 	int opt;
-	while ((opt = getopt(argc, argv, "i:o:vps")) != -1)
+	while ((opt = getopt(argc, argv, "i:o:vpsh")) != -1)
 	{
 		switch (opt)
 		{
@@ -72,6 +73,11 @@ int main(int argc, char **argv)
 					sFlag = true;
 					break;
 				}
+			case 'h':
+				{
+					hFlag = true;
+					break;
+				}
 			case '?':
 				{
 					break;
@@ -96,7 +102,9 @@ int main(int argc, char **argv)
 
 	queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
 	uint16_t leafCount = enqueueHist(&q, histogram);
-
+	//printf("\nHistogram:\n");
+	//printQueue(q);
+	//printf("\nend of hist\n");
 	treeNode *huf = buildTree(&q);
 
 	stack *path[HIST_LEN];
@@ -124,7 +132,16 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-	
+	if (hFlag)
+	{
+		for (uint16_t i = 0; i < HIST_LEN; i += 1)
+		{
+			if (histogram[i])
+			{
+				printf("hist[%u]: %u\n", i, histogram[i]);
+			}
+		}
+	}
 	/*
 	bitV *n = newVec(5);
 	printf("\n(0): %u\n", n->f); printVec(n);
@@ -193,16 +210,28 @@ uint32_t enqueueHist(queue **q, uint32_t hist[])
  */
 treeNode *buildTree(queue **q)
 {
+	int i = 0;
 	while ((*q)->head - 1 != ROOT)
 	{
 		treeNode l;
 		treeNode r;
+		printf("before dequeue:\n");
+		printQueue(*q);
 		dequeue(*q, &l);
+		printf("dequeue (1):\n");
+		printQueue(*q);
 		dequeue(*q, &r);
-		printf("dequeued: %u %u\n", l.count, r.count);
+		printf("dequeue (2):\n");
+		printQueue(*q);
+		printf("dequeued: %u, %u\n", l.count, r.count);
 		treeNode *j = join(convert(l), convert(r));
+		printf("enqueued: %u\n", j->count);
 		enqueue(*q, *j);
+		printf("after enqueue:\n");
+		printQueue(*q);
 		delNode(j);
+
+		i += 1;
 	}
 
 	treeNode tree;
