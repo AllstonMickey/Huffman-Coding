@@ -94,7 +94,6 @@ static inline bool appendStack(bitV *vec, stack *s)
 	{
 		// get the value of the bit and put it in the bv
 		uint8_t val = (s->entries[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
-		printf("setting %u\n", val);
 		if (val)
 		{
 			setBit(vec, vec->f);
