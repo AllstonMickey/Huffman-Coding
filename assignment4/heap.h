@@ -21,19 +21,18 @@
  * Sends the item at the end of the queue up the tree
  * until the heap properties are met.
  */
-static inline void percolate(queue **q)
+static inline void percolate(queue *q)
 {
-	uint32_t c = (*q)->head;
-	while (VALNODE(*q, c) < VALNODE(*q, parent(c)))
+	uint32_t c = q->head;
+	while (VALNODE(q, c) < VALNODE(q, parent(c)))
 	{
-		SWAP((*q)->nodes[c], (*q)->nodes[parent(c)]);
+		SWAP(q->nodes[c], q->nodes[parent(c)]);
 		c = parent(c);
 	}
 }
 
 uint32_t favorite(queue *q, uint32_t p)
 {
-	//printf("p: %u\n", p);
 	uint32_t l = leftChild(p);
 	uint32_t r = rightChild(p);
 
@@ -73,24 +72,21 @@ uint32_t favorite(queue *q, uint32_t p)
  * 	If it does, swap them.
  * 	If it does not, done.
  */
-static inline void recede(queue **q)
+static inline void recede(queue *q)
 {
 	uint32_t p = ROOT;
-	printf("initial favorite: %u\n", favorite(*q, p));
-	while (favorite(*q, p) != p)
+	while (favorite(q, p) != p)
 	{
-		printf("favorite: %u\n", favorite(*q, p));
-		if (VALNODE(*q, p) > VALNODE(*q, favorite(*q, p)))
+		if (VALNODE(q, p) > VALNODE(q, favorite(q, p)))
 		{
 			
-			uint32_t fav = favorite(*q, p);
+			uint32_t fav = favorite(q, p);
 			printf("swapping. . .\n");
-			SWAP((*q)->nodes[p], (*q)->nodes[favorite(*q, p)]);
+			SWAP(q->nodes[p], q->nodes[favorite(q, p)]);
 			p = fav;
 		}
 		else
 		{
-			printf("done. . .\n");
 			break;
 		}
 	}

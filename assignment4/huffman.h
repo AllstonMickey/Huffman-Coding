@@ -5,10 +5,8 @@
 
 # ifndef _HUFFMAN_H
 # define _HUFFMAN_H
-# include <stdlib.h>
-# include <stdio.h>
-# include <stdint.h>
-# include <stdbool.h>
+# include <stdlib.h> // free
+# include <stdio.h>  // putchar
 # include "stack.h"
 
 # ifndef NIL

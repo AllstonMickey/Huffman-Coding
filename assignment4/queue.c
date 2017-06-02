@@ -49,7 +49,7 @@ bool enqueue(queue *q, queueItem i)
 	q->nodes[q->head] = i;
 	if (!emptyQueue(q))
 	{
-		percolate(&q);
+		percolate(q);
 	}
 	q->head += 1;
 	
@@ -76,7 +76,7 @@ bool dequeue(queue *q, queueItem *i)
 	VALNODE(q, q->head) = 0;
 	printf("BEFORE RECEDE:\n");
 	printQueue(q);
-	recede(&q);
+	recede(q);
 	return true;
 }
 
@@ -95,7 +95,7 @@ bool emptyQueue(queue *q)
 void printQueue(queue *q)
 {
 	printf("Printing queue...\n");
-	for (uint32_t i = 0; i < 30; i += 1)
+	for (uint32_t i = 0; i < q->size; i += 1)
 	{
 		printf("pos %u: %u\n", i, VALNODE(q, i));
 	}

@@ -4,9 +4,9 @@
 # include <unistd.h>    // read
 # include <getopt.h>
 # include <string.h>
-# include "bv.h"        // bit vectors, stdint, stdio, stdlib
-# include "huffman.h"   // huffman trees, stacks, stdint, stdbool
-# include "queue.h"     // queues, heaps, stdint, stdbool
+# include "bv.h"        // stdint, stdlib, stdio
+# include "huffman.h"   // stdlib, stdio, "stack.h"
+# include "queue.h"     // stdint, stdbool
 
 # ifndef HIST_LEN
 # define HIST_LEN 256
@@ -16,8 +16,8 @@
 # define MAX_BUF 128
 # endif
 
-ssize_t loadHist(char *file, uint32_t hist[]);
-uint32_t enqueueHist(queue **q, uint32_t hist[]);
+ssize_t loadHist(char *file, uint32_t hist[HIST_LEN]);
+uint32_t enqueueHist(queue **q, uint32_t hist[HIST_LEN]);
 treeNode *buildTree(queue **q);
 uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileBytes,
 		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], stack *codes[HIST_LEN]);
@@ -26,8 +26,9 @@ void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves);
 
 int main(int argc, char **argv)
 {
-	char in[MAX_BUF] = {'\0'};
-	char out[MAX_BUF] = {'\0'};
+	char in[MAX_BUF] = {'\0'};  // set input path invalid by default
+	char out[MAX_BUF] = {'\0'}; // set output path invalid by default
+	
 	bool verbose = false; // print statistics?
 	bool pFlag = false;   // print the Huffman tree?
 	bool sFlag = false;   // print the stacks for each leaf?
@@ -102,9 +103,6 @@ int main(int argc, char **argv)
 
 	queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
 	uint16_t leafCount = enqueueHist(&q, histogram);
-	//printf("\nHistogram:\n");
-	//printQueue(q);
-	//printf("\nend of hist\n");
 	treeNode *huf = buildTree(&q);
 
 	stack *path[HIST_LEN];
@@ -142,16 +140,6 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-	/*
-	bitV *n = newVec(5);
-	printf("\n(0): %u\n", n->f); printVec(n);
-	appendStack(n, path['e']);
-	printf("\n(1): %u\n", n->f); printVec(n);
-	appendStack(n, path[0xFF]);
-	printf("\n(2): %u\n", n->f);
-	appendStack(n, path[0x0]);
-	printf("\n(3): %u\n", n->f);
-	*/
 
 	delTree(huf);
 	delQueue(q);
@@ -163,7 +151,7 @@ int main(int argc, char **argv)
  * Counts the number of occurrences of each byte in a file,
  * storing them in a histogram.
  */
-ssize_t loadHist(char *file, uint32_t hist[])
+ssize_t loadHist(char *file, uint32_t hist[HIST_LEN])
 {
 	int fd = open(file, O_RDONLY);
 	struct stat buffer;
@@ -176,6 +164,7 @@ ssize_t loadHist(char *file, uint32_t hist[])
 	{
 		hist[v->v[i]] += 1;
 	}
+
 	delVec(v);
 	close(fd);
 	return n;
@@ -186,10 +175,10 @@ ssize_t loadHist(char *file, uint32_t hist[])
  * Enqueues all 'active' entries of the histogram as treeNodes.
  * Priority is determined by the count of each node (the freq. in hist.)
  */
-uint32_t enqueueHist(queue **q, uint32_t hist[])
+uint32_t enqueueHist(queue **q, uint32_t hist[HIST_LEN])
 {
 	uint16_t leaves = 0;
-	for (int i = 0; i < HIST_LEN; i += 1)
+	for (uint16_t i = 0; i < HIST_LEN; i += 1)
 	{
 		if (hist[i])
 		{
@@ -210,28 +199,14 @@ uint32_t enqueueHist(queue **q, uint32_t hist[])
  */
 treeNode *buildTree(queue **q)
 {
-	int i = 0;
 	while ((*q)->head - 1 != ROOT)
 	{
-		treeNode l;
-		treeNode r;
-		printf("before dequeue:\n");
-		printQueue(*q);
+		treeNode l, r;
 		dequeue(*q, &l);
-		printf("dequeue (1):\n");
-		printQueue(*q);
 		dequeue(*q, &r);
-		printf("dequeue (2):\n");
-		printQueue(*q);
-		printf("dequeued: %u, %u\n", l.count, r.count);
 		treeNode *j = join(convert(l), convert(r));
-		printf("enqueued: %u\n", j->count);
 		enqueue(*q, *j);
-		printf("after enqueue:\n");
-		printQueue(*q);
 		delNode(j);
-
-		i += 1;
 	}
 
 	treeNode tree;
@@ -239,6 +214,15 @@ treeNode *buildTree(queue **q)
 	return convert(tree);
 }
 
+/* writeOFile:
+ *
+ * Writes encoded data to the output file.
+ * 1. 32 bits of magicNumber.
+ * 2. 64 bits of the size of the source file in bytes.
+ * 3. 16 bits of Huffman Tree size
+ * 4. Post-order traversal of the tree and visits to interior nodes and leaves
+ * 5. Encoded bit paths of the leaves
+ */
 uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileBytes,
 		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], stack *codes[HIST_LEN])
 {
@@ -265,9 +249,15 @@ uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileByte
 	write(fdOut, &sFileBytes, sizeof(sFileBytes));
 	write(fdOut, &treeSize, sizeof(treeSize));
 	dumpTree(t, fdOut);
-	return dumpCodes(fdOut, sFile, codes);
+	uint64_t oFileBits = dumpCodes(fdOut, sFile, codes);
+	close(fdOut);
+	return oFileBits;
 }
 
+/* dumpCodes:
+ *
+ * Writes the encoded bit paths of the leaves from the sFile to the oFile.
+ */
 uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN])
 {
 	int fdIn;
@@ -297,11 +287,13 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN]
 		appendStack(readCodes, codes[readBytes->v[i]]);
 	}
 
-	for (int i = 0; i < (readCodes->f / 8) + 1; i += 1)
+	for (uint64_t i = 0; i < (readCodes->f / 8) + 1; i += 1)
 	{
 		write(outputFildes, &(readCodes->v[i]), sizeof(readCodes->v[i]));
 	}
-	return (uint64_t) readCodes->f;
+
+	close(fdIn);
+	return readCodes->f;
 }
 
 void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves)

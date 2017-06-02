@@ -5,10 +5,9 @@
 
 # ifndef _BVector
 # define _BVector
-# include <stdint.h>
 # include <stdlib.h> // malloc, calloc, free
 # include <stdio.h>  // printf
-# include "stack.h" // appendBits
+# include "stack.h"  // appendStack
 
 # ifndef NIL
 # define NIL (void *) 0
@@ -93,7 +92,7 @@ static inline bool appendStack(bitV *vec, stack *s)
 
 	for (int i = 0; i < s->size; i += 1) // for each bit in stack
 	{
-		// get the value of the bit
+		// get the value of the bit and put it in the bv
 		uint8_t val = (s->entries[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
 		if (val)
 		{
