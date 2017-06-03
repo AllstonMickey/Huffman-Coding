@@ -296,8 +296,9 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN]
 		appendStack(readCodes, codes[readBytes->v[i]]);
 	}
 
-	for (uint64_t i = 0; i < (readCodes->f >> 3); i += 1) // for each decoded byte
+	for (uint64_t i = 0; i < readCodes->f / 8 + 1; i += 1) // for each decoded byte
 	{
+		printf("wrote: %u\n", readCodes->v[i]);
 		write(outputFildes, &(readCodes->v[i]), sizeof(readCodes->v[i]));
 	}
 
