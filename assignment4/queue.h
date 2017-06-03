@@ -2,6 +2,7 @@
 # define _QUEUE_H
 # include <stdint.h>
 # include <stdbool.h>
+# include "huffman.h"
 
 # ifndef NIL
 # define NIL (void *) 0
@@ -15,7 +16,7 @@
 # define VALNODE(q, n) ((q)->nodes[(n)].count)
 # endif
 
-typedef QUEUE_ITEM queueItem;
+typedef treeNode queueItem;
 
 typedef struct queue
 {

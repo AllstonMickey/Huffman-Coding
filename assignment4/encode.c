@@ -20,7 +20,7 @@ ssize_t loadHist(char *file, uint32_t hist[HIST_LEN]);
 uint32_t enqueueHist(queue **q, uint32_t hist[HIST_LEN]);
 treeNode *buildTree(queue **q);
 uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileBytes,
-		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], code c[HIST_LEN]);
+		    uint16_t leaves, treeNode *t, code c[HIST_LEN]);
 uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN]);
 void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves);
 
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	bool hFlag = false;   // print the histogram?
 
 	int opt;
-	while ((opt = getopt(argc, argv, "i:o:vpch")) != -1)
+	while ((opt = getopt(argc, argv, "i:o:Avpch")) != -1)
 	{
 		switch (opt)
 		{
@@ -57,6 +57,14 @@ int main(int argc, char **argv)
 					{
 						out[MAX_BUF - 1] = '\0';
 					}
+					break;
+				}
+			case 'A':
+				{
+					verbose = true;
+					pFlag = true;
+					cFlag = true;
+					hFlag = true;
 					break;
 				}
 			case 'v':
@@ -105,23 +113,11 @@ int main(int argc, char **argv)
 	uint16_t leafCount = enqueueHist(&q, histogram);
 	treeNode *huf = buildTree(&q);
 	
-	
 	code paths[HIST_LEN];
-	//for (uint16_t i = 0; i < HIST_LEN; i += 1)
-	{
-	//	paths[i] = newCode();
-	}
 	code s = newCode();
-	
-	//stack *path[HIST_LEN];
-	//stack *s = newStack(HIST_LEN, false);
-	
-	//buildCode(huf, s, path);
-
-	
 	buildCode(huf, s, paths);
 	
-	uint64_t outputNBits = writeOFile(out, in, inputNBytes, leafCount, huf, histogram, paths);
+	uint64_t outputNBits = writeOFile(out, in, inputNBytes, leafCount, huf, paths);
 
 	if (verbose)
 	{
@@ -140,7 +136,6 @@ int main(int argc, char **argv)
 				printf("paths[%u]: ", i);
 				printCode(paths[i]);
 				printf("\n");
-				//printStackBits(paths[i]);
 			}
 		}
 	}
@@ -154,17 +149,6 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-	
-	
-	//for (uint16_t i = 0; i < HIST_LEN; i += 1)
-	//{
-	//	if (histogram[i])
-	//	{
-	//		delStack(path[i]);
-	//	}
-	//}
-
-	//delStack(s);
 	
 	delTree(huf);
 	delQueue(q);
@@ -240,7 +224,7 @@ treeNode *buildTree(queue **q)
 }
 
 /* writeOFile:
- * ! CHANGED STACK TO CODE !
+ *
  * Writes encoded data to the output file.
  * 1. 32 bits of magicNumber.
  * 2. 64 bits of the size of the source file in bytes.
@@ -249,7 +233,7 @@ treeNode *buildTree(queue **q)
  * 5. Encoded bit paths of the leaves
  */
 uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileBytes,
-		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], code c[HIST_LEN])
+		uint16_t leaves, treeNode *t, code c[HIST_LEN])
 {
 	int fdOut;
 	if (oFile[0])
@@ -281,7 +265,7 @@ uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileByte
 }
 
 /* dumpCodes:
- * ! CHANGED STACK TO CODE !
+ *
  * Writes the encoded bit paths of the leaves from the sFile to the oFile.
  */
 uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
@@ -313,21 +297,10 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 		appendCode(readCodes, &(c[readBytes->v[i]]));
 	}
 
-	//char str[] = "maga";
 	for (uint64_t i = 0; i < readCodes->f / 8 + 1; i += 1)
 	{
 		write(outputFildes, &(readCodes->v[i]), sizeof(readCodes->v[i]));
-		//write(outputFildes, str, sizeof(str));
 	}
-
-	/*
-	for (uint64_t i = 0; i < readCodes->f / 8 + 1; i += 1) // for each decoded byte
-	{
-		// write(fd to write to, buffer to read from, size of bytes to read
-		
-		//write(outputFildes, &(c[readBytes->v[i]]), sizeof(c[readBytes->v[i]]));
-	}
-	*/
 
 	delVec(readBytes);
 	close(fdIn);
@@ -338,7 +311,7 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 
 void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves)
 {
-	printf("Original %u bits: ", sFileBits);
+	printf("Original %lu bits: ", sFileBits);
 	printf("leaves %u (%u bytes) ", leaves, (3 * leaves) - 1);
-	printf("encoding %u bits (%.4f%)\n", oFileBits, ((float) oFileBits / sFileBits) * 100);
+	printf("encoding %lu bits (%.4f%%).\n", oFileBits, ((double) oFileBits / sFileBits) * 100);
 }

@@ -104,18 +104,18 @@ void printTree(treeNode *t, int depth)
 			if (isalnum(t->symbol))
 			{
 				spaces(4 * depth);
-				printf("'%c' (%llu)\n", t->symbol, t->count);
+				printf("'%c' (%lu)\n", t->symbol, t->count);
 			}
 			else
 			{
 				spaces(4 * depth);
-				printf("0x%X (%llu)\n", t->symbol, t->count);
+				printf("0x%X (%lu)\n", t->symbol, t->count);
 			}
 		}
 		else
 		{
 			spaces(4 * depth);
-			printf("$ (%llu)\n", t->count);
+			printf("$ (%lu)\n", t->count);
 		}
 		printTree(t->right, depth + 1);
 	}
@@ -126,7 +126,7 @@ void printNode(treeNode *t)
 {
 	printf("node %p:\n", (void *) t);
 	printf("\tsymbol: %c %u\n", (char) t->symbol, t->symbol);
-	printf("\tcount : %u\n", t->count);
+	printf("\tcount : %lu\n", t->count);
 	printf("\t*left : %p\n", (void *) t->left);
 	printf("\t*right: %p\n", (void *) t->right);
 }

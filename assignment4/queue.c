@@ -95,6 +95,6 @@ void printQueue(queue *q)
 	printf("Printing queue...\n");
 	for (uint32_t i = 0; i < q->size; i += 1)
 	{
-		printf("pos %u: %u\n", i, VALNODE(q, i));
+		printf("pos %u: %lu\n", i, VALNODE(q, i));
 	}
 }
