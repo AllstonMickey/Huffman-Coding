@@ -54,7 +54,7 @@ static inline bool popCode(code *c, uint32_t *k)
 	else // set k to value of popped bit
 	{
 		c->l -= 1;
-		*k = ((0x1 << (c->l % 8)) % c->bits[c->l / 8]) >> (c->l % 8);
+		*k = ((0x1 << (c->l % 8)) & c->bits[c->l / 8]) >> (c->l % 8);
 		return true;
 	}
 }
@@ -67,6 +67,15 @@ static inline bool emptyCode(code *c)
 static inline bool fullCode(code *c)
 {
 	return c->l == 256;
+}
+
+static inline void printCode(const code c)
+{
+	for (uint32_t i = 0; i < c.l; i += 1)
+	{
+		uint8_t val = ((0x1 << (i % 8)) & c.bits[i / 8]) >> (i % 8);
+		printf("%u", val);
+	}
 }
 
 # endif

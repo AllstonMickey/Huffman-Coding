@@ -58,22 +58,23 @@ int32_t stepTree(treeNode *root, treeNode **t, uint32_t code);
 */
 
 // Parse a Huffman tree to build codes
-void buildCode(treeNode *t, stack *s, stack *table[256])
+void buildCode(treeNode *t, code s, code table[256])
 {
 	if (t->leaf)
 	{
-		table[t->symbol] = deepCopyStack(s, true, false);
+		table[t->symbol] = s;
 		return;
 	}
-
-	bool tmp;
-	pushBit(s, 0);
+	
+	uint32_t tmp;
+	
+	pushCode(&s, 0);
 	buildCode(t->left, s, table);
-	popBit(s, &tmp);
-
-	pushBit(s, 1);
+	popCode(&s, &tmp);
+	
+	pushCode(&s, 1);
 	buildCode(t->right, s, table);
-	popBit(s, &tmp);
+	popCode(&s, &tmp);
 }
 
 // Join two subtrees

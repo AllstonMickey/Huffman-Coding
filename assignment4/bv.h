@@ -7,7 +7,7 @@
 # define _BVector
 # include <stdlib.h> // malloc, calloc, free
 # include <stdio.h>  // printf
-# include "stack.h"  // appendStack
+# include "code.h"
 
 # ifndef NIL
 # define NIL (void *) 0
@@ -73,6 +73,38 @@ static inline uint8_t valBit(bitV *vec, uint64_t b)
 	return ((vec->v)[b >> 3] & (0x1 << (b % 8))) >> (b % 8);
 }
 
+static inline bool appendCode(bitV *vec, code *c)
+{
+	while ((vec->f + c->l) > vec->l)
+	{
+		uint8_t *tmp = (uint8_t *) realloc(vec->v, vec->l + KB);
+		if (tmp)
+		{
+			vec->v = tmp;
+			vec->l += KB;
+		}
+		else
+		{
+			tmp = NIL;
+			return false;
+		}
+	}
+	
+	for (uint32_t i = 0; i < c->l; i += 1) // for each bit in the stack
+	{
+		uint8_t val = (c->bits[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
+		if (val)
+		{
+			setBit(vec, vec->f);
+		}
+		else
+		{
+			clrBit(vec, vec->f);
+		}
+	}
+	return true;
+}
+/*
 static inline bool appendStack(bitV *vec, stack *s)
 {
 	while ((vec->f + s->size) > vec->l)
@@ -105,7 +137,7 @@ static inline bool appendStack(bitV *vec, stack *s)
 	}
 	return true;
 }
-
+*/
 static inline uint32_t lenVec(bitV *vec)
 {
 	return vec->l;
@@ -113,7 +145,7 @@ static inline uint32_t lenVec(bitV *vec)
 
 static inline void printVec(bitV *vec)
 {
-	for (uint32_t i = 0; i < (vec->l); i += 1)
+	for (uint32_t i = 0; i < (vec->f); i += 1)
 	{
 		printf("%u", valBit(vec, i));
 		if ((i + 1) % 4 == 0)

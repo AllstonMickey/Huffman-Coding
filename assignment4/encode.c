@@ -20,8 +20,8 @@ ssize_t loadHist(char *file, uint32_t hist[HIST_LEN]);
 uint32_t enqueueHist(queue **q, uint32_t hist[HIST_LEN]);
 treeNode *buildTree(queue **q);
 uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileBytes,
-		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], stack *codes[HIST_LEN]);
-uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN]);
+		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], code c[HIST_LEN]);
+uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN]);
 void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves);
 
 int main(int argc, char **argv)
@@ -31,11 +31,11 @@ int main(int argc, char **argv)
 	
 	bool verbose = false; // print statistics?
 	bool pFlag = false;   // print the Huffman tree?
-	bool sFlag = false;   // print the stacks for each leaf?
+	bool cFlag = false;   // print the codes?
 	bool hFlag = false;   // print the histogram?
 
 	int opt;
-	while ((opt = getopt(argc, argv, "i:o:vpsh")) != -1)
+	while ((opt = getopt(argc, argv, "i:o:vpch")) != -1)
 	{
 		switch (opt)
 		{
@@ -69,9 +69,9 @@ int main(int argc, char **argv)
 					pFlag = true;
 					break;
 				}
-			case 's':
+			case 'c':
 				{
-					sFlag = true;
+					cFlag = true;
 					break;
 				}
 			case 'h':
@@ -104,12 +104,24 @@ int main(int argc, char **argv)
 	queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
 	uint16_t leafCount = enqueueHist(&q, histogram);
 	treeNode *huf = buildTree(&q);
+	
+	
+	code paths[HIST_LEN];
+	//for (uint16_t i = 0; i < HIST_LEN; i += 1)
+	{
+	//	paths[i] = newCode();
+	}
+	code s = newCode();
+	
+	//stack *path[HIST_LEN];
+	//stack *s = newStack(HIST_LEN, false);
+	
+	//buildCode(huf, s, path);
 
-	stack *path[HIST_LEN];
-	stack *s = newStack(HIST_LEN, false);
-	buildCode(huf, s, path);
-
-	uint64_t outputNBits = writeOFile(out, in, inputNBytes, leafCount, huf, histogram, path);
+	
+	buildCode(huf, s, paths);
+	
+	uint64_t outputNBits = writeOFile(out, in, inputNBytes, leafCount, huf, histogram, paths);
 
 	if (verbose)
 	{
@@ -119,14 +131,16 @@ int main(int argc, char **argv)
 	{
 		printTree(huf, 0);
 	}
-	if (sFlag)
+	if (cFlag)
 	{
 		for (uint16_t i = 0; i < HIST_LEN; i += 1)
 		{
 			if (histogram[i])
 			{
-				printf("path[%u]: ", i);
-				printStackBits(path[i]);
+				printf("paths[%u]: ", i);
+				printCode(paths[i]);
+				printf("\n");
+				//printStackBits(paths[i]);
 			}
 		}
 	}
@@ -141,15 +155,17 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	for (uint16_t i = 0; i < HIST_LEN; i += 1)
-	{
-		if (histogram[i])
-		{
-			delStack(path[i]);
-		}
-	}
+	
+	//for (uint16_t i = 0; i < HIST_LEN; i += 1)
+	//{
+	//	if (histogram[i])
+	//	{
+	//		delStack(path[i]);
+	//	}
+	//}
 
-	delStack(s);
+	//delStack(s);
+	
 	delTree(huf);
 	delQueue(q);
 	return 0;
@@ -224,7 +240,7 @@ treeNode *buildTree(queue **q)
 }
 
 /* writeOFile:
- *
+ * ! CHANGED STACK TO CODE !
  * Writes encoded data to the output file.
  * 1. 32 bits of magicNumber.
  * 2. 64 bits of the size of the source file in bytes.
@@ -233,7 +249,7 @@ treeNode *buildTree(queue **q)
  * 5. Encoded bit paths of the leaves
  */
 uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileBytes,
-		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], stack *codes[HIST_LEN])
+		uint16_t leaves, treeNode *t, uint32_t hist[HIST_LEN], code c[HIST_LEN])
 {
 	int fdOut;
 	if (oFile[0])
@@ -258,16 +274,17 @@ uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileByte
 	write(fdOut, &sFileBytes, sizeof(sFileBytes));
 	write(fdOut, &treeSize, sizeof(treeSize));
 	dumpTree(t, fdOut);
-	uint64_t oFileBits = dumpCodes(fdOut, sFile, codes);
+	uint64_t oFileBits = dumpCodes(fdOut, sFile, c);
+
 	close(fdOut);
 	return oFileBits;
 }
 
 /* dumpCodes:
- *
+ * ! CHANGED STACK TO CODE !
  * Writes the encoded bit paths of the leaves from the sFile to the oFile.
  */
-uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN])
+uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 {
 	int fdIn;
 	if (sFile[0])
@@ -293,14 +310,24 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], stack *codes[HIST_LEN]
 	bitV *readCodes = newVec(KB);
 	for (int i = 0; i < n; i += 1)
 	{
-		appendStack(readCodes, codes[readBytes->v[i]]);
+		appendCode(readCodes, &(c[readBytes->v[i]]));
 	}
 
+	//char str[] = "maga";
+	for (uint64_t i = 0; i < readCodes->f / 8 + 1; i += 1)
+	{
+		write(outputFildes, &(readCodes->v[i]), sizeof(readCodes->v[i]));
+		//write(outputFildes, str, sizeof(str));
+	}
+
+	/*
 	for (uint64_t i = 0; i < readCodes->f / 8 + 1; i += 1) // for each decoded byte
 	{
-		printf("wrote: %u\n", readCodes->v[i]);
-		write(outputFildes, &(readCodes->v[i]), sizeof(readCodes->v[i]));
+		// write(fd to write to, buffer to read from, size of bytes to read
+		
+		//write(outputFildes, &(c[readBytes->v[i]]), sizeof(c[readBytes->v[i]]));
 	}
+	*/
 
 	delVec(readBytes);
 	close(fdIn);

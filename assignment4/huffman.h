@@ -7,7 +7,7 @@
 # define _HUFFMAN_H
 # include <stdlib.h> // free
 # include <stdio.h>  // putchar
-# include "stack.h"
+# include "code.h"
 
 # ifndef NIL
 # define NIL (void *) 0
@@ -39,7 +39,7 @@ treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 int32_t stepTree(treeNode *root, treeNode **t, uint32_t code);
 
 // Parse a Huffman tree to build codes
-void buildCode(treeNode *t, stack *s, stack *table[256]);
+void buildCode(treeNode *t, code s, code table[256]);
 
 static inline void delNode(treeNode *h)
 {
