@@ -9,7 +9,7 @@ DEFINE_STACK     = -DSTACK_ITEM=$(STACKTYPE)
 DEFINE_QUEUE     = -DQUEUE_ITEM=treeNode
 
 .PHONY: all
-all : encode
+all : encode decode
 
 encode : encode.o stack.o huffman.o queue.o
 	$(CC) -std=c99 encode.o stack.o huffman.o queue.o -o encode
@@ -17,6 +17,13 @@ encode : encode.o stack.o huffman.o queue.o
 encode.o : encode.c stack.h huffman.h queue.h
 	$(eval STACKTYPE=$(ENCODE_STACKTYPE))
 	$(CC) $(DEFINE_STACK) $(DEFINE_QUEUE) -std=c99 encode.c -c
+
+decode : decode.o stack.o huffman.o
+	$(CC) -std=c99 decode.o stack.o huffman.o -o decode
+
+decode.o : decode.c stack.h huffman.h
+	$(eval STACKTYPE=$(DECODE_STACKTYPE))
+	$(CC) $(DEFINE_STACK) -std=c99 decode.c -c
 
 stack.o : stack.c stack.h
 	$(CC) $(DEFINE_STACK) -std=c99 stack.c -c
