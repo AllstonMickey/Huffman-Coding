@@ -104,40 +104,7 @@ static inline bool appendCode(bitV *vec, code *c)
 	}
 	return true;
 }
-/*
-static inline bool appendStack(bitV *vec, stack *s)
-{
-	while ((vec->f + s->size) > vec->l)
-	{
-		uint8_t *tmp = (uint8_t *) realloc(vec->v, vec->l + KB);
-		if (tmp)
-		{
-			vec->v = tmp;
-			vec->l += KB;
-		}
-		else
-		{
-			tmp = NIL;
-			return false;
-		}
-	}
 
-	for (int i = 0; i < s->size; i += 1) // for each bit in stack
-	{
-		// get the value of the bit and put it in the bv
-		uint8_t val = (s->entries[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
-		if (val)
-		{
-			setBit(vec, vec->f);
-		}
-		else
-		{
-			clrBit(vec, vec->f);
-		}
-	}
-	return true;
-}
-*/
 static inline uint32_t lenVec(bitV *vec)
 {
 	return vec->l;
