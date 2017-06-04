@@ -15,7 +15,8 @@
 # define MAGIC_NUM 0xdeadd00d
 # endif
 
-uint64_t readSFile(char *file);
+int64_t readSFile(char *file);
+treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 
 int main(int argc, char **argv)
 {
@@ -90,12 +91,12 @@ int main(int argc, char **argv)
 		scanf("%s", in);
 	}
 
-	printf("%u\n", readSFile(in));
+	readSFile(in);
 
 	return 0;
 }
 
-uint64_t readSFile(char *file)
+int64_t readSFile(char *file)
 {
 	int fd = open(file, O_RDONLY);
 	if (fd == -1)
@@ -113,10 +114,47 @@ uint64_t readSFile(char *file)
 	{
 		printf("Wrong magic number.  Exiting\n");
 		close(fd);
-		return 1;
+		return -1;
 	}
 
-	printf("Success!\n");
-	return 2;
+	uint64_t oFileBytes;
+	read(fd, &oFileBytes, sizeof(oFileBytes));
+
+	uint16_t treeSize;
+	read(fd, &treeSize, sizeof(treeSize));
+	
+	uint8_t savedTree[treeSize];
+	read(fd, savedTree, treeSize);
+
+	treeNode *t = loadTree(savedTree, treeSize);
+	printTree(t, 0);
+}
+
+// Build a tree from the saved tree
+treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes)
+{
+	stack *s = newStack(treeBytes);
+	uint64_t i = 0;
+	while (i < treeBytes)
+	{	
+		if (savedTree[i] == 'L') // leaf
+		{
+			treeNode *n = newNode(savedTree[i + 1], 0, true);
+			push(s, *n);
+			i += 2;
+		}
+		else // interior node
+		{
+			treeNode l, r;
+			pop(s, &r);
+			pop(s, &l);
+			treeNode *j = join(convert(l), convert(r));
+			push(s, *j);
+			i += 1;
+		}
+	}
+	treeNode huf;
+	pop(s, &huf);
+	return convert(huf);
 }
 
