@@ -28,4 +28,4 @@ queue.o : queue.c queue.h huffman.h
 
 .PHONY: clean
 clean :
-	$(RM) queue.o huffman.o encode.o encode
+	$(RM) queue.o huffman.o stack.o encode.o decode.o encode decode
