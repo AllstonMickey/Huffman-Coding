@@ -299,21 +299,18 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 
 	struct stat buffer;
 	fstat(fdIn, &buffer);
-	bitV *readBytes = newVec(buffer.st_size * BITS);
-	ssize_t n = read(fdIn, readBytes->v, buffer.st_size);
+	uint8_t readBytes[buffer.st_size];
+	ssize_t n = read(fdIn, readBytes, buffer.st_size);
 
 	bitV *readCodes = newVec(KB);
 	for (int i = 0; i < n; i += 1)
 	{
-		appendCode(readCodes, &(c[readBytes->v[i]]));
+		appendCode(readCodes, &c[readBytes[i]]);
 	}
 
-	for (uint64_t i = 0; i < readCodes->f / 8 + 1; i += 1)
-	{
-		write(outputFildes, &(readCodes->v[i]), sizeof(readCodes->v[i]));
-	}
-
-	delVec(readBytes);
+	uint64_t bvSize = sizeof(readCodes->v[0]) * (readCodes->f / BITS + 1);
+	write(outputFildes, readCodes->v, bvSize);
+	
 	close(fdIn);
 	uint64_t oFileBits = readCodes->f;
 	delVec(readCodes);
