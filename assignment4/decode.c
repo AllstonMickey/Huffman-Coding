@@ -15,7 +15,11 @@
 # define MAGIC_NUM 0xdeadd00d
 # endif
 
-int64_t readSFile(char *file);
+# ifndef BITS
+# define BITS 8
+# endif
+
+uint64_t readSFile(char *file, treeNode **h, bitV **b);
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 
 int main(int argc, char **argv)
@@ -91,12 +95,75 @@ int main(int argc, char **argv)
 		scanf("%s", in);
 	}
 
-	readSFile(in);
+	treeNode *huf;
+	bitV *bits;
+	uint64_t oFileSize = readSFile(in, &huf, &bits);
+	uint8_t s[oFileSize];
+	uint64_t s_i = 0;
+	printf("oFileSize: %u\n", oFileSize);
+	printf("bits->l:   %u\n", bits->l);
 
+	treeNode *c = huf;
+	uint32_t code;
+	uint8_t sym;
+	for (uint64_t i = 0; i < bits->l; i += 1)
+	{
+		printf("%u", i);
+		uint8_t bitVal = ((bits->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
+		printf(" (1)");
+		if (bitVal == 0)
+		{
+			printf(" (2)");
+			if (c->left)
+			{
+				if (c->left->symbol == '$')
+				{
+					printf(" (3)");
+					c = c->left;
+				}
+				else
+				{
+					printf(" (4)");
+					s[s_i++] = c->left->symbol;
+					c = huf;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+		else if (bitVal == 1)
+		{
+			printf(" (5)");
+			if (c->right)
+			{
+				if (c->right->symbol == '$')
+				{
+					printf(" (6)");
+					c = c->right;
+				}
+				else
+				{
+					printf(" (7)");
+					s[s_i++] = c->right->symbol;
+					c = huf;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+		printf("\n");
+	}
+	
+	int fdOut = open(out, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+	write(fdOut, s, sizeof(s[s_i]) * oFileSize);
 	return 0;
 }
 
-int64_t readSFile(char *file)
+uint64_t readSFile(char *file, treeNode **h, bitV **b)
 {
 	int fd = open(file, O_RDONLY);
 	if (fd == -1)
@@ -114,7 +181,7 @@ int64_t readSFile(char *file)
 	{
 		printf("Wrong magic number.  Exiting\n");
 		close(fd);
-		return -1;
+		return 1;
 	}
 
 	uint64_t oFileBytes;
@@ -122,12 +189,20 @@ int64_t readSFile(char *file)
 
 	uint16_t treeSize;
 	read(fd, &treeSize, sizeof(treeSize));
-	
+
 	uint8_t savedTree[treeSize];
 	read(fd, savedTree, treeSize);
-
 	treeNode *t = loadTree(savedTree, treeSize);
-	printTree(t, 0);
+	*h = t;
+
+	struct stat buffer;
+	fstat(fd, &buffer);
+
+	uint64_t leftover =  buffer.st_size - (sizeof(oFileBytes) + sizeof(treeSize) + treeSize);
+	bitV *v = newVec(leftover * BITS);
+	read(fd, v->v, leftover);
+	*b = v;
+	return oFileBytes;
 }
 
 // Build a tree from the saved tree
