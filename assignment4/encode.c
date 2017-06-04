@@ -16,11 +16,15 @@
 # define MAX_BUF 128
 # endif
 
+# ifndef BITS
+# define BITS 8
+# endif
+
 ssize_t loadHist(char *file, uint32_t hist[HIST_LEN]);
 uint32_t enqueueHist(queue **q, uint32_t hist[HIST_LEN]);
 treeNode *buildTree(queue **q);
 uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileBytes,
-		    uint16_t leaves, treeNode *t, code c[HIST_LEN]);
+		uint16_t leaves, treeNode *t, code c[HIST_LEN]);
 uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN]);
 void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves);
 
@@ -28,7 +32,7 @@ int main(int argc, char **argv)
 {
 	char in[MAX_BUF] = {'\0'};  // set input path invalid by default
 	char out[MAX_BUF] = {'\0'}; // set output path invalid by default
-	
+
 	bool verbose = false; // print statistics?
 	bool pFlag = false;   // print the Huffman tree?
 	bool cFlag = false;   // print the codes?
@@ -108,50 +112,52 @@ int main(int argc, char **argv)
 	histogram[0] = 1;
 	histogram[HIST_LEN - 1] = 1;
 	uint64_t inputNBytes = (uint64_t) loadHist(in, histogram);
+	if (inputNBytes)
+	{
+		queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
+		uint16_t leafCount = enqueueHist(&q, histogram);
+		treeNode *huf = buildTree(&q);
 
-	queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
-	uint16_t leafCount = enqueueHist(&q, histogram);
-	treeNode *huf = buildTree(&q);
-	
-	code paths[HIST_LEN];
-	code s = newCode();
-	buildCode(huf, s, paths);
-	
-	uint64_t outputNBits = writeOFile(out, in, inputNBytes, leafCount, huf, paths);
+		code paths[HIST_LEN];
+		code s = newCode();
+		buildCode(huf, s, paths);
 
-	if (verbose)
-	{
-		printStatistics(inputNBytes * 8, outputNBits, leafCount);
-	}
-	if (pFlag)
-	{
-		printTree(huf, 0);
-	}
-	if (cFlag)
-	{
-		for (uint16_t i = 0; i < HIST_LEN; i += 1)
+		uint64_t outputNBits = writeOFile(out, in, inputNBytes, leafCount, huf, paths);
+
+		if (verbose)
 		{
-			if (histogram[i])
+			printStatistics(inputNBytes * 8, outputNBits, leafCount);
+		}
+		if (pFlag)
+		{
+			printTree(huf, 0);
+		}
+		if (cFlag)
+		{
+			for (uint16_t i = 0; i < HIST_LEN; i += 1)
 			{
-				printf("paths[%u]: ", i);
-				printCode(paths[i]);
-				printf("\n");
+				if (histogram[i])
+				{
+					printf("paths[%u]: ", i);
+					printCode(paths[i]);
+					printf("\n");
+				}
 			}
 		}
-	}
-	if (hFlag)
-	{
-		for (uint16_t i = 0; i < HIST_LEN; i += 1)
+		if (hFlag)
 		{
-			if (histogram[i])
+			for (uint16_t i = 0; i < HIST_LEN; i += 1)
 			{
-				printf("hist[%u]: %u\n", i, histogram[i]);
+				if (histogram[i])
+				{
+					printf("hist[%u]: %u\n", i, histogram[i]);
+				}
 			}
 		}
+
+		delTree(huf);
+		delQueue(q);
 	}
-	
-	delTree(huf);
-	delQueue(q);
 	return 0;
 }
 
@@ -163,10 +169,15 @@ int main(int argc, char **argv)
 ssize_t loadHist(char *file, uint32_t hist[HIST_LEN])
 {
 	int fd = open(file, O_RDONLY);
+	if (fd == -1)
+	{
+		perror("Cannot open input file");
+		return 0;
+	}
+
 	struct stat buffer;
 	fstat(fd, &buffer);
-
-	bitV *v = newVec(buffer.st_size * 8);
+	bitV *v = newVec(buffer.st_size * BITS);
 	ssize_t n = read(fd, v->v, buffer.st_size);
 
 	for (ssize_t i = 0; i < buffer.st_size; i += 1)
@@ -288,7 +299,7 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 
 	struct stat buffer;
 	fstat(fdIn, &buffer);
-	bitV *readBytes = newVec(buffer.st_size * 8);
+	bitV *readBytes = newVec(buffer.st_size * BITS);
 	ssize_t n = read(fdIn, readBytes->v, buffer.st_size);
 
 	bitV *readCodes = newVec(KB);
@@ -315,3 +326,4 @@ void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves)
 	printf("leaves %u (%u bytes) ", leaves, (3 * leaves) - 1);
 	printf("encoding %lu bits (%.4f%%).\n", oFileBits, ((double) oFileBits / sFileBits) * 100);
 }
+
