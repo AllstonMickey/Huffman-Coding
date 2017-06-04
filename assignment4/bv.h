@@ -80,8 +80,13 @@ static inline bool appendCode(bitV *vec, code *c)
 		uint8_t *tmp = (uint8_t *) realloc(vec->v, vec->l + KB);
 		if (tmp)
 		{
+			uint64_t oldLen = vec->l;
 			vec->v = tmp;
 			vec->l += KB;
+			for (uint64_t i = oldLen; i < vec->l; i += 1)
+			{
+				(vec->v)[i >> 3] &= ~(0x1 << (i % 8));
+			}
 		}
 		else
 		{
@@ -89,7 +94,7 @@ static inline bool appendCode(bitV *vec, code *c)
 			return false;
 		}
 	}
-	
+
 	for (uint32_t i = 0; i < c->l; i += 1) // for each bit in the stack
 	{
 		uint8_t val = (c->bits[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
