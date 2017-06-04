@@ -177,15 +177,14 @@ ssize_t loadHist(char *file, uint32_t hist[HIST_LEN])
 
 	struct stat buffer;
 	fstat(fd, &buffer);
-	bitV *v = newVec(buffer.st_size * BITS);
-	ssize_t n = read(fd, v->v, buffer.st_size);
+	uint8_t symbol[buffer.st_size];
+	ssize_t n = read(fd, symbol, buffer.st_size);
 
 	for (ssize_t i = 0; i < buffer.st_size; i += 1)
 	{
-		hist[v->v[i]] += 1;
+		hist[symbol[i]] += 1;
 	}
 
-	delVec(v);
 	close(fd);
 	return n;
 }
