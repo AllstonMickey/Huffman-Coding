@@ -19,6 +19,10 @@
 # define BITS 8
 # endif
 
+# ifndef EMPTY
+# define EMPTY(str) (str[0] == '\0')
+# endif
+
 uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b);
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v);
@@ -79,7 +83,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	while (in[0] == '\0')
+	while (EMPTY(in))
 	{
 		printf("Enter an input file path: ");
 		scanf("%s", in);
@@ -206,7 +210,7 @@ treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes)
 void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
 {
 	int fdOut;
-	if (oFile[0])
+	if (!EMPTY(oFile))
 	{
 		fdOut = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
 	}

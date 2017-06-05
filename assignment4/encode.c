@@ -20,6 +20,10 @@
 # define BITS 8
 # endif
 
+# ifndef EMPTY
+# define EMPTY(str) (str[0] == '\0')
+# endif
+
 ssize_t loadHist(char *file, uint32_t hist[HIST_LEN]);
 uint32_t enqueueHist(queue **q, uint32_t hist[HIST_LEN]);
 treeNode *buildTree(queue **q);
@@ -102,7 +106,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	while (in[0] == '\0')
+	while (EMPTY(in))
 	{
 		printf("Enter an input file path: ");
 		scanf("%s", in);
@@ -110,6 +114,7 @@ int main(int argc, char **argv)
 
 	/*
 	 * Create a histogram of the bytes in the sFile.
+	 * Sets 0x0 and 0xFF to 1 by default to always construct a tree, regardless of the file.
 	 */
 
 	uint32_t histogram[HIST_LEN] = {0};
@@ -267,7 +272,7 @@ uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileByte
 		uint16_t leaves, treeNode *t, code c[HIST_LEN])
 {
 	int fdOut;
-	if (oFile[0])
+	if (!EMPTY(oFile))
 	{
 		fdOut = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
 	}
@@ -304,7 +309,7 @@ uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileByte
 uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 {
 	int fdIn;
-	if (sFile[0])
+	if (!EMPTY(sFile))
 	{
 		fdIn = open(sFile, O_RDONLY);
 	}
