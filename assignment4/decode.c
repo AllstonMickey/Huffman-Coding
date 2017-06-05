@@ -19,28 +19,29 @@
 # define BITS 8
 # endif
 
-# ifndef GARBAGE_BYTES
-# define GARBAGE_BYTES 1
+# ifndef LAST_BYTE
+# define LAST_BYTE 1
 # endif
 
 # ifndef LINE_FEED
 # define LINE_FEED 0xA
 # endif
 
-uint64_t readSFile(char *file, treeNode **h, bitV **b);
+uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b);
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
+void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v);
+void printStatistics(uint64_t oFileBits, uint16_t leaves);
 
 int main(int argc, char **argv)
 {
-	char in[MAX_BUF] = {'\0'};
-	char out[MAX_BUF] = {'\0'};
+	char in[MAX_BUF] = {'\0'};  // set input path is invalid by default
+	char out[MAX_BUF] = {'\0'}; // set output path is invalid by default
 
 	bool verbose = false;
 	bool pFlag = false;
-	bool cFlag = false;
 
 	int opt;
-	while ((opt = getopt(argc, argv, "i:o:Avpc")) != -1)
+	while ((opt = getopt(argc, argv, "i:o:vp")) != -1)
 	{
 		switch (opt)
 		{
@@ -64,13 +65,6 @@ int main(int argc, char **argv)
 					}
 					break;
 				}
-			case 'A':
-				{
-					verbose = true;
-					pFlag = true;
-					cFlag = true;
-					break;
-				}
 			case 'v':
 				{
 					verbose = true;
@@ -79,11 +73,6 @@ int main(int argc, char **argv)
 			case 'p':
 				{
 					pFlag = true;
-					break;
-				}
-			case 'c':
-				{
-					cFlag = true;
 					break;
 				}
 			case '?':
@@ -103,38 +92,28 @@ int main(int argc, char **argv)
 		scanf("%s", in);
 	}
 
+	uint16_t leafCount;
 	treeNode *huf;
 	bitV *bits;
-	uint64_t oFileSize = readSFile(in, &huf, &bits);
-	//printf("oFileSize: %u\n", oFileSize);
-	int fdOut = open(out, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+	uint64_t oFileSize = readSFile(in, &leafCount, &huf, &bits);
+	
+	writeOFile(out, oFileSize, huf, bits);
+
+	/*int fdOut = open(out, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+
 	if (oFileSize)
 	{
-		uint8_t sym[oFileSize];
+		uint8_t sym[oFileSize]; // collection of symbols decoded
 		uint64_t symLen = 0;
-		printTree(huf, 0);
-		uint64_t lineFeed_i;
-
-		/*
-		 * For each bit of the paths
-		 * 	get the its value
-		 * 	step the tree with the value
-		 * 	write the symbol if there is one
-		 *
-		 */
+		uint64_t lineFeed_i;    // holds the index of the furthest line feed in the file
 
 		treeNode *c = huf;
-		for (int i = 0; i < bits->l / 8 + 1; i += 1)
-		{
-			printf("bits[%d]: %u\n", i, bits->v[i]);
-		}
 		for (uint64_t i = 0; i < bits->l; i += 1)
 		{
 			uint32_t val = ((bits->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
 			int32_t step = stepTree(huf, &c, val);
 			if (step != -1)
 			{
-				printf("step [i]: %u [%d]\n", step, i);
 				if (step == LINE_FEED)
 				{
 					lineFeed_i = symLen;
@@ -144,18 +123,87 @@ int main(int argc, char **argv)
 			}
 		}
 
-		symLen -= GARBAGE_BYTES;
-
-		//printf("symLen: %u\n", symLen);
-		for (uint64_t i = 0; i < lineFeed_i; i += 1)
+		symLen = lineFeed_i + LAST_BYTE;
+		for (uint64_t i = 0; i < symLen; i += 1)
 		{
 			write(fdOut, &sym[i], sizeof(sym[i]));
 		}
 	}
+	*/
+
+	if (verbose)
+	{
+		printStatistics(oFileSize * BITS, leafCount);
+	}
+	if (pFlag)
+	{
+		printTree(huf, 0);
+	}
+
 	return 0;
 }
 
-uint64_t readSFile(char *file, treeNode **h, bitV **b)
+void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
+{
+	int fdOut;
+	if (oFile[0])
+	{
+		fdOut = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+	}
+	else
+	{
+		fdOut = STDIN_FILENO;
+	}
+
+	if (fdOut == -1)
+	{
+		perror("Cannot open output file");
+		return;
+	}
+
+	if (oFileBytes)
+	{
+		uint8_t sym[oFileBytes]; // collection of symbols decoded
+		uint64_t symLen = 0;
+		uint64_t lineFeed_i;    // holds the index of the furthest line feed in the file
+
+		/*
+		 * For each bit read in,
+		 * 	Get its value and step through the tree to the node
+		 * 	If the node is a leaf, add it to the collection of symbols.
+		 */
+
+		treeNode *c = r;
+		for (uint64_t i = 0; i < v->l; i += 1)
+		{
+			uint32_t val = ((v->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
+			int32_t step = stepTree(r, &c, val);
+			if (step != -1)
+			{
+				if (step == LINE_FEED)
+				{
+					lineFeed_i = symLen;
+				}
+				sym[symLen] = step;
+				symLen += 1;
+			}
+		}
+
+		/*
+		 * By POSIX standard, each file ends with a line feed.
+		 * Therefore, only write the bytes up to the line feed
+		 * and the last byte after it.
+		 */
+
+		symLen = lineFeed_i + LAST_BYTE;
+		for (uint64_t i = 0; i < symLen; i += 1)
+		{
+			write(fdOut, &sym[i], sizeof(sym[i]));
+		}
+	}
+}
+
+uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b)
 {
 	int fd = open(file, O_RDONLY);
 	if (fd == -1)
@@ -179,6 +227,7 @@ uint64_t readSFile(char *file, treeNode **h, bitV **b)
 
 	uint16_t treeSize;
 	read(fd, &treeSize, sizeof(treeSize));
+	*leaves = treeSize;
 
 	uint8_t savedTree[treeSize];
 	read(fd, savedTree, treeSize);
@@ -191,7 +240,6 @@ uint64_t readSFile(char *file, treeNode **h, bitV **b)
 	bitV *v = newVec(buffer.st_size * BITS);
 	v->l = read(fd, v->v, buffer.st_size) * BITS;
 	*b = v;
-	//printf("v->l: %u\n", v->l);
 	return oFileBytes;
 }
 
@@ -223,3 +271,8 @@ treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes)
 	return convert(huf);
 }
 
+void printStatistics(uint64_t oFileBits, uint16_t leaves)
+{
+	printf("Original %lu bits: ", oFileBits);
+	printf("leaves %u (%u bytes)\n", leaves, (3 * leaves) - 1);
+}
