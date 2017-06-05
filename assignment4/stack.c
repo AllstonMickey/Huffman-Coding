@@ -2,9 +2,6 @@
 # include <stdio.h>
 # include "stack.h"
 
-/*
- * Allocates a new stack of items
- */
 stack *newStack(uint32_t size)
 {
 	stack *s = (stack *) malloc(sizeof(stack));
@@ -29,11 +26,11 @@ void delStack(stack *s)
 	s = NIL;
 }
 
-/*
- * Removes the top entry
+/* pop:
  *
- * @param s Stack to pop from
- * @return Popped entry
+ * Removes the top item.
+ *
+ * Sets stackItem *i to the popped item.
  */
 bool pop(stack *s, stackItem *i)
 {
@@ -46,11 +43,10 @@ bool pop(stack *s, stackItem *i)
 	return false;
 }
 
-/*
- * Adds an entry to the top
+/* push:
  *
- * @param s Stack to add to
- * @param i Entry to add
+ * Adds an item to the top.
+ * Reallocs an additional 'size' of the stack if it is full.
  */
 bool push(stack *s, stackItem i)
 {
@@ -82,20 +78,5 @@ bool emptyStack(const stack *s)
 bool fullStack(const stack *s)
 {
 	return s->top == s->size;
-}
-
-/*
- * Debugging function to print each entry (address) in the stack,
- * the top of the stack, and the size.
- */
-void printStack(const stack *s)
-{
-	printf("top: %u\n", s->top);
-	printf("size: %u\n", s->size);
-	for (uint32_t i = 0; i < s->size; i += 1)
-	{
-		printf("s->entries[%u]: %c (%u) %lu %u\n", i, (char) s->entries[i].symbol, s->entries[i].symbol,
-				s->entries[i].count, s->entries[i].leaf);
-	}
 }
 

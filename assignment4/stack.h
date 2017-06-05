@@ -31,6 +31,4 @@ bool emptyStack(const stack *s);
 // Is it full?
 bool fullStack(const stack *s);
 
-void printStack(const stack *s);
-
 # endif

@@ -269,3 +269,4 @@ void printStatistics(uint64_t oFileBits, uint16_t leaves)
 	printf("Original %lu bits: ", oFileBits);
 	printf("leaves %u (%u bytes)\n", leaves, (3 * leaves) - 1);
 }
+

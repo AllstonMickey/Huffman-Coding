@@ -177,12 +177,3 @@ void printTree(treeNode *t, int depth)
 	return;
 }
 
-void printNode(treeNode *t)
-{
-	printf("node %p:\n", (void *) t);
-	printf("\tsymbol: %c %u\n", (char) t->symbol, t->symbol);
-	printf("\tcount : %lu\n", t->count);
-	printf("\t*left : %p\n", (void *) t->left);
-	printf("\t*right: %p\n", (void *) t->right);
-}
-

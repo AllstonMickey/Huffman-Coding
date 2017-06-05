@@ -69,7 +69,7 @@ bool enqueue(queue *q, queueItem i)
  * (and thus, greatest priority), is at the root.
  *
  * Dequeue the root and fix the heap with recede()
- * in order to maintain the binary heap properties.
+ * in order to maintain the binary min-heap properties.
  *
  * Returns whether the item was succesfully dequeued or not.
  */

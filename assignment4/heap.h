@@ -17,7 +17,8 @@
 # define rightChild(n) ((2 * (n)) + 1)
 # endif
 
-/* 
+/* percolate:
+ *
  * Sends the item at the end of the queue up the tree
  * until the heap properties are met.
  */
@@ -31,6 +32,10 @@ static inline void percolate(queue *q)
 	}
 }
 
+/* favorite:
+ *
+ * Determines which child of the parent has the highest priority.
+ */
 uint32_t favorite(queue *q, uint32_t p)
 {
 	uint32_t l = leftChild(p);
@@ -38,31 +43,34 @@ uint32_t favorite(queue *q, uint32_t p)
 
 	/*
 	 * Makes sure the node exists before checking the value inside
-	 * Returns the node with highest priority
+	 *
+	 * The right node cannot exist unless there is a left node so
+	 * it is not necessary to check that case.
 	 */
 
-	if (l < q->head && r < q->head) // both nodes exist
+	if (l < q->head && r < q->head) // case 1: both nodes exist
 	{
-		if (VALNODE(q, l) <= VALNODE(q, r)) // left gets priority
+		if (VALNODE(q, l) <= VALNODE(q, r)) // case 1a: left < right
 		{
 			return l;
 		}
-		else
+		else // case 1b: right <= left
 		{
 			return r;
 		}
 	}
-	else if (l < q->head) // only left child exists, return left
+	else if (l < q->head) // case 2: one child (the left)
 	{
 		return l;
 	}
-	else // no child exists, return parent
+	else // case 3: no children
 	{
 		return p;
 	}
 }
 
-/*
+/* recede:
+ *
  * Fixes the heap by checking which of the parent's children has higher priority (if any).
  *
  * Sends the root element down the tree until heap properties are met.
