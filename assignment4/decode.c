@@ -101,6 +101,8 @@ int main(int argc, char **argv)
 		printTree(huf, 0);
 	}
 
+	delVec(bits);
+	delTree(huf);
 	return 0;
 }
 
@@ -176,6 +178,7 @@ treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes)
 		{
 			treeNode *n = newNode(savedTree[i + 1], 0, true);
 			push(s, *n);
+			delNode(n);
 			i += 2;
 		}
 		else // interior node
@@ -185,11 +188,13 @@ treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes)
 			pop(s, &l);
 			treeNode *j = join(convert(l), convert(r));
 			push(s, *j);
+			delNode(j);
 			i += 1;
 		}
 	}
 	treeNode huf;
 	pop(s, &huf);
+	delStack(s);
 	return convert(huf);
 }
 
