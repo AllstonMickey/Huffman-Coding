@@ -30,6 +30,7 @@
 uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b);
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v);
+uint64_t decodeSymbols(uint8_t sym[], uint64_t *lineFeed_i, treeNode *r, bitV *v);
 void printStatistics(uint64_t oFileBits, uint16_t leaves);
 
 int main(int argc, char **argv)
@@ -96,40 +97,40 @@ int main(int argc, char **argv)
 	treeNode *huf;
 	bitV *bits;
 	uint64_t oFileSize = readSFile(in, &leafCount, &huf, &bits);
-	
+
 	writeOFile(out, oFileSize, huf, bits);
 
 	/*int fdOut = open(out, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
 
-	if (oFileSize)
-	{
-		uint8_t sym[oFileSize]; // collection of symbols decoded
-		uint64_t symLen = 0;
-		uint64_t lineFeed_i;    // holds the index of the furthest line feed in the file
+	  if (oFileSize)
+	  {
+	  uint8_t sym[oFileSize]; // collection of symbols decoded
+	  uint64_t symLen = 0;
+	  uint64_t lineFeed_i;    // holds the index of the furthest line feed in the file
 
-		treeNode *c = huf;
-		for (uint64_t i = 0; i < bits->l; i += 1)
-		{
-			uint32_t val = ((bits->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
-			int32_t step = stepTree(huf, &c, val);
-			if (step != -1)
-			{
-				if (step == LINE_FEED)
-				{
-					lineFeed_i = symLen;
-				}
-				sym[symLen] = step;
-				symLen += 1;
-			}
-		}
+	  treeNode *c = huf;
+	  for (uint64_t i = 0; i < bits->l; i += 1)
+	  {
+	  uint32_t val = ((bits->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
+	  int32_t step = stepTree(huf, &c, val);
+	  if (step != -1)
+	  {
+	  if (step == LINE_FEED)
+	  {
+	  lineFeed_i = symLen;
+	  }
+	  sym[symLen] = step;
+	  symLen += 1;
+	  }
+	  }
 
-		symLen = lineFeed_i + LAST_BYTE;
-		for (uint64_t i = 0; i < symLen; i += 1)
-		{
-			write(fdOut, &sym[i], sizeof(sym[i]));
-		}
-	}
-	*/
+	  symLen = lineFeed_i + LAST_BYTE;
+	  for (uint64_t i = 0; i < symLen; i += 1)
+	  {
+	  write(fdOut, &sym[i], sizeof(sym[i]));
+	  }
+	  }
+	  */
 
 	if (verbose)
 	{
@@ -164,30 +165,8 @@ void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
 	if (oFileBytes)
 	{
 		uint8_t sym[oFileBytes]; // collection of symbols decoded
-		uint64_t symLen = 0;
-		uint64_t lineFeed_i;    // holds the index of the furthest line feed in the file
-
-		/*
-		 * For each bit read in,
-		 * 	Get its value and step through the tree to the node
-		 * 	If the node is a leaf, add it to the collection of symbols.
-		 */
-
-		treeNode *c = r;
-		for (uint64_t i = 0; i < v->l; i += 1)
-		{
-			uint32_t val = ((v->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
-			int32_t step = stepTree(r, &c, val);
-			if (step != -1)
-			{
-				if (step == LINE_FEED)
-				{
-					lineFeed_i = symLen;
-				}
-				sym[symLen] = step;
-				symLen += 1;
-			}
-		}
+		uint64_t lineFeed_i;     // index of the furthest line feed in the file
+		uint64_t symLen = decodeSymbols(sym, &lineFeed_i, r, v);
 
 		/*
 		 * By POSIX standard, each file ends with a line feed.
@@ -199,6 +178,31 @@ void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
 		for (uint64_t i = 0; i < symLen; i += 1)
 		{
 			write(fdOut, &sym[i], sizeof(sym[i]));
+		}
+	}
+}
+
+/*
+ * For each bit read in,
+ * 	Get its value and step through the tree to the node
+ * 	If the node is a leaf, add it to the collection of symbols.
+ */
+uint64_t decodeSymbols(uint8_t sym[], uint64_t *lineFeed_i, treeNode *r, bitV *v)
+{
+	uint64_t symLen = 0;
+	treeNode *c = r;
+	for (uint64_t i = 0; i < v->l; i += 1)
+	{
+		uint32_t val = ((v->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
+		int32_t step = stepTree(r, &c, val);
+		if (step != -1)
+		{
+			if (step == LINE_FEED)
+			{
+				*lineFeed_i = symLen;
+			}
+			sym[symLen] = step;
+			symLen += 1;
 		}
 	}
 }
