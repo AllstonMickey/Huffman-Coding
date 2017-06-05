@@ -18,7 +18,7 @@ treeNode *newNode(uint8_t s, uint64_t c, bool l)
 	return (treeNode *) 0;
 }
 
-// Delete a tree of nodes
+// Delete a tree of nodes using post-order traversal.
 void delTree(treeNode *t)
 {
 	if (t == NIL)
@@ -32,7 +32,12 @@ void delTree(treeNode *t)
 }
 
 
-// Dump a Huffman tree onto a file
+/* dumpTree:
+ *
+ * Dump the nodes of a tree onto a file using post-order traversal.
+ * If the node is a leaf, write 'L' followed by its symbol.
+ * Else, it is an interior node, write 'I'.
+ */
 void dumpTree(treeNode *t, int fildes)
 {
 	if (t->leaf)
@@ -49,7 +54,16 @@ void dumpTree(treeNode *t, int fildes)
 	}
 }
 
-// Step through a tree following the code
+/* stepTree:
+ *
+ * Goes down the tree following the value of a bit 'code'.
+ * treeNode **t represents the current node after stepping.
+ * If the bit is 0, traverse left.  Else, traverse right.
+ *
+ * If a leaf is found, return its symbol and reset the
+ * current node back to the root of the tree.
+ *
+ */
 int32_t stepTree(treeNode *root, treeNode **t, uint32_t code)
 {
 	if (code == 0)
@@ -79,7 +93,16 @@ int32_t stepTree(treeNode *root, treeNode **t, uint32_t code)
 	}
 }
 
-// Parse a Huffman tree to build codes
+/* buildCode: 
+ * 
+ * Performs a post-order traversal of the Huffman Tree
+ * using a stack, setting the bit paths of each symbol.
+ *
+ * When traversing left, push 0.
+ * When traversing right, push 1.
+ *
+ * Pop the bit after returning from either traversal.
+ */
 void buildCode(treeNode *t, code s, code table[256])
 {
 	if (t->leaf)
@@ -99,7 +122,13 @@ void buildCode(treeNode *t, code s, code table[256])
 	popCode(&s, &tmp);
 }
 
-// Join two subtrees
+/* join:
+ *
+ * Joins two nodes under one parent node, with its count as
+ * the sum of the left and right childrens' counts.
+ * 
+ * Returns the parent node.
+ */
 treeNode *join(treeNode *l, treeNode *r)
 {
 	treeNode *j = newNode('$', l->count + r->count, false);
@@ -108,6 +137,10 @@ treeNode *join(treeNode *l, treeNode *r)
 	return j;
 }
 
+/* convert:
+ * 
+ * Converts a treeNode to a pointer.
+ */
 treeNode *convert(treeNode t)
 {
 	treeNode *p = newNode(t.symbol, t.count, t.leaf);

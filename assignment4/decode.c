@@ -20,7 +20,7 @@
 # endif
 
 # ifndef LAST_BYTE
-# define LAST_BYTE 1
+# define LAST_BYTE 2
 # endif
 
 # ifndef LINE_FEED
@@ -234,9 +234,13 @@ void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
 		 * Therefore, only write the bytes up to the line feed
 		 * and the last byte after it.
 		 */
-
 		symLen = lineFeed_i + LAST_BYTE;
-		for (uint64_t i = 0; i < symLen; i += 1)
+		
+		printf("symLen: %lu\n", symLen);
+		printf("EOF: %d\n", EOF);
+
+		// oFileBytes: number of bytes in the original file -> write them back
+		for (uint64_t i = 0; i < oFileBytes; i += 1)
 		{
 			write(fdOut, &sym[i], sizeof(sym[i]));
 		}
