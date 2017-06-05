@@ -22,7 +22,7 @@
 uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b);
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v);
-uint64_t decodeSymbols(uint8_t sym[], treeNode *r, bitV *v);
+void decodeSymbols(uint8_t sym[], treeNode *r, bitV *v);
 void printStatistics(uint64_t oFileBits, uint16_t leaves);
 
 int main(int argc, char **argv)
@@ -152,6 +152,7 @@ uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b)
 	bitV *v = newVec(buffer.st_size * BITS);
 	v->l = read(fd, v->v, buffer.st_size) * BITS;
 	*b = v;
+	close(fd);
 	return oFileBytes;
 }
 
@@ -224,13 +225,9 @@ void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
 	{
 		uint8_t sym[oFileBytes]; // collection of symbols decoded
 		decodeSymbols(sym, r, v);
-		
-		// oFileBytes: number of bytes in the original, uncompressed file -> write them back
-		for (uint64_t i = 0; i < oFileBytes; i += 1)
-		{
-			write(fdOut, &sym[i], sizeof(sym[i]));
-		}
+		write(fdOut, sym, oFileBytes);
 	}
+	close(fdOut);
 }
 
 /* decodeSymbols:
@@ -246,23 +243,21 @@ void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
  *
  * Returns the number of symbols decoded.
  */
-uint64_t decodeSymbols(uint8_t sym[], treeNode *r, bitV *v)
+void decodeSymbols(uint8_t sym[], treeNode *r, bitV *v)
 {
-	uint64_t symLen = 0;
+	uint64_t len = 0;
 	treeNode *c = r; // holds the current node after stepping through the tree.  Start at the root.
-
+	
 	for (uint64_t i = 0; i < v->l; i += 1)
 	{
 		uint32_t val = ((v->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
 		int32_t step = stepTree(r, &c, val);
 		if (step != -1) // leaf node
 		{
-			sym[symLen] = step;
-			symLen += 1;
+			sym[len] = step;
+			len += 1;
 		}
 	}
-
-	return symLen;
 }
 
 void printStatistics(uint64_t oFileBits, uint16_t leaves)
