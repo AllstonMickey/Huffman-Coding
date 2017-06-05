@@ -94,7 +94,7 @@ void printStack(const stack *s)
 	printf("size: %u\n", s->size);
 	for (uint32_t i = 0; i < s->size; i += 1)
 	{
-		printf("s->entries[%u]: %c (%u) %u %u\n", i, (char) s->entries[i].symbol, s->entries[i].symbol,
+		printf("s->entries[%u]: %c (%u) %lu %u\n", i, (char) s->entries[i].symbol, s->entries[i].symbol,
 				s->entries[i].count, s->entries[i].leaf);
 	}
 }

@@ -108,15 +108,29 @@ int main(int argc, char **argv)
 		scanf("%s", in);
 	}
 
+	/*
+	 * Create a histogram of the bytes in the sFile.
+	 */
+
 	uint32_t histogram[HIST_LEN] = {0};
 	histogram[0] = 1;
 	histogram[HIST_LEN - 1] = 1;
 	uint64_t inputNBytes = (uint64_t) loadHist(in, histogram);
+
 	if (inputNBytes)
 	{
-		queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index
+		/*
+		 * Enqueue the histogram entries as treeNodes.
+		 * Build the Huffman Tree.
+		 */
+
+		queue *q = newQueue(HIST_LEN + 1); // +1 to account for the empty 0th index of the queue
 		uint16_t leafCount = enqueueHist(&q, histogram);
 		treeNode *huf = buildTree(&q);
+
+		/*
+		 * Create bit paths to each leaf of the Huffman Tree using a stack.
+		 */
 
 		code paths[HIST_LEN];
 		code s = newCode();
@@ -165,6 +179,8 @@ int main(int argc, char **argv)
  *
  * Counts the number of occurrences of each byte in a file,
  * storing them in a histogram.
+ *
+ * Returns the number of bytes read in.
  */
 ssize_t loadHist(char *file, uint32_t hist[HIST_LEN])
 {
@@ -193,6 +209,8 @@ ssize_t loadHist(char *file, uint32_t hist[HIST_LEN])
  * 
  * Enqueues all 'active' entries of the histogram as treeNodes.
  * Priority is determined by the count of each node (the freq. in hist.)
+ *
+ * Returns the number of leaves in the Huffman Tree.
  */
 uint32_t enqueueHist(queue **q, uint32_t hist[HIST_LEN])
 {
@@ -214,6 +232,7 @@ uint32_t enqueueHist(queue **q, uint32_t hist[HIST_LEN])
  *
  * Dequeues two nodes with the smallest counts and joins them under
  * a parent node.  Repeats until one node left in the queue (the root).
+ *
  * Returns the root node of the Huffman Tree as a pointer.
  */
 treeNode *buildTree(queue **q)
@@ -241,6 +260,8 @@ treeNode *buildTree(queue **q)
  * 3. 16 bits of Huffman Tree size
  * 4. Post-order traversal of the tree and visits to interior nodes and leaves
  * 5. Encoded bit paths of the leaves
+ *
+ * Returns the bits of the codes written to the output file.
  */
 uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileBytes,
 		uint16_t leaves, treeNode *t, code c[HIST_LEN])
@@ -277,6 +298,8 @@ uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileByte
 /* dumpCodes:
  *
  * Writes the encoded bit paths of the leaves from the sFile to the oFile.
+ *
+ * Returns the bits of the codes written to the output file.
  */
 uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 {
@@ -300,6 +323,12 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 	fstat(fdIn, &buffer);
 	uint8_t readBytes[buffer.st_size];
 	ssize_t n = read(fdIn, readBytes, buffer.st_size);
+
+	/*
+	 * Create a bit vector which holds the paths to the bytes of the sFile.
+	 * Loop through the bytes in the sFile, lookup the code/path to the current byte,
+	 * and append that code to the bit vector.
+	 */
 
 	bitV *readCodes = newVec(KB);
 	for (int i = 0; i < n; i += 1)

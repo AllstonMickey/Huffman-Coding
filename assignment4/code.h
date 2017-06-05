@@ -1,4 +1,5 @@
-/*
+/* code.h: stack of bits
+ *
  * Author: Darrell Long
  * Course: CMPS 12B Spring 2017
  * Date: 05/23/17

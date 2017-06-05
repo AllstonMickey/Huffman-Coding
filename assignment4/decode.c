@@ -3,8 +3,8 @@
 # include <fcntl.h>     // open
 # include <unistd.h>    // read
 # include <getopt.h>
-# include <string.h>
-# include "bv.h"
+# include <string.h>    // strncpy
+# include "bv.h"        // bit vectors
 # include "stack.h"
 
 # ifndef MAX_BUF
@@ -100,38 +100,6 @@ int main(int argc, char **argv)
 
 	writeOFile(out, oFileSize, huf, bits);
 
-	/*int fdOut = open(out, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
-
-	  if (oFileSize)
-	  {
-	  uint8_t sym[oFileSize]; // collection of symbols decoded
-	  uint64_t symLen = 0;
-	  uint64_t lineFeed_i;    // holds the index of the furthest line feed in the file
-
-	  treeNode *c = huf;
-	  for (uint64_t i = 0; i < bits->l; i += 1)
-	  {
-	  uint32_t val = ((bits->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
-	  int32_t step = stepTree(huf, &c, val);
-	  if (step != -1)
-	  {
-	  if (step == LINE_FEED)
-	  {
-	  lineFeed_i = symLen;
-	  }
-	  sym[symLen] = step;
-	  symLen += 1;
-	  }
-	  }
-
-	  symLen = lineFeed_i + LAST_BYTE;
-	  for (uint64_t i = 0; i < symLen; i += 1)
-	  {
-	  write(fdOut, &sym[i], sizeof(sym[i]));
-	  }
-	  }
-	  */
-
 	if (verbose)
 	{
 		printStatistics(oFileSize * BITS, leafCount);
@@ -144,69 +112,15 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
-{
-	int fdOut;
-	if (oFile[0])
-	{
-		fdOut = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
-	}
-	else
-	{
-		fdOut = STDIN_FILENO;
-	}
-
-	if (fdOut == -1)
-	{
-		perror("Cannot open output file");
-		return;
-	}
-
-	if (oFileBytes)
-	{
-		uint8_t sym[oFileBytes]; // collection of symbols decoded
-		uint64_t lineFeed_i;     // index of the furthest line feed in the file
-		uint64_t symLen = decodeSymbols(sym, &lineFeed_i, r, v);
-
-		/*
-		 * By POSIX standard, each file ends with a line feed.
-		 * Therefore, only write the bytes up to the line feed
-		 * and the last byte after it.
-		 */
-
-		symLen = lineFeed_i + LAST_BYTE;
-		for (uint64_t i = 0; i < symLen; i += 1)
-		{
-			write(fdOut, &sym[i], sizeof(sym[i]));
-		}
-	}
-}
-
-/*
- * For each bit read in,
- * 	Get its value and step through the tree to the node
- * 	If the node is a leaf, add it to the collection of symbols.
+/* readSFile:
+ *
+ * Scans a file to gather information about:
+ * 	magicNumber  Was this file properly encoded?
+ * 	oFileBytes   Size of the original, uncompressed file
+ * 	treeSize     How big is the Huffman Tree (bytes)?
+ * 	savedTree    How was the tree structured? (then reconstructs it)
+ * 	v            What are the bit paths being traversed in the tree to decode this file?
  */
-uint64_t decodeSymbols(uint8_t sym[], uint64_t *lineFeed_i, treeNode *r, bitV *v)
-{
-	uint64_t symLen = 0;
-	treeNode *c = r;
-	for (uint64_t i = 0; i < v->l; i += 1)
-	{
-		uint32_t val = ((v->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
-		int32_t step = stepTree(r, &c, val);
-		if (step != -1)
-		{
-			if (step == LINE_FEED)
-			{
-				*lineFeed_i = symLen;
-			}
-			sym[symLen] = step;
-			symLen += 1;
-		}
-	}
-}
-
 uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b)
 {
 	int fd = open(file, O_RDONLY);
@@ -247,7 +161,19 @@ uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b)
 	return oFileBytes;
 }
 
-// Build a tree from the saved tree
+/* loadTree:
+ *
+ * Takes in an array of characters which represent a
+ * post-order traversal of the Huffman Tree (leaf, leaf, parent).
+ *
+ * An 'L' (leaf) is followed by the symbol of the node.
+ * An 'I' (interior node) has no following symbol.
+ *
+ * Since the array follows post-order traversal, an interior node is
+ * the parent of the two nodes before it. Therefore, we can reconstruct the tree
+ * by pushing leaf nodes onto a stack, popping them when encountering an interior node,
+ * and pushing a joined tree of the left and right trees back onto the stack.
+ */
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes)
 {
 	stack *s = newStack(treeBytes);
@@ -273,6 +199,84 @@ treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes)
 	treeNode huf;
 	pop(s, &huf);
 	return convert(huf);
+}
+
+/* writeOFile:
+ *
+ * Decodes an encoded file.  Writes the decoded file.
+ */
+void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
+{
+	int fdOut;
+	if (oFile[0])
+	{
+		fdOut = open(oFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+	}
+	else
+	{
+		fdOut = STDIN_FILENO;
+	}
+
+	if (fdOut == -1)
+	{
+		perror("Cannot open output file");
+		return;
+	}
+
+	if (oFileBytes)
+	{
+		uint8_t sym[oFileBytes]; // collection of symbols decoded
+		uint64_t lineFeed_i;     // index of the furthest line feed in the file
+		uint64_t symLen = decodeSymbols(sym, &lineFeed_i, r, v);
+
+		/*
+		 * By POSIX standard, each file ends with a line feed.
+		 * Therefore, only write the bytes up to the line feed
+		 * and the last byte after it.
+		 */
+
+		symLen = lineFeed_i + LAST_BYTE;
+		for (uint64_t i = 0; i < symLen; i += 1)
+		{
+			write(fdOut, &sym[i], sizeof(sym[i]));
+		}
+	}
+}
+
+/* decodeSymbols:
+ *
+ * Traverses a Huffman Tree by following the bit paths stored in a vector.
+ * If a leaf node is found, store it in a collection of bytes to be written to the output.
+ *
+ * Also keeps track of the furthest line feed to signal the end of the file by POSIX standards.
+ *
+ * For each bit
+ * 	Step through the tree following the bit's value.
+ * 	If a leaf is encountered, store it.
+ *
+ * Returns the number of symbols decoded.
+ */
+uint64_t decodeSymbols(uint8_t sym[], uint64_t *lineFeed_i, treeNode *r, bitV *v)
+{
+	uint64_t symLen = 0;
+	treeNode *c = r; // holds the current node after stepping through the tree.  Start at the root.
+
+	for (uint64_t i = 0; i < v->l; i += 1)
+	{
+		uint32_t val = ((v->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
+		int32_t step = stepTree(r, &c, val);
+		if (step != -1) // leaf node
+		{
+			if (step == LINE_FEED)
+			{
+				*lineFeed_i = symLen;
+			}
+			sym[symLen] = step;
+			symLen += 1;
+		}
+	}
+
+	return symLen;
 }
 
 void printStatistics(uint64_t oFileBits, uint16_t leaves)
