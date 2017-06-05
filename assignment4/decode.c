@@ -99,67 +99,17 @@ int main(int argc, char **argv)
 	bitV *bits;
 	uint64_t oFileSize = readSFile(in, &huf, &bits);
 	uint8_t s[oFileSize];
-	uint64_t s_i = 0;
-	printf("oFileSize: %u\n", oFileSize);
-	printf("bits->l:   %u\n", bits->l);
-
-	treeNode *c = huf;
-	uint32_t code;
-	uint8_t sym;
-	for (uint64_t i = 0; i < bits->l; i += 1)
-	{
-		printf("%u", i);
-		uint8_t bitVal = ((bits->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
-		printf(" (1)");
-		if (bitVal == 0)
-		{
-			printf(" (2)");
-			if (c->left)
-			{
-				if (c->left->symbol == '$')
-				{
-					printf(" (3)");
-					c = c->left;
-				}
-				else
-				{
-					printf(" (4)");
-					s[s_i++] = c->left->symbol;
-					c = huf;
-				}
-			}
-			else
-			{
-				break;
-			}
-		}
-		else if (bitVal == 1)
-		{
-			printf(" (5)");
-			if (c->right)
-			{
-				if (c->right->symbol == '$')
-				{
-					printf(" (6)");
-					c = c->right;
-				}
-				else
-				{
-					printf(" (7)");
-					s[s_i++] = c->right->symbol;
-					c = huf;
-				}
-			}
-			else
-			{
-				break;
-			}
-		}
-		printf("\n");
-	}
+	printTree(huf, 0);
 	
-	int fdOut = open(out, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
-	write(fdOut, s, sizeof(s[s_i]) * oFileSize);
+	treeNode *c = huf;
+	printNode(c);
+	printf("%d\n", stepTree(huf, &c, 0));
+	printf("%d\n", stepTree(huf, &c, 1));
+	printf("%d\n", stepTree(huf, &c, 1));
+	printf("%d\n", stepTree(huf, &c, 0));
+	//int fdOut = open(out, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+	//write(fdOut, s, sizeof(s));
+
 	return 0;
 }
 

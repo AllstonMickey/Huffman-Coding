@@ -49,10 +49,37 @@ void dumpTree(treeNode *t, int fildes)
 	}
 }
 
-/*
 // Step through a tree following the code
-int32_t stepTree(treeNode *root, treeNode **t, uint32_t code);
-*/
+int32_t stepTree(treeNode *root, treeNode **t, uint32_t code)
+{
+	if (code == 0)
+	{
+		if ((*t)->left)
+		{
+			*t = (*t)->left;
+		}
+	}
+	else
+	{
+		if ((*t)->right)
+		{
+			*t = (*t)->right;
+		}
+	}
+
+	printNode(*t);
+
+	if ((*t)->leaf)
+	{
+		int32_t sym = (*t)->symbol;
+		*t = root;
+		return sym;
+	}
+	else
+	{
+		return -1;
+	}
+}
 
 // Parse a Huffman tree to build codes
 void buildCode(treeNode *t, code s, code table[256])
