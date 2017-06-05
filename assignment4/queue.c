@@ -1,5 +1,10 @@
-/*
- * Implementation of a priority queue as a binary min-heap
+/* Implementation of a priority queue as a binary min-heap
+ * 
+ * Since the Huffman Tree being constructed can only have a maximum
+ * of 256 nodes enqueued, the advantages of the min-heap priority queue are
+ * not emphasized, but a binary min-heap seemed like a challenging yet rewarding
+ * learning experience.  An implementation of a priority queue as a circular array
+ * would have similar time complexities in this instance, but not as beneficial to my education.
  */
 
 # include <stdio.h>
@@ -32,12 +37,14 @@ void delQueue(queue *q)
 	q = NIL;
 }
 
-/*
+/* enqueue:
+ *
  * Adds an item to the queue and puts it in its
  * correct position in the queue, dependent on its priority.
  *
  * Smaller VALNODEs percolate up to the top of the tree.
  *
+ * Returns whether the item was successfully enqueued or not.
  */
 bool enqueue(queue *q, queueItem i)
 {
@@ -56,12 +63,15 @@ bool enqueue(queue *q, queueItem i)
 	return true;
 }
 
-/*
- * Since the queue is a binary heap, the smallest element
+/* dequeue:
+ *
+ * Since the queue is a binary min-heap, the smallest element
  * (and thus, greatest priority), is at the root.
  *
  * Dequeue the root and fix the heap with recede()
  * in order to maintain the binary heap properties.
+ *
+ * Returns whether the item was succesfully dequeued or not.
  */
 bool dequeue(queue *q, queueItem *i)
 {
@@ -90,11 +100,3 @@ bool emptyQueue(queue *q)
 	return q->head == ROOT;
 }
 
-void printQueue(queue *q)
-{
-	printf("Printing queue...\n");
-	for (uint32_t i = 0; i < q->size; i += 1)
-	{
-		printf("pos %u: %lu\n", i, VALNODE(q, i));
-	}
-}

@@ -13,7 +13,7 @@
 # endif
 
 # ifndef VALNODE
-# define VALNODE(q, n) ((q)->nodes[(n)].count)
+# define VALNODE(q, n) ((q)->nodes[n].count)
 # endif
 
 typedef treeNode queueItem;
@@ -40,7 +40,5 @@ bool fullQueue(queue *q);
 
 // Is it empty?
 bool emptyQueue(queue *q);
-
-void printQueue(queue *q);
 
 # endif

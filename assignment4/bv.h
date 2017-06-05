@@ -1,5 +1,4 @@
-/*
- * Interface provided by Darrell Long
+/* Interface provided by Darrell Long
  * Course: CMPS 12B Spring 2017
  */
 
@@ -20,7 +19,7 @@
 typedef struct bitV {
 	uint8_t *v;
 	uint64_t l;
-	uint64_t f; // position to place the next 'inactive' bit
+	uint64_t f; // furthest bit, position to place the next 'inactive' bit
 } bitV;
 
 static inline bitV *newVec(uint64_t len)
@@ -73,6 +72,12 @@ static inline uint8_t valBit(bitV *vec, uint64_t b)
 	return ((vec->v)[b >> 3] & (0x1 << (b % 8))) >> (b % 8);
 }
 
+/* appendCode:
+ *
+ * Appends a stack of bits (code) to a bit vector.
+ * 
+ * Reallocs an additional 4 KB until the vector can store the stack.
+ */
 static inline bool appendCode(bitV *vec, code *c)
 {
 	while ((vec->f + c->l) > vec->l)
@@ -113,23 +118,6 @@ static inline bool appendCode(bitV *vec, code *c)
 static inline uint32_t lenVec(bitV *vec)
 {
 	return vec->l;
-}
-
-static inline void printVec(bitV *vec)
-{
-	printf("here!\n");
-	for (uint32_t i = 0; i < (vec->f); i += 1)
-	{
-		printf("%u", valBit(vec, i));
-		if ((i + 1) % 4 == 0)
-		{
-			printf(" ");
-		}
-		if ((i + 1) % 8 == 0)
-		{
-			printf("\n");
-		}
-	}
 }
 
 # endif
