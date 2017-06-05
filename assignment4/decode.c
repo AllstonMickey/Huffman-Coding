@@ -23,6 +23,10 @@
 # define GARBAGE_BYTES 1
 # endif
 
+# ifndef LINE_FEED
+# define LINE_FEED 0xA
+# endif
+
 uint64_t readSFile(char *file, treeNode **h, bitV **b);
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 
@@ -108,7 +112,8 @@ int main(int argc, char **argv)
 	{
 		uint8_t sym[oFileSize];
 		uint64_t symLen = 0;
-		//printTree(huf, 0);
+		printTree(huf, 0);
+		uint64_t lineFeed_i;
 
 		/*
 		 * For each bit of the paths
@@ -119,22 +124,30 @@ int main(int argc, char **argv)
 		 */
 
 		treeNode *c = huf;
+		for (int i = 0; i < bits->l / 8 + 1; i += 1)
+		{
+			printf("bits[%d]: %u\n", i, bits->v[i]);
+		}
 		for (uint64_t i = 0; i < bits->l; i += 1)
 		{
 			uint32_t val = ((bits->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
 			int32_t step = stepTree(huf, &c, val);
 			if (step != -1)
 			{
-				//printf("step, i: %u %d\n", step, i);
+				printf("step [i]: %u [%d]\n", step, i);
+				if (step == LINE_FEED)
+				{
+					lineFeed_i = symLen;
+				}
 				sym[symLen] = step;
 				symLen += 1;
 			}
 		}
 
-		symLen -= GARBAGE_BYTES; 
+		symLen -= GARBAGE_BYTES;
 
 		//printf("symLen: %u\n", symLen);
-		for (uint64_t i = 0; i < symLen; i += 1)
+		for (uint64_t i = 0; i < lineFeed_i; i += 1)
 		{
 			write(fdOut, &sym[i], sizeof(sym[i]));
 		}
