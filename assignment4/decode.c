@@ -19,18 +19,10 @@
 # define BITS 8
 # endif
 
-# ifndef LAST_BYTE
-# define LAST_BYTE 2
-# endif
-
-# ifndef LINE_FEED
-# define LINE_FEED 0xA
-# endif
-
 uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b);
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v);
-uint64_t decodeSymbols(uint8_t sym[], uint64_t *lineFeed_i, treeNode *r, bitV *v);
+uint64_t decodeSymbols(uint8_t sym[], treeNode *r, bitV *v);
 void printStatistics(uint64_t oFileBits, uint16_t leaves);
 
 int main(int argc, char **argv)
@@ -226,20 +218,9 @@ void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
 	if (oFileBytes)
 	{
 		uint8_t sym[oFileBytes]; // collection of symbols decoded
-		uint64_t lineFeed_i;     // index of the furthest line feed in the file
-		uint64_t symLen = decodeSymbols(sym, &lineFeed_i, r, v);
-
-		/*
-		 * By POSIX standard, each file ends with a line feed.
-		 * Therefore, only write the bytes up to the line feed
-		 * and the last byte after it.
-		 */
-		symLen = lineFeed_i + LAST_BYTE;
+		decodeSymbols(sym, r, v);
 		
-		printf("symLen: %lu\n", symLen);
-		printf("EOF: %d\n", EOF);
-
-		// oFileBytes: number of bytes in the original file -> write them back
+		// oFileBytes: number of bytes in the original, uncompressed file -> write them back
 		for (uint64_t i = 0; i < oFileBytes; i += 1)
 		{
 			write(fdOut, &sym[i], sizeof(sym[i]));
@@ -260,7 +241,7 @@ void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
  *
  * Returns the number of symbols decoded.
  */
-uint64_t decodeSymbols(uint8_t sym[], uint64_t *lineFeed_i, treeNode *r, bitV *v)
+uint64_t decodeSymbols(uint8_t sym[], treeNode *r, bitV *v)
 {
 	uint64_t symLen = 0;
 	treeNode *c = r; // holds the current node after stepping through the tree.  Start at the root.
@@ -271,10 +252,6 @@ uint64_t decodeSymbols(uint8_t sym[], uint64_t *lineFeed_i, treeNode *r, bitV *v
 		int32_t step = stepTree(r, &c, val);
 		if (step != -1) // leaf node
 		{
-			if (step == LINE_FEED)
-			{
-				*lineFeed_i = symLen;
-			}
 			sym[symLen] = step;
 			symLen += 1;
 		}
