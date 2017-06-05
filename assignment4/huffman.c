@@ -67,8 +67,6 @@ int32_t stepTree(treeNode *root, treeNode **t, uint32_t code)
 		}
 	}
 
-	printNode(*t);
-
 	if ((*t)->leaf)
 	{
 		int32_t sym = (*t)->symbol;

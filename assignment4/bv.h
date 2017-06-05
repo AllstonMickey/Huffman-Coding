@@ -117,6 +117,7 @@ static inline uint32_t lenVec(bitV *vec)
 
 static inline void printVec(bitV *vec)
 {
+	printf("here!\n");
 	for (uint32_t i = 0; i < (vec->f); i += 1)
 	{
 		printf("%u", valBit(vec, i));

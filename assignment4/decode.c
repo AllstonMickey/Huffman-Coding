@@ -19,6 +19,10 @@
 # define BITS 8
 # endif
 
+# ifndef GARBAGE_BYTES
+# define GARBAGE_BYTES 1
+# endif
+
 uint64_t readSFile(char *file, treeNode **h, bitV **b);
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 
@@ -98,18 +102,43 @@ int main(int argc, char **argv)
 	treeNode *huf;
 	bitV *bits;
 	uint64_t oFileSize = readSFile(in, &huf, &bits);
-	uint8_t s[oFileSize];
-	printTree(huf, 0);
-	
-	treeNode *c = huf;
-	printNode(c);
-	printf("%d\n", stepTree(huf, &c, 0));
-	printf("%d\n", stepTree(huf, &c, 1));
-	printf("%d\n", stepTree(huf, &c, 1));
-	printf("%d\n", stepTree(huf, &c, 0));
-	//int fdOut = open(out, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
-	//write(fdOut, s, sizeof(s));
+	//printf("oFileSize: %u\n", oFileSize);
+	int fdOut = open(out, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU | S_IRGRP | S_IROTH);
+	if (oFileSize)
+	{
+		uint8_t sym[oFileSize];
+		uint64_t symLen = 0;
+		//printTree(huf, 0);
 
+		/*
+		 * For each bit of the paths
+		 * 	get the its value
+		 * 	step the tree with the value
+		 * 	write the symbol if there is one
+		 *
+		 */
+
+		treeNode *c = huf;
+		for (uint64_t i = 0; i < bits->l; i += 1)
+		{
+			uint32_t val = ((bits->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
+			int32_t step = stepTree(huf, &c, val);
+			if (step != -1)
+			{
+				//printf("step, i: %u %d\n", step, i);
+				sym[symLen] = step;
+				symLen += 1;
+			}
+		}
+
+		symLen -= GARBAGE_BYTES; 
+
+		//printf("symLen: %u\n", symLen);
+		for (uint64_t i = 0; i < symLen; i += 1)
+		{
+			write(fdOut, &sym[i], sizeof(sym[i]));
+		}
+	}
 	return 0;
 }
 
@@ -124,8 +153,6 @@ uint64_t readSFile(char *file, treeNode **h, bitV **b)
 
 	uint32_t magicNumber;
 	read(fd, &magicNumber, sizeof(magicNumber));
-
-	printf("Magic number: %u\n", magicNumber);
 
 	if (magicNumber != MAGIC_NUM)
 	{
@@ -148,10 +175,10 @@ uint64_t readSFile(char *file, treeNode **h, bitV **b)
 	struct stat buffer;
 	fstat(fd, &buffer);
 
-	uint64_t leftover =  buffer.st_size - (sizeof(oFileBytes) + sizeof(treeSize) + treeSize);
-	bitV *v = newVec(leftover * BITS);
-	read(fd, v->v, leftover);
+	bitV *v = newVec(buffer.st_size * BITS);
+	v->l = read(fd, v->v, buffer.st_size) * BITS;
 	*b = v;
+	//printf("v->l: %u\n", v->l);
 	return oFileBytes;
 }
 
