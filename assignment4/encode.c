@@ -1,3 +1,6 @@
+/* Huffman Encode Algorithm Implementation
+ */
+
 # include <sys/types.h> // fstat
 # include <sys/stat.h>  // fstat
 # include <fcntl.h>     // fstat
@@ -28,7 +31,7 @@ ssize_t loadHist(char *file, uint32_t hist[HIST_LEN]);
 uint32_t enqueueHist(queue **q, uint32_t hist[HIST_LEN]);
 treeNode *buildTree(queue **q);
 uint64_t writeOFile(char oFile[MAX_BUF], char sFile[MAX_BUF], uint64_t sFileBytes,
-		uint16_t leaves, treeNode *t, code c[HIST_LEN]);
+			uint16_t leaves, treeNode *t, code c[HIST_LEN]);
 uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN]);
 void printStatistics(uint64_t sFileBits, uint64_t oFileBits, uint16_t leaves);
 
@@ -198,14 +201,17 @@ ssize_t loadHist(char *file, uint32_t hist[HIST_LEN])
 
 	struct stat buffer;
 	fstat(fd, &buffer);
-	uint8_t symbol[buffer.st_size];
-	ssize_t n = read(fd, symbol, buffer.st_size);
+	//uint8_t symbol[buffer.st_size];
+	uint8_t *sym = (uint8_t *) calloc(buffer.st_size, sizeof(uint8_t));
+	ssize_t n = read(fd, sym, buffer.st_size);
 
 	for (ssize_t i = 0; i < buffer.st_size; i += 1)
 	{
-		hist[symbol[i]] += 1;
+		hist[sym[i]] += 1;
 	}
 
+	free(sym);
+	sym = NIL;
 	close(fd);
 	return n;
 }
@@ -326,7 +332,7 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 
 	struct stat buffer;
 	fstat(fdIn, &buffer);
-	uint8_t readBytes[buffer.st_size];
+	uint8_t *readBytes = (uint8_t *) calloc(buffer.st_size, sizeof(uint8_t));
 	ssize_t n = read(fdIn, readBytes, buffer.st_size);
 
 	/*
@@ -344,6 +350,8 @@ uint64_t dumpCodes(int outputFildes, char sFile[MAX_BUF], code c[HIST_LEN])
 	uint64_t bvSize = sizeof(readCodes->v[0]) * (readCodes->f / BITS + 1);
 	write(outputFildes, readCodes->v, bvSize);
 	
+	free(readBytes);
+	readBytes = NIL;
 	close(fdIn);
 	uint64_t oFileBits = readCodes->f;
 	delVec(readCodes);

@@ -1,12 +1,50 @@
-Idea for generic stacks:
-	Each data structure should be represented as sections of bits within the stack.
-	
-For each bit in the data structure (using sizeof*8), we can push each individual bit, either
-a zero or a one.  We have these cases implemented in bv.h, bf.h, and now code.h.  They are nearly
-identical concepts.  To do so, two push functions must be made.  One which takes any item as its second
-parameter, and the other which pushes single bits, taken as a bool parameter.  The first push function
-repeatedly calls the second.  This allows pushing of 8 bit integers and single bits, including every
-possible data structure, since computers will represent them ultimately as ones and zeros.
+Files:
+bv.h
+code.h
+decode.c
+encode.c
+heap.h
+huffman.c, huffman.h
+queue.c, queue.h
+stack.c, stack.h
+Makefile
 
-To pop the items off, all you need to know is the data type being popped off, and then pop the bits off,
-in partitions of width equal to the number of bits of the data type.
+How to compile & run:
+'make' or 'make all': compiles the encode and decode programs. 
+'make encode':        compiles the encode program.
+'make decode':        compiles the decode program.
+'make clean':         remove the object files and encode/decode programs
+'./encode <flags>':   Run the encode program.
+'./decode <flags>':   Run the decode program.
+
+Flags:
+[REQUIRED]
+	-i <path>: full path to the input file
+[OPTIONAL]
+	-o <path>: full path to the output file
+	-A:  . . . Sets all flags (-vp, -ch if available)
+	-v:  . . . Enable verbose mode - prints statistics about the program
+	-p:  . . . Prints the Huffman Tree
+	-c:  . . . (./encode only) Prints the codes/bit paths to each leaf in the Huffman Tree
+	-h:  . . . (./encode only) Prints the histogram of bytes
+
+Description:
+These programs encode/decode any file by using the greedy Huffman Algorithm.
+[encoding]
+	Construct a histogram of the bytes in a file.
+	Enqueue each histogram entry as a node in the Huffman Tree.
+	Repeatedly dequeue 2X and enqueue until the root of the tree is remaining.
+	Load the codes for each leaf by a post-order traversal of the tree, assigning
+	    a 0 when traversing left and a 1 when traversing right.  Store the codes in
+	    a bit vector for maximum efficiency.
+	Write the tree and the paths to each leaf to an encoded output file.
+
+[decode]
+	Read the encoded file.
+	Reconstruct the Huffman Tree with a stack.
+	For each byte in the original, uncompressed file, look up its code and step through the tree.
+	Write the bytes back to a decoded output file.
+
+Using both programs, any file can be encoded and then decoded back to an exact copy of the original.
+Note that the default permissions to a file are 0744 (-rwxr--r--).
+You may change these on your own if they do not suit what you intended.

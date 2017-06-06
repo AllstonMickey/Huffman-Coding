@@ -1,3 +1,6 @@
+/* Huffman Decode Algorithm Implementation
+ */
+
 # include <sys/types.h> // open
 # include <sys/stat.h>  // open
 # include <fcntl.h>     // open
@@ -26,7 +29,7 @@
 uint64_t readSFile(char *file, uint16_t *leaves, treeNode **h, bitV **b);
 treeNode *loadTree(uint8_t savedTree[], uint16_t treeBytes);
 void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v);
-void decodeSymbols(uint8_t sym[], treeNode *r, bitV *v);
+void decodeSymbols(uint8_t sym[], uint64_t oFileBytes, treeNode *r, bitV *v);
 void printStatistics(uint64_t oFileBits, uint16_t leaves);
 
 int main(int argc, char **argv)
@@ -92,10 +95,10 @@ int main(int argc, char **argv)
 	uint16_t leafCount;
 	treeNode *huf;
 	bitV *bits;
+	
 	uint64_t oFileSize = readSFile(in, &leafCount, &huf, &bits);
-
 	writeOFile(out, oFileSize, huf, bits);
-
+	
 	if (verbose)
 	{
 		printStatistics(oFileSize * BITS, leafCount);
@@ -227,9 +230,11 @@ void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
 
 	if (oFileBytes)
 	{
-		uint8_t sym[oFileBytes]; // collection of symbols decoded
-		decodeSymbols(sym, r, v);
+		uint8_t *sym = (uint8_t *) calloc(oFileBytes, sizeof(uint8_t));
+		decodeSymbols(sym, oFileBytes, r, v);
 		write(fdOut, sym, oFileBytes);
+		free(sym);
+		sym = NIL;
 	}
 	close(fdOut);
 }
@@ -247,20 +252,22 @@ void writeOFile(char oFile[MAX_BUF], uint64_t oFileBytes, treeNode *r, bitV *v)
  *
  * Returns the number of symbols decoded.
  */
-void decodeSymbols(uint8_t sym[], treeNode *r, bitV *v)
+void decodeSymbols(uint8_t sym[], uint64_t oFileBytes, treeNode *r, bitV *v)
 {
-	uint64_t len = 0;
-	treeNode *c = r; // holds the current node after stepping through the tree.  Start at the root.
-	
-	for (uint64_t i = 0; i < v->l; i += 1)
+	treeNode *c = r;    // holds the current node after stepping through the tree.  Start at the root.
+	uint64_t len = 0;   // position to store the next symbol
+	uint64_t bit_i = 0; // position of the current bit
+
+	while (len < oFileBytes)
 	{
-		uint32_t val = ((v->v)[i >> 3] & (0x1 << (i % 8))) >> (i % 8);
+		uint32_t val = ((v->v)[bit_i >> 3] & (0x1 << (bit_i % 8))) >> (bit_i % 8);
 		int32_t step = stepTree(r, &c, val);
 		if (step != -1) // leaf node
 		{
 			sym[len] = step;
 			len += 1;
 		}
+		bit_i += 1;
 	}
 }
 
