@@ -35,20 +35,41 @@ int main(int argc, char **argv)
 	
 	uint64_t counter = 0;
 
+	pthread_t threads[threadCount];
+
+	/* Initialize the mutex.
+	 */
+	pthread_mutex_init(&mutex, NULL);
+
 	for (int i = 0; i < threadCount; i += 1)
 	{
-		pthread_t thread;
-		pthread_mutex_init(&mutex, NULL); // initialize mutex
-		pthread_create(&thread, NULL, threadFunc, &counter); // create a thread
-		pthread_join(thread, NULL); // wait for the thread to be done doing whatever
-		pthread_mutex_destroy(&mutex); // destroy the mutex
+		/* pthread_create:
+		 * 
+		 * @param thread     The thread to initialize.
+		 * @param NULL       Set default attributes to the thread.
+		 * @param threadFunc A void pointer to a function that the thread will execute.
+		 * @param counter    Any argument that the thread will need to use in execution.
+		 */
+		pthread_create(&threads[i], NULL, threadFunc, &counter);
 	}
+	for (int i = 0; i < threadCount; i += 1)
+	{
+		pthread_join(threads[i], NULL);
+
+	}
+	pthread_mutex_destroy(&mutex);
 
 	printf("%u\n", counter);
 
 	return 0;
 }
 
+/* threadFunc:
+ *
+ * Serves as the entry point for the thread (taken as a pointer in pthread_create)
+ *
+ * @param arg: any argument being passed by the thread
+ */
 void *threadFunc(void *arg)
 {
 	uint32_t *n = (uint32_t *) arg;
@@ -56,6 +77,7 @@ void *threadFunc(void *arg)
 	{
 		incr(n);
 	}
+	return NULL;
 }
 
 void incr(uint32_t *n)
