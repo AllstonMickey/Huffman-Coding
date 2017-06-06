@@ -33,15 +33,12 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	uint64_t counter = 0;
+	uint64_t counter = 0; // Argument to be passed to the thread.
+	pthread_mutex_init(&mutex, NULL); // Initialize the mutex.	
+	pthread_t threads[threadCount]; // Declare the requested threads.
 
-	pthread_t threads[threadCount];
-
-	/* Initialize the mutex.
-	 */
-	pthread_mutex_init(&mutex, NULL);
-
-	for (int i = 0; i < threadCount; i += 1)
+	// Initialize the threads.
+	for (uint32_t i = 0; i < threadCount; i += 1)
 	{
 		/* pthread_create:
 		 * 
@@ -52,14 +49,17 @@ int main(int argc, char **argv)
 		 */
 		pthread_create(&threads[i], NULL, threadFunc, &counter);
 	}
-	for (int i = 0; i < threadCount; i += 1)
+
+	// Wait for each thread to be done executing.
+	for (uint32_t i = 0; i < threadCount; i += 1)
 	{
 		pthread_join(threads[i], NULL);
 
 	}
-	pthread_mutex_destroy(&mutex);
 
-	printf("%u\n", counter);
+	pthread_mutex_destroy(&mutex); // Done with multithreading, destroy the mutex.
+
+	printf("%lu\n", counter);
 
 	return 0;
 }
