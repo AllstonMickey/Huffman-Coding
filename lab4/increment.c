@@ -7,9 +7,18 @@
 uint8_t enableMutex = 0;
 pthread_mutex_t mutex;
 
-void *threadFunc(void *arg);
-void incr(uint32_t *n);
+void *threadFunc(void *args);
+void increment(uint32_t *n);
 
+/* threadIncr:
+ *
+ * increments the count by the number of iterations
+ */
+struct threadIncr
+{
+	uint32_t iters;
+	uint32_t count;
+};
 
 int main(int argc, char **argv)
 {
@@ -40,10 +49,11 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	uint64_t counter = 0; // Argument to be passed to the thread.
+	
 	pthread_mutex_init(&mutex, NULL); // Initialize the mutex.	
-	pthread_t threads[threadCount]; // Declare the requested threads.
-
+	struct threadIncr incr = { .iters = 1000, .count = 0 };
+	pthread_t *threads = (pthread_t *) calloc(threadCount, sizeof(pthread_t));
+	
 	// Initialize the threads.
 	for (uint32_t i = 0; i < threadCount; i += 1)
 	{
@@ -54,7 +64,7 @@ int main(int argc, char **argv)
 		 * @param threadFunc A void pointer to a function that the thread will execute.
 		 * @param counter    Any argument that the thread will need to use in execution.
 		 */
-		pthread_create(&threads[i], NULL, threadFunc, &counter);
+		pthread_create(&threads[i], NULL, threadFunc, &incr);
 	}
 
 	// Wait for each thread to be done executing.
@@ -66,7 +76,7 @@ int main(int argc, char **argv)
 
 	pthread_mutex_destroy(&mutex); // Done with multithreading, destroy the mutex.
 
-	printf("%lu\n", counter);
+	printf("%u\n", incr.count);
 
 	return 0;
 }
@@ -77,17 +87,17 @@ int main(int argc, char **argv)
  *
  * @param arg: any argument being passed by the thread
  */
-void *threadFunc(void *arg)
+void *threadFunc(void *args)
 {
-	uint32_t *n = (uint32_t *) arg;
-	for (uint16_t i = 0; i < 1000; i += 1)
+	struct threadIncr *arg = (struct threadIncr *) args;
+	for (uint16_t i = 0; i < arg->iters; i += 1)
 	{
-		incr(n);
+		increment(&arg->count);
 	}
 	return NULL;
 }
 
-void incr(uint32_t *n)
+void increment(uint32_t *n)
 {
 	if (enableMutex)
 	{

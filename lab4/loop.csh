@@ -6,3 +6,4 @@ foreach i (`seq 100`)
 diff noMutex.txt yesMutex.txt
 echo '\n'
 end
+rm noMutex.txt yesMutex.txt
