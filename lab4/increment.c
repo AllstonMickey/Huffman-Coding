@@ -4,22 +4,29 @@
 # include <stdint.h>
 # include <stdio.h>
 
+uint8_t enableMutex = 0;
 pthread_mutex_t mutex;
 
 void *threadFunc(void *arg);
 void incr(uint32_t *n);
 
+
 int main(int argc, char **argv)
 {
 	uint32_t threadCount = 1;
 	int opt;
-	while ((opt = getopt(argc, argv, "n:")) != -1)
+	while ((opt = getopt(argc, argv, "n:m")) != -1)
 	{
 		switch (opt)
 		{
 			case 'n':
 			{
 				threadCount = atoi(optarg);
+				break;
+			}
+			case 'm':
+			{
+				enableMutex = 1;
 				break;
 			}
 			case '?':
@@ -82,7 +89,14 @@ void *threadFunc(void *arg)
 
 void incr(uint32_t *n)
 {
-	pthread_mutex_lock(&mutex);
-	*n += 1;
-	pthread_mutex_unlock(&mutex);
+	if (enableMutex)
+	{
+		pthread_mutex_lock(&mutex);
+		*n += 1;
+		pthread_mutex_unlock(&mutex);
+	}
+	else
+	{
+		*n += 1;
+	}
 }
