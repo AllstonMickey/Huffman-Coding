@@ -4,13 +4,12 @@
 # include <stdint.h>
 # include <stdio.h>
 
-uint8_t enableMutex = 0;
 pthread_mutex_t mutex;
 
 void *incrementThread(void *args);
 void incrementVal(uint32_t *n);
 
-/* thread:
+/* threadCounter:
  *
  * holds a counter and the number of iterations to increment
  */
@@ -22,20 +21,15 @@ struct threadCounter
 
 int main(int argc, char **argv)
 {
-	uint32_t threadCount = 1;
+	uint32_t nthreads = 0;
 	int opt;
-	while ((opt = getopt(argc, argv, "n:m")) != -1)
+	while ((opt = getopt(argc, argv, "n:")) != -1)
 	{
 		switch (opt)
 		{
 			case 'n':
 			{
-				threadCount = atoi(optarg);
-				break;
-			}
-			case 'm':
-			{
-				enableMutex = 1;
+				nthreads = atoi(optarg);
 				break;
 			}
 			case '?':
@@ -48,14 +42,19 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-	
-	
-	pthread_mutex_init(&mutex, NULL); // Initialize the mutex.	
-	struct threadCounter tc = { .iters = 1000, .count = 0 }; // create the struct of arguments to pass to each thread
-	pthread_t *threads = (pthread_t *) calloc(threadCount, sizeof(pthread_t));
+
+	while (nthreads == 0)
+	{
+		printf("Specify the number of threads to run (> 0): ");
+		scanf("%u", &nthreads);
+	}
+
+	pthread_mutex_init(&mutex, NULL); // Initialize the mutex.
+	struct threadCounter tc = { .iters = 1000, .count = 0 }; // Create the struct of arguments to pass to each thread.
+	pthread_t *threads = (pthread_t *) calloc(nthreads, sizeof(pthread_t)); // Allocate memory for the threads.
 	
 	// Initialize the threads and increment the counter.
-	for (uint32_t i = 0; i < threadCount; i += 1)
+	for (uint32_t i = 0; i < nthreads; i += 1)
 	{
 		/* pthread_create:
 		 * 
@@ -68,7 +67,7 @@ int main(int argc, char **argv)
 	}
 
 	// Wait for each thread to be done executing.
-	for (uint32_t i = 0; i < threadCount; i += 1)
+	for (uint32_t i = 0; i < nthreads; i += 1)
 	{
 		pthread_join(threads[i], NULL);
 
@@ -81,7 +80,7 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-/* threadIncr:
+/* incrementThread:
  *
  * Increments the count in the thread by the number of iterations.
  *
@@ -99,14 +98,7 @@ void *incrementThread(void *args)
 
 void incrementVal(uint32_t *n)
 {
-	if (enableMutex)
-	{
-		pthread_mutex_lock(&mutex);
-		*n += 1;
-		pthread_mutex_unlock(&mutex);
-	}
-	else
-	{
-		*n += 1;
-	}
+	pthread_mutex_lock(&mutex);
+	*n += 1;
+	pthread_mutex_unlock(&mutex);
 }
