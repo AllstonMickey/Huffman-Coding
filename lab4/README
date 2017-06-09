@@ -1,0 +1,26 @@
+// explain functioning of program
+// design choices
+// meaning of mutex
+// meaning of race condition
+Files:
+increment.c
+Makefile
+
+How to Compile & Run:
+'./make', './make all', and './make increment' compile the program.
+'./make clean' removes extraneous object and binary files created during compilation.
+'./increment -n <nthread>' runs the program with nthread number of threads.  The -n argument is required.
+
+Description:
+This program increments a counter initialized at 0.  Each thread calls a function which increments
+the counter through 1000 iterations.  The number of threads to spawn is specified by the -n argument.
+
+
+
+A mutex is a structure with a value that signals to other concurrent threads if
+it is currently active in a critical section or not.  This prevents a shared variable
+being modified by concurrent threads until the ongoing thread has completed its execution.
+
+A race condition is when a shared variable is being modified by multiple threads at once in a
+critical section, causing the threads to "race" each other to modify the variable before the others.
+If this happens, the resulting behavior is not deterministic and some data may be lost due.
