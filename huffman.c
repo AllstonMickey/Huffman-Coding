@@ -149,6 +149,7 @@ treeNode *convert(treeNode t)
 	return p;
 }
 
+// credit: DDEL
 void printTree(treeNode *t, int depth)
 {
 	if (t)
