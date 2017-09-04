@@ -18,15 +18,15 @@ make | Compiles the encode and decode programs.
 make all | Compiles the encode and decode programs. 
 make encode | Compiles the encode program.
 make decode | Compiles the decode program.
-make clean | Remove the object files and encode/decode programs
-./encode [flags] | Run the encode program.
-./decode [flags] | Run the decode program.
+make clean | Remove the object files and encode/decode binaries
+./encode _[flags]_ | Run the encode program.
+./decode _[flags]_ | Run the decode program.
 
 ## Flags:
 Argument(s) | Description | Coding Type
 --- | --- | ---
--i [path] | Full path to the input file | Both **_[REQUIRED]_**
--o [path] | Full path to the output file | Both
+-i _[path]_ | Full path to the input file | Both **_[REQUIRED]_**
+-o _[path]_ | Full path to the output file | Both
 -A | Sets all flags (-vp, -ch if available) | Both
 -v | Enable verbose mode - prints statistics about the program | Both
 -p | Prints the Huffman Tree | Both
