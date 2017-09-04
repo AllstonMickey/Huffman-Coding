@@ -25,7 +25,7 @@ make clean | Remove the object files and encode/decode programs
 ## Flags:
 Argument(s) | Description | Coding Type
 --- | --- | ---
-**-i [path] | Full path to the input file** | Both [REQUIRED]
+-i [path] | Full path to the input file | Both **_[REQUIRED]_**
 -o [path] | Full path to the output file | Both
 -A | Sets all flags (-vp, -ch if available) | Both
 -v | Enable verbose mode - prints statistics about the program | Both
